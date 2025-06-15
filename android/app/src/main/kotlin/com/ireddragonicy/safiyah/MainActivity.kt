@@ -1,4 +1,4 @@
-package com.ireddragonicy.safiyah.safiyah
+package com.ireddragonicy.safiyah
 
 import io.flutter.embedding.android.FlutterActivity
 
