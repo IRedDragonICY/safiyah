@@ -1,5 +1,7 @@
+// routes/route_names.dart
 class RouteNames {
   static const String splash = '/splash';
+  static const String onboarding = '/onboarding';
   static const String login = '/auth/login';
   static const String register = '/auth/register';
 

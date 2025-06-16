@@ -1,9 +1,12 @@
+// main.dart
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:safiyah/presentation/bloc/home/home_event.dart';
+import 'package:safiyah/presentation/bloc/onboarding/onboarding_bloc.dart';
+import 'package:safiyah/presentation/bloc/onboarding/onboarding_event.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import 'app.dart';
@@ -68,6 +71,9 @@ class SafiyahApp extends StatelessWidget {
       ],
       child: MultiBlocProvider(
         providers: [
+          BlocProvider<OnboardingBloc>(
+            create: (context) => OnboardingBloc()..add(CheckOnboardingStatus()),
+          ),
           BlocProvider<AuthBloc>(
             create: (context) => AuthBloc(
               authRepository: context.read<AuthRepository>(),

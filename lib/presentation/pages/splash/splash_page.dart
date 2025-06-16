@@ -1,6 +1,9 @@
+// presentation/pages/splash/splash_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safiyah/presentation/bloc/onboarding/onboarding_bloc.dart';
+import 'package:safiyah/presentation/bloc/onboarding/onboarding_state.dart';
 
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/strings.dart';
@@ -15,8 +18,7 @@ class SplashPage extends StatefulWidget {
   State<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage>
-    with TickerProviderStateMixin {
+class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   late AnimationController _logoController;
   late AnimationController _textController;
   late Animation<double> _logoAnimation;
@@ -53,7 +55,6 @@ class _SplashPageState extends State<SplashPage>
     ));
 
     _startAnimations();
-    _checkAuthStatus();
   }
 
   void _startAnimations() async {
@@ -64,25 +65,34 @@ class _SplashPageState extends State<SplashPage>
     _textController.forward();
   }
 
-  void _checkAuthStatus() async {
-    await Future.delayed(const Duration(milliseconds: 2500));
-    if (mounted) {
-      context.read<AuthBloc>().add(const CheckAuthStatus());
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthAuthenticated || state is AuthGuest) {
-            context.go('/');
-          } else if (state is AuthUnauthenticated) {
-            context.go('/auth/login');
-          }
-        },
-        child: Container(
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<OnboardingBloc, OnboardingState>(
+          listener: (context, state) async {
+            await Future.delayed(const Duration(milliseconds: 2500));
+            if (mounted) {
+              if (state is OnboardingShow) {
+                context.go('/onboarding');
+              } else if (state is OnboardingCompleted) {
+                context.read<AuthBloc>().add(const CheckAuthStatus());
+              }
+            }
+          },
+        ),
+        BlocListener<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is AuthAuthenticated || state is AuthGuest) {
+              context.go('/');
+            } else if (state is AuthUnauthenticated) {
+              context.go('/auth/login');
+            }
+          },
+        ),
+      ],
+      child: Scaffold(
+        body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -151,10 +161,10 @@ class _SplashPageState extends State<SplashPage>
             child: Text(
               AppStrings.appName,
               style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
-              ),
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                  ),
             ),
           ),
         );
@@ -173,9 +183,9 @@ class _SplashPageState extends State<SplashPage>
             child: Text(
               AppStrings.appTagline,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Colors.white.withOpacity(0.9),
-                fontWeight: FontWeight.w300,
-              ),
+                    color: Colors.white.withOpacity(0.9),
+                    fontWeight: FontWeight.w300,
+                  ),
               textAlign: TextAlign.center,
             ),
           ),

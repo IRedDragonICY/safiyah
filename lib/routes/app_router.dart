@@ -1,10 +1,14 @@
+// routes/app_router.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safiyah/presentation/pages/onboarding/onboarding_page.dart';
 
+import '../presentation/pages/home/home_page.dart';
+import '../presentation/pages/settings/settings_page.dart';
 import '../presentation/pages/splash/splash_page.dart';
 import '../presentation/pages/auth/login_page.dart';
 import '../presentation/pages/auth/register_page.dart';
-import '../presentation/pages/home/home_page.dart';
+import '../presentation/pages/main_navigation_wrapper.dart';
 import '../presentation/pages/prayer/prayer_times_page.dart';
 import '../presentation/pages/prayer/qibla_page.dart';
 import '../presentation/pages/places/places_map_page.dart';
@@ -13,7 +17,6 @@ import '../presentation/pages/itinerary/itinerary_list_page.dart';
 import '../presentation/pages/itinerary/create_itinerary_page.dart';
 import '../presentation/pages/itinerary/itinerary_detail_page.dart';
 import '../presentation/pages/ar/ar_navigation_page.dart';
-import '../presentation/pages/settings/settings_page.dart';
 import '../data/models/place_model.dart';
 import 'route_names.dart';
 
@@ -27,6 +30,11 @@ class AppRouter {
         builder: (context, state) => const SplashPage(),
       ),
       GoRoute(
+        path: RouteNames.onboarding,
+        name: 'onboarding',
+        builder: (context, state) => const OnboardingPage(),
+      ),
+      GoRoute(
         path: RouteNames.login,
         name: 'login',
         builder: (context, state) => const LoginPage(),
@@ -36,40 +44,57 @@ class AppRouter {
         name: 'register',
         builder: (context, state) => const RegisterPage(),
       ),
-      GoRoute(
-        path: RouteNames.home,
-        name: 'home',
-        builder: (context, state) => const MainNavigationWrapper(),
-      ),
-      GoRoute(
-        path: RouteNames.prayer,
-        name: 'prayer',
-        builder: (context, state) => const PrayerTimesPage(),
+      ShellRoute(
+        builder: (context, state, child) {
+          return MainNavigationWrapper(child: child);
+        },
+        routes: [
+          GoRoute(
+            path: RouteNames.home,
+            name: 'home',
+            builder: (context, state) => const HomePage(),
+          ),
+          GoRoute(
+            path: RouteNames.prayer,
+            name: 'prayer',
+            builder: (context, state) => const PrayerTimesPage(),
+          ),
+          GoRoute(
+            path: RouteNames.places,
+            name: 'places',
+            builder: (context, state) {
+              final typeParam = state.uri.queryParameters['type'];
+              PlaceType? filterType;
+
+              if (typeParam != null) {
+                try {
+                  filterType = PlaceType.values.firstWhere(
+                    (type) => type.name == typeParam,
+                  );
+                } catch (e) {
+                  filterType = null;
+                }
+              }
+
+              return PlacesMapPage(filterType: filterType);
+            },
+          ),
+          GoRoute(
+            path: RouteNames.itinerary,
+            name: 'itinerary',
+            builder: (context, state) => const ItineraryListPage(),
+          ),
+          GoRoute(
+            path: RouteNames.settings,
+            name: 'settings',
+            builder: (context, state) => const SettingsPage(),
+          ),
+        ],
       ),
       GoRoute(
         path: RouteNames.qibla,
         name: 'qibla',
         builder: (context, state) => const QiblaPage(),
-      ),
-      GoRoute(
-        path: RouteNames.places,
-        name: 'places',
-        builder: (context, state) {
-          final typeParam = state.uri.queryParameters['type'];
-          PlaceType? filterType;
-
-          if (typeParam != null) {
-            try {
-              filterType = PlaceType.values.firstWhere(
-                (type) => type.name == typeParam,
-              );
-            } catch (e) {
-              filterType = null;
-            }
-          }
-
-          return PlacesMapPage(filterType: filterType);
-        },
       ),
       GoRoute(
         path: '/places/detail/:id',
@@ -78,11 +103,6 @@ class AppRouter {
           final id = state.pathParameters['id']!;
           return PlaceDetailPage(placeId: id);
         },
-      ),
-      GoRoute(
-        path: RouteNames.itinerary,
-        name: 'itinerary',
-        builder: (context, state) => const ItineraryListPage(),
       ),
       GoRoute(
         path: RouteNames.createItinerary,
@@ -144,69 +164,4 @@ class AppRouter {
       ),
     ),
   );
-}
-
-class MainNavigationWrapper extends StatefulWidget {
-  const MainNavigationWrapper({super.key});
-
-  @override
-  State<MainNavigationWrapper> createState() => _MainNavigationWrapperState();
-}
-
-class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
-  int _currentIndex = 0;
-
-  final List<Widget> _pages = [
-    const HomePage(),
-    const PrayerTimesPage(),
-    const PlacesMapPage(),
-    const ItineraryListPage(),
-    const SettingsPage(),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.schedule_outlined),
-            activeIcon: Icon(Icons.schedule),
-            label: 'Prayer',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map_outlined),
-            activeIcon: Icon(Icons.map),
-            label: 'Places',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt_outlined),
-            activeIcon: Icon(Icons.list_alt),
-            label: 'Itinerary',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings_outlined),
-            activeIcon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-      ),
-    );
-  }
 }
