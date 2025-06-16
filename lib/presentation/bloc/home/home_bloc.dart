@@ -23,13 +23,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async {
     try {
       emit(const HomeLoading());
-      
-      // Load prayer times
+
       final prayerTimes = await _prayerRepository.getPrayerTimes();
-      
-      // Load weather (dummy data for prototype)
+
       final weather = _getDummyWeather();
-      
+
       emit(HomeLoaded(
         prayerTimes: prayerTimes,
         weather: weather,
@@ -55,9 +53,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         latitude: event.latitude,
         longitude: event.longitude,
       );
-      
+
       final weather = _getDummyWeather();
-      
+
       emit(HomeLoaded(
         prayerTimes: prayerTimes,
         weather: weather,
@@ -69,11 +67,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   WeatherModel _getDummyWeather() {
     return const WeatherModel(
-      temperature: 28.5,
+      temperature: 18.0,
       condition: 'Partly Cloudy',
-      humidity: 75,
-      windSpeed: 12.3,
-      location: 'Kuala Lumpur, Malaysia',
+      humidity: 60,
+      windSpeed: 15.0,
+      location: 'Tokyo, Japan',
     );
   }
 }

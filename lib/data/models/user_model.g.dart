@@ -36,8 +36,8 @@ UserPreferences _$UserPreferencesFromJson(Map<String, dynamic> json) =>
       calculationMethod: json['calculationMethod'] as String? ?? 'MWL',
       prayerNotificationMinutes:
           (json['prayerNotificationMinutes'] as num?)?.toInt() ?? 15,
-      darkMode: json['darkMode'] as bool? ?? false,
       language: json['language'] as String? ?? 'en',
+      themeMode: json['themeMode'] as String? ?? 'system',
     );
 
 Map<String, dynamic> _$UserPreferencesToJson(UserPreferences instance) =>
@@ -47,6 +47,6 @@ Map<String, dynamic> _$UserPreferencesToJson(UserPreferences instance) =>
       'madhab': instance.madhab,
       'calculationMethod': instance.calculationMethod,
       'prayerNotificationMinutes': instance.prayerNotificationMinutes,
-      'darkMode': instance.darkMode,
       'language': instance.language,
+      'themeMode': instance.themeMode,
     };

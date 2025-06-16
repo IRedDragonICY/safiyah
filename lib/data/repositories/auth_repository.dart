@@ -17,20 +17,16 @@ class AuthRepository {
   }
 
   Future<UserModel> signIn(String email, String password) async {
-    // Simulate API call delay
     await Future.delayed(const Duration(seconds: 2));
-    
-    // For prototype, always return dummy user
+
     final user = _getDummyUser();
     await _localStorage.saveCurrentUser(user.toJson());
     return user;
   }
 
   Future<UserModel> signUp(String email, String password, String fullName) async {
-    // Simulate API call delay
     await Future.delayed(const Duration(seconds: 2));
-    
-    // For prototype, create dummy user
+
     final user = _getDummyUser().copyWith(
       email: email,
       fullName: fullName,
@@ -52,7 +48,7 @@ class AuthRepository {
       id: 'user123',
       email: 'muslim.traveler@safiyah.com',
       fullName: 'Ahmad Muslim',
-      profileImageUrl: 'https://example.com/profile.jpg',
+      profileImageUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1160&q=80',
       createdAt: DateTime.now().subtract(const Duration(days: 365)),
       updatedAt: DateTime.now(),
       preferences: const UserPreferences(
@@ -61,8 +57,8 @@ class AuthRepository {
         madhab: 'Shafi',
         calculationMethod: 'MWL',
         prayerNotificationMinutes: 15,
-        darkMode: false,
         language: 'en',
+        themeMode: 'system',
       ),
     );
   }

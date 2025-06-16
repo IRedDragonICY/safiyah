@@ -9,24 +9,21 @@ class PlaceRepository {
     int radius = 5000,
   }) async {
     try {
-      // Get location if not provided
       if (latitude == null || longitude == null) {
         final position = await LocationService.getCurrentPosition();
         latitude = position.latitude;
         longitude = position.longitude;
       }
 
-      // In real app, make API call to get nearby places
       return _getDummyPlaces(latitude, longitude, type);
     } catch (e) {
-      return _getDummyPlaces(3.1390, 101.6869, type); // KL coordinates
+      return _getDummyPlaces(35.6895, 139.6917, type);
     }
   }
 
   Future<List<PlaceModel>> searchPlaces(String query) async {
     try {
-      // In real app, make API call to search places
-      final allPlaces = _getDummyPlaces(3.1390, 101.6869, null);
+      final allPlaces = _getDummyPlaces(35.6895, 139.6917, null);
       return allPlaces.where((place) {
         return place.name.toLowerCase().contains(query.toLowerCase()) ||
                place.description.toLowerCase().contains(query.toLowerCase());
@@ -38,7 +35,7 @@ class PlaceRepository {
 
   Future<PlaceModel?> getPlaceById(String id) async {
     try {
-      final allPlaces = _getDummyPlaces(3.1390, 101.6869, null);
+      final allPlaces = _getDummyPlaces(35.6895, 139.6917, null);
       return allPlaces.firstWhere((place) => place.id == id);
     } catch (e) {
       return null;
@@ -47,215 +44,146 @@ class PlaceRepository {
 
   List<PlaceModel> _getDummyPlaces(double userLat, double userLng, PlaceType? filterType) {
     final allPlaces = [
-      // Mosques
       PlaceModel(
-        id: 'mosque1',
-        name: 'Masjid Negara',
-        description: 'National Mosque of Malaysia with beautiful architecture',
+        id: 'mosque_jp_1',
+        name: 'Tokyo Camii & Diyanet Turkish Culture Center',
+        description: 'The largest mosque in Japan, known for its beautiful Ottoman architecture.',
         type: PlaceType.mosque,
-        latitude: 3.1428,
-        longitude: 101.6914,
-        address: 'Jalan Perdana, Tasik Perdana, 50480 Kuala Lumpur',
-        phoneNumber: '+603-2693-7784',
-        website: 'https://www.masjidnegara.gov.my',
-        rating: 4.8,
-        reviewCount: 2500,
-        imageUrls: [
-          'https://example.com/masjid-negara1.jpg',
-          'https://example.com/masjid-negara2.jpg',
-        ],
-        openingHours: OpeningHours(hours: {
-          'monday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 5, minute: 0),
-            close: TimeOfDay(hour: 22, minute: 0),
-          ),
-          'tuesday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 5, minute: 0),
-            close: TimeOfDay(hour: 22, minute: 0),
-          ),
-          'wednesday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 5, minute: 0),
-            close: TimeOfDay(hour: 22, minute: 0),
-          ),
-          'thursday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 5, minute: 0),
-            close: TimeOfDay(hour: 22, minute: 0),
-          ),
-          'friday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 5, minute: 0),
-            close: TimeOfDay(hour: 22, minute: 0),
-          ),
-          'saturday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 5, minute: 0),
-            close: TimeOfDay(hour: 22, minute: 0),
-          ),
-          'sunday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 5, minute: 0),
-            close: TimeOfDay(hour: 22, minute: 0),
-          ),
-        }),
-        amenities: ['Prayer Hall', 'Ablution Area', 'Library', 'Parking'],
-        isHalalCertified: true,
-        halalCertification: 'JAKIM',
-        distanceFromUser: _calculateDistance(userLat, userLng, 3.1428, 101.6914),
-      ),
-      PlaceModel(
-        id: 'mosque2',
-        name: 'KLCC Mosque',
-        description: 'Modern mosque located in the heart of KL city center',
-        type: PlaceType.mosque,
-        latitude: 3.1581,
-        longitude: 101.7117,
-        address: 'Suria KLCC, Kuala Lumpur City Centre',
-        phoneNumber: '+603-2382-2828',
-        rating: 4.6,
-        reviewCount: 1200,
-        imageUrls: [
-          'https://example.com/klcc-mosque1.jpg',
-        ],
-        openingHours: OpeningHours(hours: {
-          'monday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 5, minute: 0),
-            close: TimeOfDay(hour: 22, minute: 0),
-          ),
-          'tuesday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 5, minute: 0),
-            close: TimeOfDay(hour: 22, minute: 0),
-          ),
-          'wednesday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 5, minute: 0),
-            close: TimeOfDay(hour: 22, minute: 0),
-          ),
-          'thursday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 5, minute: 0),
-            close: TimeOfDay(hour: 22, minute: 0),
-          ),
-          'friday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 5, minute: 0),
-            close: TimeOfDay(hour: 22, minute: 0),
-          ),
-          'saturday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 5, minute: 0),
-            close: TimeOfDay(hour: 22, minute: 0),
-          ),
-          'sunday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 5, minute: 0),
-            close: TimeOfDay(hour: 22, minute: 0),
-          ),
-        }),
-        amenities: ['Prayer Hall', 'Ablution Area', 'Air Conditioning'],
-        isHalalCertified: true,
-        halalCertification: 'JAKIM',
-        distanceFromUser: _calculateDistance(userLat, userLng, 3.1581, 101.7117),
-      ),
-      
-      // Restaurants
-      PlaceModel(
-        id: 'restaurant1',
-        name: 'Hadramout Restaurant',
-        description: 'Authentic Middle Eastern cuisine with JAKIM halal certification',
-        type: PlaceType.restaurant,
-        latitude: 3.1478,
-        longitude: 101.6953,
-        address: 'No. 88, Jalan Bukit Bintang, 55100 Kuala Lumpur',
-        phoneNumber: '+603-2145-1191',
-        website: 'https://hadramout.com.my',
-        rating: 4.7,
-        reviewCount: 1800,
-        imageUrls: [
-          'https://example.com/hadramout1.jpg',
-          'https://example.com/hadramout2.jpg',
-        ],
-        openingHours: OpeningHours(hours: {
-          'monday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 11, minute: 0),
-            close: TimeOfDay(hour: 23, minute: 0),
-          ),
-          'tuesday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 11, minute: 0),
-            close: TimeOfDay(hour: 23, minute: 0),
-          ),
-          'wednesday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 11, minute: 0),
-            close: TimeOfDay(hour: 23, minute: 0),
-          ),
-          'thursday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 11, minute: 0),
-            close: TimeOfDay(hour: 23, minute: 0),
-          ),
-          'friday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 11, minute: 0),
-            close: TimeOfDay(hour: 23, minute: 0),
-          ),
-          'saturday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 11, minute: 0),
-            close: TimeOfDay(hour: 23, minute: 0),
-          ),
-          'sunday': DayHours(
-            isClosed: false, 
-            open: TimeOfDay(hour: 11, minute: 0),
-            close: TimeOfDay(hour: 23, minute: 0),
-          ),
-        }),
-        amenities: ['Halal Certified', 'Family Friendly', 'Parking', 'WiFi'],
-        isHalalCertified: true,
-        halalCertification: 'JAKIM',
-        distanceFromUser: _calculateDistance(userLat, userLng, 3.1478, 101.6953),
-      ),
-      
-      // Hotels
-      PlaceModel(
-        id: 'hotel1',
-        name: 'Mandarin Oriental Kuala Lumpur',
-        description: 'Luxury hotel with halal dining options and prayer facilities',
-        type: PlaceType.hotel,
-        latitude: 3.1492,
-        longitude: 101.7074,
-        address: 'Kuala Lumpur City Centre, 50088 Kuala Lumpur',
-        phoneNumber: '+603-2380-8888',
-        website: 'https://www.mandarinoriental.com/kuala-lumpur',
+        latitude: 35.6685,
+        longitude: 139.6800,
+        address: '1-19 Oyama-cho, Shibuya-ku, Tokyo',
+        phoneNumber: '+81-3-5790-0760',
+        website: 'https://tokyocamii.org/',
         rating: 4.9,
-        reviewCount: 3200,
+        reviewCount: 3500,
         imageUrls: [
-          'https://example.com/mandarin1.jpg',
+          'https://images.unsplash.com/photo-1594225293932-a513554b2955?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80',
         ],
-        amenities: ['Prayer Room', 'Halal Dining', 'Spa', 'Pool', 'Concierge'],
+        openingHours: OpeningHours(hours: {
+          'monday': DayHours(
+            isClosed: false,
+            open: TimeOfDay(hour: 10, minute: 0),
+            close: TimeOfDay(hour: 18, minute: 0),
+          ),
+          'tuesday': DayHours(
+            isClosed: false,
+            open: TimeOfDay(hour: 10, minute: 0),
+            close: TimeOfDay(hour: 18, minute: 0),
+          ),
+          'wednesday': DayHours(
+            isClosed: false,
+            open: TimeOfDay(hour: 10, minute: 0),
+            close: TimeOfDay(hour: 18, minute: 0),
+          ),
+          'thursday': DayHours(
+            isClosed: false,
+            open: TimeOfDay(hour: 10, minute: 0),
+            close: TimeOfDay(hour: 18, minute: 0),
+          ),
+          'friday': DayHours(
+            isClosed: false,
+            open: TimeOfDay(hour: 10, minute: 0),
+            close: TimeOfDay(hour: 18, minute: 0),
+          ),
+          'saturday': DayHours(
+            isClosed: false,
+            open: TimeOfDay(hour: 10, minute: 0),
+            close: TimeOfDay(hour: 18, minute: 0),
+          ),
+          'sunday': DayHours(
+            isClosed: false,
+            open: TimeOfDay(hour: 10, minute: 0),
+            close: TimeOfDay(hour: 18, minute: 0),
+          ),
+        }),
+        amenities: ['Prayer Hall', 'Ablution Area', 'Cultural Center', 'Library'],
+        isHalalCertified: true,
+        halalCertification: 'Mosque',
+        distanceFromUser: _calculateDistance(userLat, userLng, 35.6685, 139.6800),
+      ),
+      PlaceModel(
+        id: 'restaurant_jp_1',
+        name: 'Halal Ramen Ouka',
+        description: 'Famous for its rich and flavorful vegan and chicken halal ramen.',
+        type: PlaceType.restaurant,
+        latitude: 35.6882,
+        longitude: 139.7107,
+        address: '1-11-7 Shinjuku, Shinjuku-ku, Tokyo',
+        phoneNumber: '+81-3-5925-8426',
+        website: 'https://www.facebook.com/shinjukugyoenramenouka/',
+        rating: 4.8,
+        reviewCount: 2100,
+        imageUrls: [
+          'https://images.unsplash.com/photo-1552611052-33e04de081de?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1964&q=80',
+        ],
+        openingHours: OpeningHours(hours: {
+          'monday': DayHours(
+            isClosed: false,
+            open: TimeOfDay(hour: 12, minute: 0),
+            close: TimeOfDay(hour: 22, minute: 0),
+          ),
+          'tuesday': DayHours(isClosed: true, open: TimeOfDay(hour: 0, minute: 0), close: TimeOfDay(hour: 0, minute: 0)),
+          'wednesday': DayHours(
+            isClosed: false,
+            open: TimeOfDay(hour: 12, minute: 0),
+            close: TimeOfDay(hour: 22, minute: 0),
+          ),
+          'thursday': DayHours(
+            isClosed: false,
+            open: TimeOfDay(hour: 12, minute: 0),
+            close: TimeOfDay(hour: 22, minute: 0),
+          ),
+          'friday': DayHours(
+            isClosed: false,
+            open: TimeOfDay(hour: 12, minute: 0),
+            close: TimeOfDay(hour: 22, minute: 0),
+          ),
+          'saturday': DayHours(
+            isClosed: false,
+            open: TimeOfDay(hour: 12, minute: 0),
+            close: TimeOfDay(hour: 22, minute: 0),
+          ),
+          'sunday': DayHours(
+            isClosed: false,
+            open: TimeOfDay(hour: 12, minute: 0),
+            close: TimeOfDay(hour: 22, minute: 0),
+          ),
+        }),
+        amenities: ['Halal Certified', 'Family Friendly', 'Vegan Options'],
+        isHalalCertified: true,
+        halalCertification: 'Self-Certified',
+        distanceFromUser: _calculateDistance(userLat, userLng, 35.6882, 139.7107),
+      ),
+      PlaceModel(
+        id: 'hotel_jp_1',
+        name: 'Shinjuku Prince Hotel',
+        description: 'Modern hotel with easy access to transport and some halal breakfast options upon request.',
+        type: PlaceType.hotel,
+        latitude: 35.6946,
+        longitude: 139.7001,
+        address: '1-30-1 Kabukicho, Shinjuku-ku, Tokyo',
+        phoneNumber: '+81-3-3205-1111',
+        website: 'https://www.princehotels.com/shinjuku/',
+        rating: 4.5,
+        reviewCount: 4200,
+        imageUrls: [
+          'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80',
+        ],
+        amenities: ['Concierge', 'WiFi', 'Nearby Halal Food'],
         isHalalCertified: false,
-        distanceFromUser: _calculateDistance(userLat, userLng, 3.1492, 101.7074),
+        distanceFromUser: _calculateDistance(userLat, userLng, 35.6946, 139.7001),
       ),
     ];
 
     if (filterType != null) {
       return allPlaces.where((place) => place.type == filterType).toList();
     }
-    
+
     return allPlaces;
   }
 
   double _calculateDistance(double lat1, double lng1, double lat2, double lng2) {
-    // Simple distance calculation (in meters)
-    // In real app, use proper geospatial calculation
-    const double earthRadius = 6371000; // meters
+    const double earthRadius = 6371000;
     double dLat = (lat2 - lat1) * (3.14159 / 180);
     double dLng = (lng2 - lng1) * (3.14159 / 180);
     

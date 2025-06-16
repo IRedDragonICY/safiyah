@@ -67,8 +67,8 @@ class UserPreferences extends Equatable {
   final String madhab; // Hanafi, Shafi, Maliki, Hanbali
   final String calculationMethod; // MWL, ISNA, Egypt, etc.
   final int prayerNotificationMinutes;
-  final bool darkMode;
   final String language;
+  final String themeMode; // 'system', 'light', 'dark'
 
   const UserPreferences({
     this.enablePrayerNotifications = true,
@@ -76,11 +76,11 @@ class UserPreferences extends Equatable {
     this.madhab = 'Shafi',
     this.calculationMethod = 'MWL',
     this.prayerNotificationMinutes = 15,
-    this.darkMode = false,
     this.language = 'en',
+    this.themeMode = 'system',
   });
 
-  factory UserPreferences.fromJson(Map<String, dynamic> json) => 
+  factory UserPreferences.fromJson(Map<String, dynamic> json) =>
       _$UserPreferencesFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserPreferencesToJson(this);
@@ -91,20 +91,20 @@ class UserPreferences extends Equatable {
     String? madhab,
     String? calculationMethod,
     int? prayerNotificationMinutes,
-    bool? darkMode,
     String? language,
+    String? themeMode,
   }) {
     return UserPreferences(
-      enablePrayerNotifications: 
+      enablePrayerNotifications:
           enablePrayerNotifications ?? this.enablePrayerNotifications,
-      enableLocationTracking: 
+      enableLocationTracking:
           enableLocationTracking ?? this.enableLocationTracking,
       madhab: madhab ?? this.madhab,
       calculationMethod: calculationMethod ?? this.calculationMethod,
-      prayerNotificationMinutes: 
+      prayerNotificationMinutes:
           prayerNotificationMinutes ?? this.prayerNotificationMinutes,
-      darkMode: darkMode ?? this.darkMode,
       language: language ?? this.language,
+      themeMode: themeMode ?? this.themeMode,
     );
   }
 
@@ -115,7 +115,7 @@ class UserPreferences extends Equatable {
         madhab,
         calculationMethod,
         prayerNotificationMinutes,
-        darkMode,
         language,
+        themeMode,
       ];
 }

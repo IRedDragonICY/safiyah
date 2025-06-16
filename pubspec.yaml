@@ -70,6 +70,7 @@ dependencies:
 
   # Camera & AR
   camera: ^0.11.1
+  camera_android_camerax: ^0.6.18+3
 #  ar_flutter_plugin: ^0.7.3
 
   # Date & Time

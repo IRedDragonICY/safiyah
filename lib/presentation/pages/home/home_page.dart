@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/colors.dart';
@@ -9,12 +10,32 @@ import '../../bloc/home/home_bloc.dart';
 import '../../bloc/home/home_event.dart';
 import '../../bloc/home/home_state.dart';
 import '../../widgets/common/loading_widget.dart';
-import '../../widgets/home/prayer_times_widget.dart';
 import '../../widgets/home/quick_actions_widget.dart';
-import '../../widgets/home/weather_widget.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
+
+  IconData _getWeatherIcon(String condition) {
+    switch (condition.toLowerCase()) {
+      case 'sunny':
+      case 'clear':
+        return Icons.wb_sunny_outlined;
+      case 'partly cloudy':
+      case 'cloudy':
+      case 'overcast':
+        return Icons.wb_cloudy_outlined;
+      case 'rainy':
+      case 'rain':
+        return Icons.water_drop_outlined;
+      case 'thunderstorm':
+        return Icons.flash_on_outlined;
+      case 'snowy':
+      case 'snow':
+        return Icons.ac_unit_outlined;
+      default:
+        return Icons.wb_sunny_outlined;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +45,7 @@ class HomePage extends StatelessWidget {
           if (state is HomeLoading) {
             return const Center(child: LoadingWidget());
           }
-          
+
           if (state is HomeError) {
             return Center(
               child: Column(
@@ -45,31 +66,27 @@ class HomePage extends StatelessWidget {
               ),
             );
           }
-          
+
           if (state is HomeLoaded) {
             return RefreshIndicator(
               onRefresh: () async {
-                context.read<HomeBloc>().add(LoadHomeData());
+                context.read<HomeBloc>().add(const LoadHomeData());
               },
               child: CustomScrollView(
                 slivers: [
-                  _buildAppBar(context),
+                  SliverToBoxAdapter(
+                    child: _buildHeroHeader(context, state),
+                  ),
                   SliverPadding(
                     padding: const EdgeInsets.all(16.0),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
-                        _buildGreeting(context),
-                        const SizedBox(height: 24),
-                        WeatherWidget(weather: state.weather),
-                        const SizedBox(height: 16),
-                        PrayerTimesWidget(prayerTimes: state.prayerTimes),
-                        const SizedBox(height: 16),
                         const QuickActionsWidget(),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 24),
                         _buildRecentItineraries(context),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 24),
                         _buildNearbyPlaces(context),
-                        const SizedBox(height: 100), // Bottom padding
+                        const SizedBox(height: 100),
                       ]),
                     ),
                   ),
@@ -77,133 +94,124 @@ class HomePage extends StatelessWidget {
               ),
             );
           }
-          
+
           return const SizedBox.shrink();
         },
       ),
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
-    return SliverAppBar(
-      expandedHeight: 120,
-      floating: true,
-      pinned: true,
-      backgroundColor: AppColors.primary,
-      flexibleSpace: FlexibleSpaceBar(
-        background: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: AppColors.primaryGradient,
-            ),
-          ),
-        ),
-        title: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(
-                Icons.mosque,
-                color: AppColors.primary,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Text(
-              AppStrings.appName,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.notifications_outlined, color: Colors.white),
-          onPressed: () {
-            // Navigate to notifications
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.person_outline, color: Colors.white),
-          onPressed: () {
-            context.push('/profile');
-          },
-        ),
-      ],
-    );
-  }
+  Widget _buildHeroHeader(BuildContext context, HomeLoaded state) {
+    final nextPrayer = state.prayerTimes.getNextPrayer();
+    final timeFormat = DateFormat('HH:mm');
 
-  Widget _buildGreeting(BuildContext context) {
-    final hour = DateTime.now().hour;
-    String greeting;
-    
-    if (hour < 12) {
-      greeting = AppStrings.goodMorning;
-    } else if (hour < 17) {
-      greeting = AppStrings.goodAfternoon;
-    } else {
-      greeting = AppStrings.goodEvening;
-    }
-    
-    return Card(
-      elevation: AppConstants.cardElevation,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: AppColors.secondaryGradient,
-          ),
-        ),
-        child: Row(
+    return Container(
+      margin: const EdgeInsets.all(16.0),
+      height: 300,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28.0),
+        child: Stack(
           children: [
-            Expanded(
+            Positioned.fill(
+              child: Image.network(
+                'https://images.unsplash.com/photo-1542051841857-5f90071e7989?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80',
+                fit: BoxFit.cover,
+                color: Colors.black.withOpacity(0.3),
+                colorBlendMode: BlendMode.darken,
+              ),
+            ),
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.black.withOpacity(0.6),
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.8)
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: const [0.0, 0.5, 1.0],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              left: 24,
+              bottom: 24,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    AppStrings.assalamualaikum,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                  if (nextPrayer != null)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Next Prayer: ${nextPrayer.name}',
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    color: Colors.white.withOpacity(0.9),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                        Text(
+                          timeFormat.format(nextPrayer.time),
+                          style:
+                              Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                      ],
                     ),
+                ],
+              ),
+            ),
+            Positioned(
+              right: 24,
+              bottom: 24,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    _getWeatherIcon(state.weather.condition),
+                    color: Colors.white,
+                    size: 24,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(width: 8),
                   Text(
-                    greeting,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.white.withOpacity(0.9),
-                    ),
+                    '${state.weather.temperature.round()}°',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
                   ),
                 ],
               ),
             ),
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: const Icon(
-                Icons.waving_hand,
-                color: Colors.white,
-                size: 30,
+            Positioned(
+              left: 24,
+              right: 24,
+              bottom: 90,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    state.prayerTimes.locationName,
+                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  Text(
+                    'Japan',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          color: Colors.white.withOpacity(0.8),
+                          fontWeight: FontWeight.w400,
+                        ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -222,8 +230,8 @@ class HomePage extends StatelessWidget {
             Text(
               'Recent Itineraries',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
             TextButton(
               onPressed: () => context.push('/itinerary'),
@@ -236,19 +244,43 @@ class HomePage extends StatelessWidget {
           height: 160,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: 3,
+            itemCount: 2,
             itemBuilder: (context, index) {
+              final itineraries = [
+                {
+                  'title': 'Spiritual Journey',
+                  'location': 'Tokyo, Japan',
+                  'desc':
+                      'Exploring the rich culture and serene mosques of Tokyo.',
+                  'date': 'Apr 10 - Apr 17',
+                  'status': 'Upcoming',
+                  'id': '3'
+                },
+                {
+                  'title': 'Kyoto & Osaka Tour',
+                  'location': 'Kyoto, Japan',
+                  'desc': 'Discovering the historic temples and halal food.',
+                  'date': 'May 05 - May 12',
+                  'status': 'Upcoming',
+                  'id': '4'
+                }
+              ];
+              final itinerary = itineraries[index];
+
               return Container(
                 width: 280,
                 margin: const EdgeInsets.only(right: 16),
                 child: Card(
                   elevation: AppConstants.cardElevation,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.borderRadius),
                   ),
                   child: InkWell(
-                    onTap: () => context.push('/itinerary/detail/1'),
-                    borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                    onTap: () =>
+                        context.push('/itinerary/detail/${itinerary['id']}'),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.borderRadius),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -275,18 +307,24 @@ class HomePage extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Istanbul Heritage Tour',
-                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      itinerary['title'] as String,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     Text(
-                                      'Istanbul, Turkey',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: Colors.grey[600],
-                                      ),
+                                      itinerary['location'] as String,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Colors.grey[600],
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -295,7 +333,7 @@ class HomePage extends StatelessWidget {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Exploring the Islamic heritage of Istanbul with visits to historic mosques and cultural sites.',
+                            itinerary['desc'] as String,
                             style: Theme.of(context).textTheme.bodyMedium,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -310,10 +348,13 @@ class HomePage extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'Jan 15 - Jan 22',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Colors.grey[600],
-                                ),
+                                itinerary['date'] as String,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: Colors.grey[600],
+                                    ),
                               ),
                               const Spacer(),
                               Container(
@@ -326,11 +367,14 @@ class HomePage extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
-                                  'Upcoming',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppColors.success,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                  itinerary['status'] as String,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: AppColors.success,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                 ),
                               ),
                             ],
@@ -358,8 +402,8 @@ class HomePage extends StatelessWidget {
             Text(
               'Nearby Places',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
             TextButton(
               onPressed: () => context.push('/places'),
@@ -375,25 +419,47 @@ class HomePage extends StatelessWidget {
             itemCount: 4,
             itemBuilder: (context, index) {
               final places = [
-                {'name': 'Masjid Negara', 'type': 'Mosque', 'distance': '2.5 km', 'icon': Icons.mosque},
-                {'name': 'Hadramout Restaurant', 'type': 'Restaurant', 'distance': '1.2 km', 'icon': Icons.restaurant},
-                {'name': 'Islamic Arts Museum', 'type': 'Museum', 'distance': '3.1 km', 'icon': Icons.museum},
-                {'name': 'Halal Mart', 'type': 'Store', 'distance': '0.8 km', 'icon': Icons.store},
+                {
+                  'name': 'Tokyo Camii',
+                  'type': 'Mosque',
+                  'distance': '1.2 km',
+                  'icon': Icons.mosque
+                },
+                {
+                  'name': 'Halal Ramen',
+                  'type': 'Restaurant',
+                  'distance': '0.8 km',
+                  'icon': Icons.restaurant
+                },
+                {
+                  'name': 'Shinjuku Gyoen',
+                  'type': 'Park',
+                  'distance': '2.5 km',
+                  'icon': Icons.park
+                },
+                {
+                  'name': 'Gyomu Super',
+                  'type': 'Store',
+                  'distance': '0.5 km',
+                  'icon': Icons.store
+                },
               ];
-              
+
               final place = places[index];
-              
+
               return Container(
                 width: 140,
                 margin: const EdgeInsets.only(right: 12),
                 child: Card(
                   elevation: AppConstants.cardElevation,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.borderRadius),
                   ),
                   child: InkWell(
-                    onTap: () => context.push('/places/detail/mosque1'),
-                    borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                    onTap: () => context.push('/places/detail/mosque_jp_1'),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.borderRadius),
                     child: Padding(
                       padding: const EdgeInsets.all(12),
                       child: Column(
@@ -414,18 +480,24 @@ class HomePage extends StatelessWidget {
                           const SizedBox(height: 8),
                           Text(
                             place['name'] as String,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
                           ),
                           Text(
                             place['type'] as String,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey[600],
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                  color: Colors.grey[600],
+                                ),
                             textAlign: TextAlign.center,
                           ),
                           const Spacer(),
@@ -440,10 +512,13 @@ class HomePage extends StatelessWidget {
                             ),
                             child: Text(
                               place['distance'] as String,
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: AppColors.secondary,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: AppColors.secondary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                             ),
                           ),
                         ],

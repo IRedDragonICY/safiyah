@@ -13,6 +13,7 @@ import '../presentation/pages/itinerary/itinerary_list_page.dart';
 import '../presentation/pages/itinerary/create_itinerary_page.dart';
 import '../presentation/pages/itinerary/itinerary_detail_page.dart';
 import '../presentation/pages/ar/ar_navigation_page.dart';
+import '../presentation/pages/settings/settings_page.dart';
 import '../data/models/place_model.dart';
 import 'route_names.dart';
 
@@ -20,14 +21,11 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: RouteNames.splash,
     routes: [
-      // Splash
       GoRoute(
         path: RouteNames.splash,
         name: 'splash',
         builder: (context, state) => const SplashPage(),
       ),
-
-      // Auth Routes
       GoRoute(
         path: RouteNames.login,
         name: 'login',
@@ -38,15 +36,11 @@ class AppRouter {
         name: 'register',
         builder: (context, state) => const RegisterPage(),
       ),
-
-      // Main App Routes
       GoRoute(
         path: RouteNames.home,
         name: 'home',
         builder: (context, state) => const MainNavigationWrapper(),
       ),
-
-      // Prayer Routes
       GoRoute(
         path: RouteNames.prayer,
         name: 'prayer',
@@ -57,8 +51,6 @@ class AppRouter {
         name: 'qibla',
         builder: (context, state) => const QiblaPage(),
       ),
-
-      // Places Routes
       GoRoute(
         path: RouteNames.places,
         name: 'places',
@@ -87,8 +79,6 @@ class AppRouter {
           return PlaceDetailPage(placeId: id);
         },
       ),
-
-      // Itinerary Routes
       GoRoute(
         path: RouteNames.itinerary,
         name: 'itinerary',
@@ -115,8 +105,6 @@ class AppRouter {
           return CreateItineraryPage(itineraryId: id);
         },
       ),
-
-      // AR Navigation
       GoRoute(
         path: RouteNames.arNavigation,
         name: 'ar_navigation',
@@ -170,9 +158,10 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
 
   final List<Widget> _pages = [
     const HomePage(),
-    const PlacesMapPage(),
     const PrayerTimesPage(),
+    const PlacesMapPage(),
     const ItineraryListPage(),
+    const SettingsPage(),
   ];
 
   @override
@@ -192,20 +181,29 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
         },
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.map),
-            label: 'Places',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.schedule),
+            icon: Icon(Icons.schedule_outlined),
+            activeIcon: Icon(Icons.schedule),
             label: 'Prayer',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt),
+            icon: Icon(Icons.map_outlined),
+            activeIcon: Icon(Icons.map),
+            label: 'Places',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list_alt_outlined),
+            activeIcon: Icon(Icons.list_alt),
             label: 'Itinerary',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings_outlined),
+            activeIcon: Icon(Icons.settings),
+            label: 'Settings',
           ),
         ],
       ),

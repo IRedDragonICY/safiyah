@@ -18,24 +18,22 @@ import 'presentation/bloc/home/home_bloc.dart';
 import 'presentation/bloc/itinerary/itinerary_bloc.dart';
 import 'presentation/bloc/places/places_bloc.dart';
 import 'presentation/bloc/prayer/prayer_bloc.dart';
+import 'presentation/bloc/settings/settings_bloc.dart';
+import 'presentation/bloc/settings/settings_event.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize timezone data
+
   tz.initializeTimeZones();
-  
-  // Initialize Hive
+
   await Hive.initFlutter();
-  
-  // Initialize services
+
   await _initializeServices();
-  
-  // Set preferred orientations
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
-  
+
   runApp(SafiyahApp());
 }
 
@@ -69,6 +67,12 @@ class SafiyahApp extends StatelessWidget {
             create: (context) => AuthBloc(
               authRepository: context.read<AuthRepository>(),
             ),
+          ),
+          BlocProvider<SettingsBloc>(
+            create: (context) => SettingsBloc(
+              authRepository: context.read<AuthRepository>(),
+              authBloc: context.read<AuthBloc>(),
+            )..add(const LoadSettings()),
           ),
           BlocProvider<HomeBloc>(
             create: (context) => HomeBloc(

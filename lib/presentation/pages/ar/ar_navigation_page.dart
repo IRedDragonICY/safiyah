@@ -25,7 +25,6 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
 
   Future<void> _initializeCamera() async {
     try {
-      // Request camera permission
       final cameraPermission = await Permission.camera.request();
       if (cameraPermission != PermissionStatus.granted) {
         setState(() {
@@ -35,7 +34,6 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
         return;
       }
 
-      // Get available cameras
       final cameras = await availableCameras();
       if (cameras.isEmpty) {
         setState(() {
@@ -45,7 +43,6 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
         return;
       }
 
-      // Initialize camera controller
       _cameraController = CameraController(
         cameras.first,
         ResolutionPreset.high,
@@ -112,17 +109,14 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
 
     return Stack(
       children: [
-        // Camera Preview
         Positioned.fill(
           child: CameraPreview(_cameraController!),
         ),
 
-        // AR Overlay
         Positioned.fill(
           child: _buildAROverlay(),
         ),
 
-        // Controls
         Positioned(
           bottom: 0,
           left: 0,
@@ -185,37 +179,34 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
       painter: AROverlayPainter(),
       child: Stack(
         children: [
-          // Simulated AR markers for nearby places
           _buildARMarker(
-            'Masjid Negara',
-            'Mosque • 500m',
+            'Tokyo Camii',
+            'Mosque • 1.2km',
             Alignment.center,
             AppColors.mosque,
             Icons.mosque,
           ),
           _buildARMarker(
-            'Hadramout Restaurant',
-            'Halal Restaurant • 200m',
+            'Halal Ramen Ouka',
+            'Halal Restaurant • 800m',
             Alignment.centerRight,
             AppColors.halalFood,
             Icons.restaurant,
           ),
           _buildARMarker(
-            'Islamic Arts Museum',
-            'Museum • 800m',
+            'Shinjuku Gyoen',
+            'Park • 2.5km',
             Alignment.centerLeft,
             AppColors.primary,
-            Icons.museum,
+            Icons.park,
           ),
 
-          // Compass overlay
           Positioned(
             top: 20,
             right: 20,
             child: _buildCompassOverlay(),
           ),
 
-          // Information panel
           Positioned(
             top: 20,
             left: 20,
@@ -240,7 +231,6 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // AR Pin
             Container(
               width: 60,
               height: 60,
@@ -263,14 +253,12 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
               ),
             ),
 
-            // Connecting line
             Container(
               width: 2,
               height: 30,
               color: color.withOpacity(0.7),
             ),
 
-            // Info card
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
@@ -386,7 +374,7 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
           ),
           const SizedBox(height: 4),
           const Text(
-            'Kuala Lumpur City Centre',
+            'Shibuya, Tokyo',
             style: TextStyle(
               color: Colors.grey,
               fontSize: 10,
@@ -678,25 +666,21 @@ class AROverlayPainter extends CustomPainter {
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
 
-    // Draw crosshair in center
     final center = Offset(size.width / 2, size.height / 2);
     const crosshairSize = 20.0;
 
-    // Horizontal line
     canvas.drawLine(
       Offset(center.dx - crosshairSize, center.dy),
       Offset(center.dx + crosshairSize, center.dy),
       paint,
     );
 
-    // Vertical line
     canvas.drawLine(
       Offset(center.dx, center.dy - crosshairSize),
       Offset(center.dx, center.dy + crosshairSize),
       paint,
     );
 
-    // Draw corner brackets
     final bracketPaint = Paint()
       ..color = AppColors.primary.withOpacity(0.7)
       ..strokeWidth = 3
@@ -705,7 +689,6 @@ class AROverlayPainter extends CustomPainter {
     const bracketSize = 30.0;
     const margin = 40.0;
 
-    // Top-left corner
     canvas.drawLine(
       const Offset(margin, margin),
       const Offset(margin + bracketSize, margin),
@@ -717,7 +700,6 @@ class AROverlayPainter extends CustomPainter {
       bracketPaint,
     );
 
-    // Top-right corner
     canvas.drawLine(
       Offset(size.width - margin, margin),
       Offset(size.width - margin - bracketSize, margin),
@@ -729,7 +711,6 @@ class AROverlayPainter extends CustomPainter {
       bracketPaint,
     );
 
-    // Bottom-left corner
     canvas.drawLine(
       Offset(margin, size.height - margin),
       Offset(margin + bracketSize, size.height - margin),
@@ -741,7 +722,6 @@ class AROverlayPainter extends CustomPainter {
       bracketPaint,
     );
 
-    // Bottom-right corner
     canvas.drawLine(
       Offset(size.width - margin, size.height - margin),
       Offset(size.width - margin - bracketSize, size.height - margin),
