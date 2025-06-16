@@ -1,5 +1,5 @@
 import 'dart:ui';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -9,6 +9,8 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   static Future<void> initialize() async {
+    if (kIsWeb) return;
+
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -35,7 +37,6 @@ class NotificationService {
   static void _onNotificationTapped(NotificationResponse notificationResponse) {
     final String? payload = notificationResponse.payload;
     if (payload != null && payload.isNotEmpty) {
-      // Handle notification tap
     }
   }
 
@@ -154,7 +155,6 @@ class NotificationService {
           continue;
         }
 
-        // Skip sunrise notification (not a prayer)
         if (prayerName.toLowerCase() == 'sunrise') {
           continue;
         }
@@ -167,7 +167,6 @@ class NotificationService {
           payload: 'prayer_$prayerName',
         );
 
-        // Schedule reminder 10 minutes before
         final reminderTime = prayerTime.subtract(const Duration(minutes: 10));
         if (reminderTime.isAfter(DateTime.now())) {
           await scheduleReminderNotification(
@@ -350,11 +349,9 @@ class NotificationService {
   }
 
   static Future<void> cancelAllPrayerNotifications() async {
-    // Cancel prayer notifications (IDs 100-199)
     for (int i = 100; i < 200; i++) {
       await cancelNotification(i);
     }
-    // Cancel reminder notifications (IDs 200-299)
     for (int i = 200; i < 300; i++) {
       await cancelNotification(i);
     }
@@ -365,8 +362,8 @@ class NotificationService {
     final index = prayerNames.indexOf(prayerName.toLowerCase());
 
     if (index != -1) {
-      await cancelNotification(100 + index); // Prayer notification
-      await cancelNotification(200 + index); // Reminder notification
+      await cancelNotification(100 + index);
+      await cancelNotification(200 + index);
     }
   }
 
@@ -538,8 +535,6 @@ class NotificationService {
   }
 
   static Future<void> initializeTimeZone() async {
-    // This should be called before any scheduled notifications
-    // Implement timezone initialization based on user location
   }
 
   static Future<Map<String, dynamic>> getNotificationStats() async {

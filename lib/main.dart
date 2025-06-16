@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,17 +31,21 @@ void main() async {
 
   await _initializeServices();
 
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
+  if (!kIsWeb) {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+  }
 
   runApp(SafiyahApp());
 }
 
 Future<void> _initializeServices() async {
   await StorageService.initialize();
-  await NotificationService.initialize();
-  await LocationService.initialize();
+  if (!kIsWeb) {
+    await NotificationService.initialize();
+    await LocationService.initialize();
+  }
 }
 
 class SafiyahApp extends StatelessWidget {

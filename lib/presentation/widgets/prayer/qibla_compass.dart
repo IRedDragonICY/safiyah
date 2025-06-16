@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'dart:math' as math;
@@ -26,6 +27,7 @@ class _QiblaCompassState extends State<QiblaCompass> {
   }
 
   void _initCompass() {
+    if (kIsWeb) return;
     FlutterCompass.events?.listen((CompassEvent event) {
       if (mounted) {
         setState(() {
@@ -37,6 +39,10 @@ class _QiblaCompassState extends State<QiblaCompass> {
 
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) {
+      return _buildWebFallback();
+    }
+
     if (_compassHeading == null) {
       return const SizedBox(
         height: 300,
@@ -59,7 +65,6 @@ class _QiblaCompassState extends State<QiblaCompass> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Compass Background
           Transform.rotate(
             angle: ((_compassHeading ?? 0) * (math.pi / 180) * -1),
             child: CustomPaint(
@@ -67,8 +72,6 @@ class _QiblaCompassState extends State<QiblaCompass> {
               painter: CompassPainter(),
             ),
           ),
-          
-          // Qibla Direction Indicator
           Transform.rotate(
             angle: ((widget.qiblaDirection - (_compassHeading ?? 0)) * (math.pi / 180)),
             child: CustomPaint(
@@ -76,8 +79,6 @@ class _QiblaCompassState extends State<QiblaCompass> {
               painter: QiblaNeedlePainter(),
             ),
           ),
-          
-          // Center Circle
           Container(
             width: 20,
             height: 20,
@@ -87,8 +88,6 @@ class _QiblaCompassState extends State<QiblaCompass> {
               border: Border.all(color: Colors.white, width: 2),
             ),
           ),
-          
-          // Kaaba Icon
           Transform.rotate(
             angle: ((widget.qiblaDirection - (_compassHeading ?? 0)) * (math.pi / 180)),
             child: Transform.translate(
@@ -118,6 +117,48 @@ class _QiblaCompassState extends State<QiblaCompass> {
       ),
     );
   }
+
+  Widget _buildWebFallback() {
+    return Container(
+      height: 300,
+      width: 300,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.1),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.grey.withOpacity(0.3),
+          width: 2,
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.explore_off,
+            size: 48,
+            color: Colors.grey[600],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Live Compass Not Available on Web',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Point your device North to align with the Qibla direction shown.',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.grey[700],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class CompassPainter extends CustomPainter {
@@ -125,29 +166,27 @@ class CompassPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2 - 20;
-    
+
     final paint = Paint()
       ..color = Colors.grey.withOpacity(0.3)
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
-    
-    // Draw outer circle
+
     canvas.drawCircle(center, radius, paint);
-    
-    // Draw cardinal directions
+
     final textPainter = TextPainter(
       textAlign: TextAlign.center,
       textDirection: TextDirection.ltr,
     );
-    
+
     final directions = ['N', 'E', 'S', 'W'];
     final angles = [0, 90, 180, 270];
-    
+
     for (int i = 0; i < directions.length; i++) {
       final angle = angles[i] * math.pi / 180;
       final x = center.dx + (radius - 15) * math.sin(angle);
       final y = center.dy - (radius - 15) * math.cos(angle);
-      
+
       textPainter.text = TextSpan(
         text: directions[i],
         style: TextStyle(
@@ -162,21 +201,20 @@ class CompassPainter extends CustomPainter {
         Offset(x - textPainter.width / 2, y - textPainter.height / 2),
       );
     }
-    
-    // Draw degree marks
+
     paint.color = Colors.grey.withOpacity(0.5);
     paint.strokeWidth = 1;
-    
+
     for (int i = 0; i < 360; i += 10) {
       final angle = i * math.pi / 180;
       final startRadius = i % 30 == 0 ? radius - 15 : radius - 8;
       final endRadius = radius;
-      
+
       final startX = center.dx + startRadius * math.sin(angle);
       final startY = center.dy - startRadius * math.cos(angle);
       final endX = center.dx + endRadius * math.sin(angle);
       final endY = center.dy - endRadius * math.cos(angle);
-      
+
       canvas.drawLine(
         Offset(startX, startY),
         Offset(endX, endY),
@@ -196,23 +234,20 @@ class QiblaNeedlePainter extends CustomPainter {
     final paint = Paint()
       ..color = AppColors.qiblaDirection
       ..style = PaintingStyle.fill;
-    
-    // Draw Qibla needle pointing to Kaaba
+
     final path = Path();
-    path.moveTo(center.dx, center.dy - 100); // Top point
-    path.lineTo(center.dx - 8, center.dy + 20); // Bottom left
-    path.lineTo(center.dx + 8, center.dy + 20); // Bottom right
+    path.moveTo(center.dx, center.dy - 100);
+    path.lineTo(center.dx - 8, center.dy + 20);
+    path.lineTo(center.dx + 8, center.dy + 20);
     path.close();
-    
-    // Add shadow
+
     final shadowPaint = Paint()
       ..color = Colors.black.withOpacity(0.3)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
-    
+
     canvas.drawPath(path, shadowPaint);
     canvas.drawPath(path, paint);
-    
-    // Draw small circle at the base
+
     paint.color = AppColors.qiblaDirection.withOpacity(0.8);
     canvas.drawCircle(Offset(center.dx, center.dy + 15), 4, paint);
   }

@@ -1,9 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class LocationService {
   static Future<void> initialize() async {
-    await _requestLocationPermission();
+    if (!kIsWeb) {
+      await _requestLocationPermission();
+    }
   }
 
   static Future<bool> _requestLocationPermission() async {
