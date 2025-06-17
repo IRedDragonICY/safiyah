@@ -1,4 +1,3 @@
-// routes/app_router.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safiyah/presentation/pages/onboarding/onboarding_page.dart';
@@ -84,12 +83,12 @@ class AppRouter {
             name: 'itinerary',
             builder: (context, state) => const ItineraryListPage(),
           ),
-          GoRoute(
-            path: RouteNames.settings,
-            name: 'settings',
-            builder: (context, state) => const SettingsPage(),
-          ),
         ],
+      ),
+      GoRoute(
+        path: RouteNames.settings,
+        name: 'settings',
+        builder: (context, state) => const SettingsPage(),
       ),
       GoRoute(
         path: RouteNames.qibla,

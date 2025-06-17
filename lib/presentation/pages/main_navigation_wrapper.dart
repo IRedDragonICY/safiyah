@@ -1,4 +1,3 @@
-// presentation/pages/main_navigation_wrapper.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safiyah/routes/route_names.dart';
@@ -27,9 +26,6 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
     if (location.startsWith(RouteNames.itinerary)) {
       return 3;
     }
-    if (location.startsWith(RouteNames.settings)) {
-      return 4;
-    }
     return 0;
   }
 
@@ -46,9 +42,6 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
         break;
       case 3:
         context.go(RouteNames.itinerary);
-        break;
-      case 4:
-        context.go(RouteNames.settings);
         break;
     }
   }
@@ -81,11 +74,6 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
             icon: Icon(Icons.list_alt_outlined),
             activeIcon: Icon(Icons.list_alt),
             label: 'Itinerary',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings_outlined),
-            activeIcon: Icon(Icons.settings),
-            label: 'Settings',
           ),
         ],
       ),
