@@ -73,22 +73,10 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildHeader(BuildContext context) {
     return Column(
       children: [
-        Container(
+        SizedBox(
           width: 100,
           height: 100,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: AppColors.primaryGradient,
-            ),
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: const Icon(
-            Icons.mosque,
-            size: 50,
-            color: Colors.white,
-          ),
+          child: Image.asset('assets/icons/icon.png'),
         ),
         const SizedBox(height: 24),
         Text(
@@ -168,7 +156,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildForgotPasswordButton(BuildContext context) {
     return TextButton(
       onPressed: () {
-        // Navigate to forgot password page
         _showForgotPasswordDialog(context);
       },
       child: Text(
@@ -262,7 +249,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
             ElevatedButton(
               onPressed: () {
-                // Handle password reset
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(

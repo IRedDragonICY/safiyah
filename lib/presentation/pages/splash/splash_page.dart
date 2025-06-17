@@ -1,4 +1,3 @@
-// presentation/pages/splash/splash_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -129,7 +128,6 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.9),
               borderRadius: BorderRadius.circular(30),
               boxShadow: [
                 BoxShadow(
@@ -139,10 +137,9 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                 ),
               ],
             ),
-            child: const Icon(
-              Icons.mosque,
-              size: 60,
-              color: AppColors.primary,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: Image.asset('assets/icons/icon.png'),
             ),
           ),
         );
