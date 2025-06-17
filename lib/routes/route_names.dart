@@ -16,5 +16,7 @@ class RouteNames {
   static const String itinerary = '/itinerary';
   static const String createItinerary = '/itinerary/create';
 
+  static const String voucher = '/voucher';
+
   static const String arNavigation = '/ar-navigation';
 }

@@ -16,6 +16,7 @@ import '../presentation/pages/itinerary/itinerary_list_page.dart';
 import '../presentation/pages/itinerary/create_itinerary_page.dart';
 import '../presentation/pages/itinerary/itinerary_detail_page.dart';
 import '../presentation/pages/ar/ar_navigation_page.dart';
+import '../presentation/pages/voucher/voucher_page.dart';
 import '../data/models/place_model.dart';
 import 'route_names.dart';
 
@@ -82,6 +83,11 @@ class AppRouter {
             path: RouteNames.itinerary,
             name: 'itinerary',
             builder: (context, state) => const ItineraryListPage(),
+          ),
+          GoRoute(
+            path: RouteNames.voucher,
+            name: 'voucher',
+            builder: (context, state) => const VoucherPage(),
           ),
         ],
       ),

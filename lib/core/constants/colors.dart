@@ -35,6 +35,9 @@ class AppColors {
   static const Color halalFood = Color(0xFF4CAF50); // Green
   static const Color mosque = Color(0xFF2E7D32); // Dark Green
   
+  // Voucher Color
+  static const Color voucherSpecial = Color(0xFFD32F2F);
+
   // Gradient Colors
   static const List<Color> primaryGradient = [
     Color(0xFF2E7D32),

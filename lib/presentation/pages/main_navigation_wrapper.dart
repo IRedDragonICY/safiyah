@@ -26,6 +26,9 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
     if (location.startsWith(RouteNames.itinerary)) {
       return 3;
     }
+    if (location.startsWith(RouteNames.voucher)) {
+      return 4;
+    }
     return 0;
   }
 
@@ -42,6 +45,9 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
         break;
       case 3:
         context.go(RouteNames.itinerary);
+        break;
+      case 4:
+        context.go(RouteNames.voucher);
         break;
     }
   }
@@ -74,6 +80,11 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
             icon: Icon(Icons.list_alt_outlined),
             activeIcon: Icon(Icons.list_alt),
             label: 'Itinerary',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.local_offer_outlined),
+            activeIcon: Icon(Icons.local_offer),
+            label: 'Vouchers',
           ),
         ],
       ),
