@@ -1,4 +1,3 @@
-// routes/route_names.dart
 class RouteNames {
   static const String splash = '/splash';
   static const String onboarding = '/onboarding';
@@ -19,4 +18,6 @@ class RouteNames {
   static const String voucher = '/voucher';
 
   static const String arNavigation = '/ar-navigation';
+
+  static const String chatbot = '/chatbot';
 }

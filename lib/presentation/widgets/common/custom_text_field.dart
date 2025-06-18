@@ -12,6 +12,7 @@ class CustomTextField extends StatelessWidget {
   final bool obscureText;
   final bool readOnly;
   final bool enabled;
+  final bool autofocus;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
   final Widget? prefixIcon;
@@ -33,6 +34,7 @@ class CustomTextField extends StatelessWidget {
     this.obscureText = false,
     this.readOnly = false,
     this.enabled = true,
+    this.autofocus = false,
     this.keyboardType,
     this.inputFormatters,
     this.prefixIcon,
@@ -53,6 +55,7 @@ class CustomTextField extends StatelessWidget {
       obscureText: obscureText,
       readOnly: readOnly,
       enabled: enabled,
+      autofocus: autofocus,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
       maxLines: maxLines,

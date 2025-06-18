@@ -1,9 +1,10 @@
-// main.dart
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:safiyah/data/repositories/chatbot_repository.dart';
+import 'package:safiyah/presentation/bloc/chatbot/chatbot_bloc.dart';
 import 'package:safiyah/presentation/bloc/home/home_event.dart';
 import 'package:safiyah/presentation/bloc/onboarding/onboarding_bloc.dart';
 import 'package:safiyah/presentation/bloc/onboarding/onboarding_event.dart';
@@ -40,7 +41,7 @@ void main() async {
     ]);
   }
 
-  runApp(SafiyahApp());
+  runApp(const SafiyahApp());
 }
 
 Future<void> _initializeServices() async {
@@ -52,6 +53,8 @@ Future<void> _initializeServices() async {
 }
 
 class SafiyahApp extends StatelessWidget {
+  const SafiyahApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
@@ -67,6 +70,9 @@ class SafiyahApp extends StatelessWidget {
         ),
         RepositoryProvider<ItineraryRepository>(
           create: (context) => ItineraryRepository(),
+        ),
+        RepositoryProvider<ChatbotRepository>(
+          create: (context) => ChatbotRepository(),
         ),
       ],
       child: MultiBlocProvider(
@@ -88,7 +94,7 @@ class SafiyahApp extends StatelessWidget {
           BlocProvider<HomeBloc>(
             create: (context) => HomeBloc(
               prayerRepository: context.read<PrayerRepository>(),
-            )..add(LoadHomeData()),
+            )..add(const LoadHomeData()),
           ),
           BlocProvider<PrayerBloc>(
             create: (context) => PrayerBloc(
@@ -103,6 +109,11 @@ class SafiyahApp extends StatelessWidget {
           BlocProvider<ItineraryBloc>(
             create: (context) => ItineraryBloc(
               itineraryRepository: context.read<ItineraryRepository>(),
+            ),
+          ),
+          BlocProvider<ChatbotBloc>(
+            create: (context) => ChatbotBloc(
+              chatbotRepository: context.read<ChatbotRepository>(),
             ),
           ),
         ],

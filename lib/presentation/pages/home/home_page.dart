@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:safiyah/routes/route_names.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/strings.dart';
-import '../../../routes/route_names.dart';
 import '../../bloc/home/home_bloc.dart';
 import '../../bloc/home/home_event.dart';
 import '../../bloc/home/home_state.dart';
@@ -219,12 +219,25 @@ class HomePage extends StatelessWidget {
               top: 16,
               right: 16,
               child: SafeArea(
-                child: IconButton(
-                  icon: const Icon(Icons.settings_outlined, color: Colors.white),
-                  onPressed: () => context.push(RouteNames.settings),
-                  tooltip: 'Settings',
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.black.withOpacity(0.3),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(24)
+                  ),
+                  child: Row(
+                    children: [
+                       IconButton(
+                        icon: const Icon(Icons.auto_awesome_outlined, color: Colors.white),
+                        onPressed: () => context.push(RouteNames.chatbot),
+                        tooltip: 'AI Assistant',
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.settings_outlined, color: Colors.white),
+                        onPressed: () => context.push(RouteNames.settings),
+                        tooltip: 'Settings',
+                      ),
+                    ],
                   ),
                 ),
               ),

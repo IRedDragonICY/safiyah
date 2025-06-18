@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safiyah/presentation/pages/chatbot/chatbot_page.dart';
 import 'package:safiyah/presentation/pages/onboarding/onboarding_page.dart';
 
 import '../presentation/pages/home/home_page.dart';
@@ -16,12 +17,13 @@ import '../presentation/pages/itinerary/itinerary_list_page.dart';
 import '../presentation/pages/itinerary/create_itinerary_page.dart';
 import '../presentation/pages/itinerary/itinerary_detail_page.dart';
 import '../presentation/pages/ar/ar_navigation_page.dart';
-import '../presentation/pages/voucher/voucher_page.dart';
-import '../data/models/place_model.dart';
 import 'route_names.dart';
 
 class AppRouter {
+  static final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
   static final GoRouter router = GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: RouteNames.splash,
     routes: [
       GoRoute(
@@ -44,50 +46,46 @@ class AppRouter {
         name: 'register',
         builder: (context, state) => const RegisterPage(),
       ),
-      ShellRoute(
-        builder: (context, state, child) {
-          return MainNavigationWrapper(child: child);
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return MainNavigationWrapper(navigationShell: navigationShell);
         },
-        routes: [
-          GoRoute(
-            path: RouteNames.home,
-            name: 'home',
-            builder: (context, state) => const HomePage(),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: RouteNames.home,
+                name: 'home',
+                builder: (context, state) => const HomePage(),
+              ),
+            ],
           ),
-          GoRoute(
-            path: RouteNames.prayer,
-            name: 'prayer',
-            builder: (context, state) => const PrayerTimesPage(),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: RouteNames.prayer,
+                name: 'prayer',
+                builder: (context, state) => const PrayerTimesPage(),
+              ),
+            ],
           ),
-          GoRoute(
-            path: RouteNames.places,
-            name: 'places',
-            builder: (context, state) {
-              final typeParam = state.uri.queryParameters['type'];
-              PlaceType? filterType;
-
-              if (typeParam != null) {
-                try {
-                  filterType = PlaceType.values.firstWhere(
-                    (type) => type.name == typeParam,
-                  );
-                } catch (e) {
-                  filterType = null;
-                }
-              }
-
-              return PlacesMapPage(filterType: filterType);
-            },
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: RouteNames.itinerary,
+                name: 'itinerary',
+                builder: (context, state) => const ItineraryListPage(),
+              ),
+            ],
           ),
-          GoRoute(
-            path: RouteNames.itinerary,
-            name: 'itinerary',
-            builder: (context, state) => const ItineraryListPage(),
-          ),
-          GoRoute(
-            path: RouteNames.voucher,
-            name: 'voucher',
-            builder: (context, state) => const VoucherPage(),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: RouteNames.places,
+                name: 'places',
+                builder: (context, state) => const PlacesMapPage(),
+              ),
+            ],
           ),
         ],
       ),
@@ -98,11 +96,13 @@ class AppRouter {
       ),
       GoRoute(
         path: RouteNames.qibla,
+        parentNavigatorKey: _rootNavigatorKey,
         name: 'qibla',
         builder: (context, state) => const QiblaPage(),
       ),
       GoRoute(
         path: '/places/detail/:id',
+        parentNavigatorKey: _rootNavigatorKey,
         name: 'place_detail',
         builder: (context, state) {
           final id = state.pathParameters['id']!;
@@ -111,11 +111,13 @@ class AppRouter {
       ),
       GoRoute(
         path: RouteNames.createItinerary,
+        parentNavigatorKey: _rootNavigatorKey,
         name: 'create_itinerary',
         builder: (context, state) => const CreateItineraryPage(),
       ),
       GoRoute(
         path: '/itinerary/detail/:id',
+        parentNavigatorKey: _rootNavigatorKey,
         name: 'itinerary_detail',
         builder: (context, state) {
           final id = state.pathParameters['id']!;
@@ -124,6 +126,7 @@ class AppRouter {
       ),
       GoRoute(
         path: '/itinerary/edit/:id',
+        parentNavigatorKey: _rootNavigatorKey,
         name: 'edit_itinerary',
         builder: (context, state) {
           final id = state.pathParameters['id']!;
@@ -132,8 +135,15 @@ class AppRouter {
       ),
       GoRoute(
         path: RouteNames.arNavigation,
+        parentNavigatorKey: _rootNavigatorKey,
         name: 'ar_navigation',
         builder: (context, state) => const ARNavigationPage(),
+      ),
+      GoRoute(
+        path: RouteNames.chatbot,
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'chatbot',
+        builder: (context, state) => const ChatbotPage(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
