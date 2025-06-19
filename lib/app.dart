@@ -8,6 +8,7 @@ import 'presentation/bloc/settings/settings_bloc.dart';
 import 'presentation/bloc/settings/settings_state.dart';
 import 'presentation/theme/app_theme.dart';
 import 'routes/app_router.dart';
+import 'core/constants/colors.dart';
 
 class SafiyahMaterialApp extends StatelessWidget {
   @override
@@ -18,11 +19,40 @@ class SafiyahMaterialApp extends StatelessWidget {
           builder: (context, settingsState) {
             return BlocBuilder<AuthBloc, AuthState>(
               builder: (context, authState) {
+                Color seed = AppColors.primary;
+                ColorScheme? lightDyn = lightDynamic;
+                ColorScheme? darkDyn = darkDynamic;
+
+                if (settingsState is SettingsLoaded) {
+                  switch (settingsState.paletteName) {
+                    case 'green':
+                      seed = AppColors.primary;
+                      lightDyn = null;
+                      darkDyn = null;
+                      break;
+                    case 'orange':
+                      seed = AppColors.secondary;
+                      lightDyn = null;
+                      darkDyn = null;
+                      break;
+                    case 'blue':
+                      seed = Colors.blue;
+                      lightDyn = null;
+                      darkDyn = null;
+                      break;
+                    case 'device':
+                    default:
+                      // keep dynamic schemes if available else fallback to primary
+                      seed = AppColors.primary;
+                      break;
+                  }
+                }
+
                 return MaterialApp.router(
                   title: 'Safiyah - Muslim Traveler',
                   debugShowCheckedModeBanner: false,
-                  theme: AppTheme.lightTheme(lightDynamic),
-                  darkTheme: AppTheme.darkTheme(darkDynamic),
+                  theme: AppTheme.lightTheme(dynamicScheme: lightDyn, seedColor: seed),
+                  darkTheme: AppTheme.darkTheme(dynamicScheme: darkDyn, seedColor: seed),
                   themeMode: settingsState is SettingsLoaded ? settingsState.themeMode : ThemeMode.system,
                   routerConfig: AppRouter.router,
                 );

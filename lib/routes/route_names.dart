@@ -20,4 +20,9 @@ class RouteNames {
   static const String arNavigation = '/ar-navigation';
 
   static const String chatbot = '/chatbot';
+
+  static const String personalization = '/personalization';
+  static const String termsOfService = '/terms-of-service';
+
+  static const String boycott = '/boycott';
 }

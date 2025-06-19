@@ -30,7 +30,7 @@ class SettingsPage extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.all(16.0),
             children: [
-              _buildAppearanceSection(context, state.preferences),
+              _buildAppearanceSection(context, state.preferences, state.paletteName),
               _buildPrayerSection(context, state.preferences),
               _buildNotificationsSection(context, state.preferences),
               _buildAccountSection(context),
@@ -56,7 +56,7 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAppearanceSection(BuildContext context, UserPreferences prefs) {
+  Widget _buildAppearanceSection(BuildContext context, UserPreferences prefs, String paletteName) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -72,12 +72,18 @@ class SettingsPage extends StatelessWidget {
                 onTap: () => _showThemeDialog(context, prefs),
               ),
               const Divider(height: 1),
-              SwitchListTile(
-                secondary: const Icon(Icons.language),
+              ListTile(
+                leading: const Icon(Icons.palette),
+                title: const Text('Color Palette'),
+                subtitle: Text(_paletteLabel(paletteName)),
+                onTap: () => _showPaletteDialog(context),
+              ),
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.language),
                 title: const Text('Language'),
                 subtitle: const Text('English'),
-                value: true,
-                onChanged: (value) {},
+                onTap: () => _showLanguageDialog(context),
               ),
             ],
           ),
@@ -264,6 +270,122 @@ class SettingsPage extends StatelessWidget {
               ),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  String _paletteLabel(String name) {
+    switch (name) {
+      case 'device':
+        return 'Follow Device';
+      case 'green':
+        return 'Safiyah Green';
+      case 'orange':
+        return 'Vibrant Orange';
+      case 'blue':
+        return 'Calming Blue';
+      default:
+        return name;
+    }
+  }
+
+  void _showPaletteDialog(BuildContext context) {
+    final settingsState = context.read<SettingsBloc>().state;
+    if (settingsState is! SettingsLoaded) return;
+
+    final current = settingsState.paletteName;
+
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      builder: (dialogContext) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Text(
+              'Choose Color Palette',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            RadioListTile<String>(
+              title: const Text('Follow Device'),
+              secondary: const Icon(Icons.phone_android),
+              value: 'device',
+              groupValue: current,
+              onChanged: (value) {
+                context.read<SettingsBloc>().add(const ChangePalette(paletteName: 'device'));
+                Navigator.pop(dialogContext);
+              },
+            ),
+            RadioListTile<String>(
+              title: const Text('Safiyah Green'),
+              secondary: const Icon(Icons.circle, color: AppColors.primary),
+              value: 'green',
+              groupValue: current,
+              onChanged: (value) {
+                context.read<SettingsBloc>().add(const ChangePalette(paletteName: 'green'));
+                Navigator.pop(dialogContext);
+              },
+            ),
+            RadioListTile<String>(
+              title: const Text('Vibrant Orange'),
+              secondary: const Icon(Icons.circle, color: AppColors.secondary),
+              value: 'orange',
+              groupValue: current,
+              onChanged: (value) {
+                context.read<SettingsBloc>().add(const ChangePalette(paletteName: 'orange'));
+                Navigator.pop(dialogContext);
+              },
+            ),
+            RadioListTile<String>(
+              title: const Text('Calming Blue'),
+              secondary: const Icon(Icons.circle, color: Colors.blue),
+              value: 'blue',
+              groupValue: current,
+              onChanged: (value) {
+                context.read<SettingsBloc>().add(const ChangePalette(paletteName: 'blue'));
+                Navigator.pop(dialogContext);
+              },
+            ),
+            const SizedBox(height: 12),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showLanguageDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      builder: (dialogContext) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Text(
+              'Choose Language',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            RadioListTile<String>(
+              title: const Text('English'),
+              value: 'en',
+              groupValue: 'en',
+              onChanged: (_) {
+                Navigator.pop(dialogContext);
+              },
+            ),
+            RadioListTile<String>(
+              title: const Text('Bahasa Indonesia'),
+              value: 'id',
+              groupValue: 'en',
+              onChanged: (_) {
+                Navigator.pop(dialogContext);
+              },
+            ),
+            const SizedBox(height: 12),
+          ],
         );
       },
     );

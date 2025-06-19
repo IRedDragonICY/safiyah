@@ -4,10 +4,10 @@ import 'package:material_color_utilities/material_color_utilities.dart';
 import '../../core/constants/colors.dart';
 
 class AppTheme {
-  static ThemeData lightTheme(ColorScheme? lightColorScheme) {
-    final colorScheme = lightColorScheme ?? 
+  static ThemeData lightTheme({ColorScheme? dynamicScheme, required Color seedColor}) {
+    final colorScheme = dynamicScheme ??
         ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
+          seedColor: seedColor,
           brightness: Brightness.light,
         );
 
@@ -110,10 +110,10 @@ class AppTheme {
     );
   }
 
-  static ThemeData darkTheme(ColorScheme? darkColorScheme) {
-    final colorScheme = darkColorScheme ??
+  static ThemeData darkTheme({ColorScheme? dynamicScheme, required Color seedColor}) {
+    final colorScheme = dynamicScheme ??
         ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
+          seedColor: seedColor,
           brightness: Brightness.dark,
         );
 

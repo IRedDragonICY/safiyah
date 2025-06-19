@@ -8,6 +8,9 @@ import '../presentation/pages/settings/settings_page.dart';
 import '../presentation/pages/splash/splash_page.dart';
 import '../presentation/pages/auth/login_page.dart';
 import '../presentation/pages/auth/register_page.dart';
+import '../presentation/pages/auth/personalization_page.dart';
+import '../presentation/pages/legal/terms_of_service_page.dart';
+import '../presentation/pages/boycott/boycott_page.dart';
 import '../presentation/pages/main_navigation_wrapper.dart';
 import '../presentation/pages/prayer/prayer_times_page.dart';
 import '../presentation/pages/prayer/qibla_page.dart';
@@ -45,6 +48,23 @@ class AppRouter {
         path: RouteNames.register,
         name: 'register',
         builder: (context, state) => const RegisterPage(),
+      ),
+      GoRoute(
+        path: RouteNames.personalization,
+        name: 'personalization',
+        builder: (context, state) => const PersonalizationPage(),
+      ),
+      GoRoute(
+        path: RouteNames.termsOfService,
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'terms_of_service',
+        builder: (context, state) => const TermsOfServicePage(),
+      ),
+      GoRoute(
+        path: RouteNames.boycott,
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'boycott',
+        builder: (context, state) => const BoycottPage(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

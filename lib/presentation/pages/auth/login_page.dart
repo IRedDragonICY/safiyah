@@ -28,8 +28,10 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthAuthenticated || state is AuthGuest) {
-            context.go('/');
+          if (state is AuthAuthenticated) {
+            context.go('/personalization');
+          } else if (state is AuthGuest) {
+            context.go('/personalization');
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -61,6 +63,8 @@ class _LoginPageState extends State<LoginPage> {
                   _buildGuestButton(context),
                   const SizedBox(height: 24),
                   _buildSignUpButton(context),
+                  const SizedBox(height: 8),
+                  _buildTermsButton(context),
                 ],
               ),
             ),
@@ -216,6 +220,18 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildTermsButton(BuildContext context) {
+    return TextButton(
+      onPressed: () {
+        context.push('/terms-of-service');
+      },
+      child: Text(
+        'Terms of Service',
+        style: TextStyle(color: AppColors.primary),
+      ),
     );
   }
 

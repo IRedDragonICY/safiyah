@@ -21,6 +21,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         super(const SettingsInitial()) {
     on<LoadSettings>(_onLoadSettings);
     on<ChangeTheme>(_onChangeTheme);
+    on<ChangePalette>(_onChangePalette);
   }
 
   ThemeMode _mapStringToThemeMode(String themeString) {
@@ -56,11 +57,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       emit(SettingsLoaded(
         preferences: prefs,
         themeMode: _mapStringToThemeMode(prefs.themeMode),
+        paletteName: 'green',
       ));
     } else {
       emit(const SettingsLoaded(
         preferences: UserPreferences(),
         themeMode: ThemeMode.system,
+        paletteName: 'green',
       ));
     }
   }
@@ -85,9 +88,25 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       _authBloc.add(UpdateUserProfile(user: updatedUser));
     }
 
+    String currentPalette = 'green';
+    if (state is SettingsLoaded) {
+      currentPalette = (state as SettingsLoaded).paletteName;
+    }
+
     emit(SettingsLoaded(
       preferences: newPrefs,
       themeMode: event.themeMode,
+      paletteName: currentPalette,
     ));
+  }
+
+  Future<void> _onChangePalette(
+    ChangePalette event,
+    Emitter<SettingsState> emit,
+  ) async {
+    if (state is SettingsLoaded) {
+      final updated = (state as SettingsLoaded).copyWith(paletteName: event.paletteName);
+      emit(updated);
+    }
   }
 }

@@ -110,6 +110,13 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                 _buildTagline(),
                 const SizedBox(height: 80),
                 _buildLoadingIndicator(),
+                const SizedBox(height: 24),
+                Text(
+                  'v1.0.0',
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: Colors.white70,
+                      ),
+                ),
               ],
             ),
           ),

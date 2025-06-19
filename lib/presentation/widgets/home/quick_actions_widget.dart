@@ -104,6 +104,13 @@ class QuickActionsWidget extends StatelessWidget {
                   color: AppColors.warning,
                   onTap: () => context.push('/places?type=store'),
                 ),
+                _buildQuickActionItem(
+                  context,
+                  icon: Icons.no_food,
+                  label: 'Boycott',
+                  color: AppColors.error,
+                  onTap: () => context.push('/boycott'),
+                ),
               ],
             ),
           ],

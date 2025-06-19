@@ -17,12 +17,26 @@ class SettingsInitial extends SettingsState {
 class SettingsLoaded extends SettingsState {
   final UserPreferences preferences;
   final ThemeMode themeMode;
+  final String paletteName; // 'device', 'green', 'orange', 'blue'
 
   const SettingsLoaded({
     required this.preferences,
     required this.themeMode,
+    this.paletteName = 'device',
   });
 
+  SettingsLoaded copyWith({
+    UserPreferences? preferences,
+    ThemeMode? themeMode,
+    String? paletteName,
+  }) {
+    return SettingsLoaded(
+      preferences: preferences ?? this.preferences,
+      themeMode: themeMode ?? this.themeMode,
+      paletteName: paletteName ?? this.paletteName,
+    );
+  }
+
   @override
-  List<Object?> get props => [preferences, themeMode];
+  List<Object?> get props => [preferences, themeMode, paletteName];
 }

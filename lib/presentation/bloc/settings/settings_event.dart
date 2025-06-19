@@ -20,3 +20,12 @@ class ChangeTheme extends SettingsEvent {
   @override
   List<Object?> get props => [themeMode];
 }
+
+class ChangePalette extends SettingsEvent {
+  final String paletteName; // 'device', 'green', 'orange', 'blue'
+
+  const ChangePalette({required this.paletteName});
+
+  @override
+  List<Object?> get props => [paletteName];
+}
