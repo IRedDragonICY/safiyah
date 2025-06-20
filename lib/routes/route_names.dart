@@ -21,6 +21,8 @@ class RouteNames {
 
   static const String chatbot = '/chatbot';
 
+  static const String currency = '/currency';
+
   static const String personalization = '/personalization';
   static const String termsOfService = '/terms-of-service';
 

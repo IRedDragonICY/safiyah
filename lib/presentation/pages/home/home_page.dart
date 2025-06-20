@@ -12,6 +12,7 @@ import '../../bloc/home/home_event.dart';
 import '../../bloc/home/home_state.dart';
 import '../../widgets/common/loading_widget.dart';
 import '../../widgets/home/quick_actions_widget.dart';
+import '../../widgets/home/currency_widget.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -82,6 +83,8 @@ class HomePage extends StatelessWidget {
                     padding: const EdgeInsets.all(16.0),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
+                        const CurrencyWidget(),
+                        const SizedBox(height: 16),
                         const QuickActionsWidget(),
                         const SizedBox(height: 24),
                         _buildRecentItineraries(context),

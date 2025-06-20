@@ -11,6 +11,7 @@ import '../presentation/pages/auth/register_page.dart';
 import '../presentation/pages/auth/personalization_page.dart';
 import '../presentation/pages/legal/terms_of_service_page.dart';
 import '../presentation/pages/boycott/boycott_page.dart';
+import '../presentation/pages/currency/currency_page.dart';
 import '../presentation/pages/main_navigation_wrapper.dart';
 import '../presentation/pages/prayer/prayer_times_page.dart';
 import '../presentation/pages/prayer/qibla_page.dart';
@@ -164,6 +165,12 @@ class AppRouter {
         parentNavigatorKey: _rootNavigatorKey,
         name: 'chatbot',
         builder: (context, state) => const ChatbotPage(),
+      ),
+      GoRoute(
+        path: RouteNames.currency,
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'currency',
+        builder: (context, state) => const CurrencyPage(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
