@@ -141,7 +141,7 @@ class ColorBlindnessService {
       onTertiaryContainer: applyColorFilter(originalScheme.onTertiaryContainer),
       errorContainer: applyColorFilter(originalScheme.errorContainer),
       onErrorContainer: applyColorFilter(originalScheme.onErrorContainer),
-      surfaceVariant: applyColorFilter(originalScheme.surfaceVariant),
+      surfaceContainerHighest: applyColorFilter(originalScheme.surfaceContainerHighest),
       onSurfaceVariant: applyColorFilter(originalScheme.onSurfaceVariant),
       outline: applyColorFilter(originalScheme.outline),
       outlineVariant: applyColorFilter(originalScheme.outlineVariant),

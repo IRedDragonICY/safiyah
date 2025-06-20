@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../../data/models/currency_model.dart';
@@ -988,20 +987,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
     );
   }
 
-  String _getEstimatedTime() {
-    switch (_destinationCurrency.code) {
-      case 'JPY':
-        return '15 menit';
-      case 'USD':
-        return '2-3 hari kerja';
-      case 'EUR':
-        return '3-4 hari kerja';
-      case 'GBP':
-        return '2-3 hari kerja';
-      default:
-        return '2-4 hari kerja';
-    }
-  }
+
 
   Widget _buildEmptyRateAlerts() {
     final theme = Theme.of(context);

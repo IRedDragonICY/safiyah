@@ -350,7 +350,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Berkontribusi untuk Sedekah',
+                  'Contributing to Charity',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.green[700],
@@ -358,7 +358,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Sebagian dari pembayaran langganan Anda akan disumbangkan untuk kegiatan sosial dan sedekah. Dengan berlangganan, Anda tidak hanya mendapat fitur premium tetapi juga pahala.',
+                  'Part of your subscription payment will be donated to social activities and charity. By subscribing, you not only get premium features but also earn spiritual rewards.',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.green[600],
                   ),
@@ -427,9 +427,9 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
               const SizedBox(height: 16),
               const Text('Payment methods:'),
               const SizedBox(height: 8),
-              _buildPaymentMethod('GoPay', Icons.account_balance_wallet),
-              _buildPaymentMethod('OVO', Icons.account_balance_wallet),
-              _buildPaymentMethod('Dana', Icons.account_balance_wallet),
+              _buildPaymentMethod('PayPal', Icons.account_balance_wallet),
+              _buildPaymentMethod('Google Pay', Icons.account_balance_wallet),
+              _buildPaymentMethod('Apple Pay', Icons.account_balance_wallet),
               _buildPaymentMethod('Bank Transfer', Icons.account_balance),
             ],
           ),

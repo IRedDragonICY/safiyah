@@ -181,8 +181,6 @@ class _PersonalizationPageState extends State<PersonalizationPage>
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final size = MediaQuery.of(context).size;
 
     return Scaffold(
       body: Container(
@@ -210,8 +208,8 @@ class _PersonalizationPageState extends State<PersonalizationPage>
                         onPressed: _previousStep,
                         icon: const Icon(Icons.arrow_back),
                         style: IconButton.styleFrom(
-                          backgroundColor: colorScheme.surfaceVariant,
-                          foregroundColor: colorScheme.onSurfaceVariant,
+                                          backgroundColor: colorScheme.surfaceContainerHighest,
+                foregroundColor: colorScheme.onSurfaceVariant,
                         ),
                       )
                     else
@@ -223,7 +221,7 @@ class _PersonalizationPageState extends State<PersonalizationPage>
                           value: (_currentStep + 1) / 3,
                           minHeight: 8,
                           borderRadius: BorderRadius.circular(4),
-                          backgroundColor: colorScheme.surfaceVariant,
+                          backgroundColor: colorScheme.surfaceContainerHighest,
                           valueColor: AlwaysStoppedAnimation<Color>(
                             colorScheme.primary,
                           ),
@@ -334,7 +332,7 @@ class _PersonalizationPageState extends State<PersonalizationPage>
                   shadowColor: colorScheme.primary.withValues(alpha: 0.3),
                   color: isSelected
                       ? colorScheme.primaryContainer
-                      : colorScheme.surfaceVariant,
+                      : colorScheme.surfaceContainerHighest,
                   child: InkWell(
                     onTap: () {
                       setState(() {
@@ -384,7 +382,7 @@ class _PersonalizationPageState extends State<PersonalizationPage>
     final Set<String> regionSet = _selectedContinent!.countries.values
         .map((c) => c.region.isNotEmpty ? c.region : 'Other')
         .toSet();
-    final List<String> _regionNames = regionSet.toList()..sort();
+    final List<String> regionNames = regionSet.toList()..sort();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -419,9 +417,9 @@ class _PersonalizationPageState extends State<PersonalizationPage>
                 crossAxisSpacing: 16,
                 childAspectRatio: 2.2,
               ),
-              itemCount: _regionNames.length,
+              itemCount: regionNames.length,
               itemBuilder: (context, index) {
-                final region = _regionNames[index];
+                final region = regionNames[index];
                 final isSelected = _selectedRegion == region;
 
                 return Card(
@@ -429,7 +427,7 @@ class _PersonalizationPageState extends State<PersonalizationPage>
                   shadowColor: colorScheme.primary.withValues(alpha: 0.3),
                   color: isSelected
                       ? colorScheme.primaryContainer
-                      : colorScheme.surfaceVariant,
+                      : colorScheme.surfaceContainerHighest,
                   child: InkWell(
                     onTap: () {
                       setState(() {
@@ -540,7 +538,7 @@ class _PersonalizationPageState extends State<PersonalizationPage>
                   return Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: colorScheme.surfaceVariant,
+                      color: colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: colorScheme.outline.withValues(alpha: 0.2),
@@ -603,7 +601,7 @@ class _PersonalizationPageState extends State<PersonalizationPage>
                       decoration: BoxDecoration(
                         color: isSelected
                             ? colorScheme.primaryContainer
-                            : colorScheme.surfaceVariant,
+                            : colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: isSelected

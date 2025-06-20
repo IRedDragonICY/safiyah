@@ -130,7 +130,7 @@ class EventCard extends StatelessWidget {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    Colors.black.withOpacity(0.4),
+                    Colors.black.withValues(alpha: 0.4),
                   ],
                 ),
               ),
@@ -178,7 +178,7 @@ class EventCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: badgeColor.withOpacity(0.9),
+        color: badgeColor.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Text(
@@ -197,8 +197,8 @@ class EventCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: event.priceInfo.isFree 
-            ? Theme.of(context).colorScheme.tertiary.withOpacity(0.9)
-            : Theme.of(context).colorScheme.secondary.withOpacity(0.9),
+            ? Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.9)
+            : Theme.of(context).colorScheme.secondary.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Text(
@@ -222,7 +222,7 @@ class EventCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: Colors.white.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -299,7 +299,7 @@ class EventCard extends StatelessWidget {
             Text(
               event.description,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8),
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -367,7 +367,7 @@ class EventCard extends StatelessWidget {
                     return Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceVariant,
+                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(

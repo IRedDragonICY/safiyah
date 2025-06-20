@@ -385,7 +385,7 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.arrow_back),
                       style: IconButton.styleFrom(
-                        backgroundColor: colorScheme.surfaceVariant,
+                        backgroundColor: colorScheme.surfaceContainerHighest,
                         foregroundColor: colorScheme.onSurfaceVariant,
                       ),
                     ),
@@ -428,7 +428,7 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: colorScheme.surfaceVariant,
+                    color: colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: colorScheme.outline.withValues(alpha: 0.2),
@@ -480,7 +480,7 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
                       onSelected: (_) {
                         setState(() => _selectedCategory = category);
                       },
-                      backgroundColor: colorScheme.surfaceVariant,
+                      backgroundColor: colorScheme.surfaceContainerHighest,
                       selectedColor: colorScheme.primaryContainer,
                       labelStyle: TextStyle(
                         color: isSelected 
@@ -766,7 +766,7 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: colorScheme.surfaceVariant,
+                          color: colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
@@ -797,7 +797,7 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: colorScheme.surfaceVariant,
+                        color: colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Column(
@@ -877,7 +877,7 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: colorScheme.surfaceVariant,
+                          color: colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Column(

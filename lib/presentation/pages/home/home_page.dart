@@ -6,7 +6,6 @@ import 'package:safiyah/routes/route_names.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/colors.dart';
-import '../../../core/constants/strings.dart';
 import '../../../core/services/ai_accessibility_service.dart';
 import '../../bloc/home/home_bloc.dart';
 import '../../bloc/home/home_event.dart';
@@ -217,23 +216,59 @@ class _HomePageState extends State<HomePage> {
             Positioned(
               right: 24,
               bottom: 24,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    _getWeatherIcon(state.weather.condition),
-                    color: Colors.white,
-                    size: 24,
+              child: InkWell(
+                onTap: () => context.push('/weather'),
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${state.weather.temperature.round()}°',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(
+                        _getWeatherIcon(state.weather.condition),
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                      const SizedBox(width: 8),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${state.weather.temperature.round()}°',
+                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              height: 1,
+                            ),
+                          ),
+                          Text(
+                            state.weather.condition,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              height: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.chevron_right,
+                        color: Colors.white.withValues(alpha: 0.7),
+                        size: 20,
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
             Positioned(

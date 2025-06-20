@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'package:uuid/uuid.dart';
+
 
 class ChatbotRepository {
-  final Uuid _uuid = const Uuid();
+
 
   Stream<String> getResponseStream(String userMessage) async* {
     await Future.delayed(const Duration(milliseconds: 500));

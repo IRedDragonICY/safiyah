@@ -56,7 +56,6 @@ class NotificationService {
       initializationSettings,
       onDidReceiveNotificationResponse: _onNotificationTapped,
     );
-    await _requestNotificationPermission();
   }
 
   static void _onNotificationTapped(NotificationResponse notificationResponse) {
@@ -65,7 +64,7 @@ class NotificationService {
     }
   }
 
-  static Future<bool> _requestNotificationPermission() async {
+  static Future<bool> requestNotificationPermission() async {
     final status = await Permission.notification.request();
     return status.isGranted;
   }

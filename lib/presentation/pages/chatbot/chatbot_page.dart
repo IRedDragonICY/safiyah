@@ -160,7 +160,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3)
+          color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,7 +247,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
                   decoration: InputDecoration(
                     hintText: 'Ask Safiyah anything...',
                     filled: true,
-                    fillColor: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.5),
+                    fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(24.0),
                       borderSide: BorderSide.none,

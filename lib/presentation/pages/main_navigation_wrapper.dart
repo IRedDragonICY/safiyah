@@ -83,7 +83,7 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> with Tick
         }
       } else {
         // Swipe left - go to next page  
-        if (currentIndex < 4) {
+        if (currentIndex < 3) {
           _animateSwipe(currentIndex + 1, isSwipeRight: false);
         }
       }
@@ -138,20 +138,60 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> with Tick
     });
   }
 
-  Widget _buildNavItem(BuildContext context, {required IconData icon, required int index}) {
+  Widget _buildNavItem(BuildContext context, {
+    required IconData icon, 
+    required IconData selectedIcon,
+    required int index, 
+    required String label
+  }) {
     final isSelected = widget.navigationShell.currentIndex == index;
-    return IconButton(
-      icon: Icon(
-        icon,
-        color: isSelected
-            ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).colorScheme.onSurfaceVariant,
+    final theme = Theme.of(context);
+    
+    return Expanded(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => _onItemTapped(index, context),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 28,
+                height: 28,
+                decoration: isSelected ? BoxDecoration(
+                  color: theme.colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(14),
+                ) : null,
+                child: Icon(
+                  isSelected ? selectedIcon : icon,
+                  color: isSelected
+                      ? theme.colorScheme.onPrimaryContainer
+                      : theme.colorScheme.onSurfaceVariant,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: isSelected
+                      ? theme.colorScheme.onSurface
+                      : theme.colorScheme.onSurfaceVariant,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  fontSize: 10,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
       ),
-      onPressed: () => _onItemTapped(index, context),
     );
   }
 
-    @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: GestureDetector(
@@ -161,25 +201,59 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> with Tick
           child: widget.navigationShell,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push(RouteNames.chatbot),
-        child: const Icon(Icons.auto_awesome),
-        elevation: 2,
+      floatingActionButton: Container(
+        width: 64,
+        height: 64,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Theme.of(context).colorScheme.primary,
+              Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+            ],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(32),
+            onTap: () => context.push(RouteNames.chatbot),
+            child: const Icon(
+              Icons.auto_awesome,
+              color: Colors.white,
+              size: 28,
+            ),
+          ),
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            _buildNavItem(context, icon: Icons.home_outlined, index: 0),
-            _buildNavItem(context, icon: Icons.schedule_outlined, index: 1),
-            const SizedBox(width: 40),
-            _buildNavItem(context, icon: Icons.list_alt_outlined, index: 2),
-            _buildNavItem(context, icon: Icons.map_outlined, index: 3),
-            _buildNavItem(context, icon: Icons.event_outlined, index: 4),
-          ],
+        notchMargin: 12.0,
+        elevation: 8,
+        shadowColor: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.2),
+        child: Container(
+          height: 65,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              _buildNavItem(context, icon: Icons.home_outlined, selectedIcon: Icons.home, index: 0, label: 'Home'),
+              _buildNavItem(context, icon: Icons.schedule_outlined, selectedIcon: Icons.schedule, index: 1, label: 'Prayer'),
+              const SizedBox(width: 64), // Space for floating action button
+              _buildNavItem(context, icon: Icons.list_alt_outlined, selectedIcon: Icons.list_alt, index: 2, label: 'Itinerary'),
+              _buildNavItem(context, icon: Icons.map_outlined, selectedIcon: Icons.map, index: 3, label: 'Places'),
+            ],
+          ),
         ),
       ),
     );

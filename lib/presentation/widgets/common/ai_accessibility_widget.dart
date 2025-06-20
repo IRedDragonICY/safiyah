@@ -56,7 +56,7 @@ class _AIAccessibilityWidgetState extends State<AIAccessibilityWidget>
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
               width: 2,
             ),
           ),
@@ -131,7 +131,7 @@ class _AIAccessibilityWidgetState extends State<AIAccessibilityWidget>
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.green.withOpacity(0.5),
+                  color: Colors.green.withValues(alpha: 0.5),
                   blurRadius: 4,
                   spreadRadius: 1,
                 ),
@@ -157,7 +157,7 @@ class _AIAccessibilityWidgetState extends State<AIAccessibilityWidget>
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Theme.of(context).colorScheme.tertiary.withOpacity(
+                      color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 
                         0.3 + (0.7 * _pulseController.value),
                       ),
                       blurRadius: 8,
@@ -189,7 +189,7 @@ class _AIAccessibilityWidgetState extends State<AIAccessibilityWidget>
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.blue.withOpacity(0.5),
+                  color: Colors.blue.withValues(alpha: 0.5),
                   blurRadius: 4,
                   spreadRadius: 1,
                 ),
@@ -228,7 +228,7 @@ class _AIAccessibilityWidgetState extends State<AIAccessibilityWidget>
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.orange.withOpacity(0.5),
+                  color: Colors.orange.withValues(alpha: 0.5),
                   blurRadius: 4,
                   spreadRadius: 1,
                 ),
@@ -256,7 +256,7 @@ class _AIAccessibilityWidgetState extends State<AIAccessibilityWidget>
                   boxShadow: isListening
                       ? [
                           BoxShadow(
-                            color: Colors.red.withOpacity(0.5),
+                            color: Colors.red.withValues(alpha: 0.5),
                             blurRadius: 8,
                             spreadRadius: 2,
                           ),
@@ -290,7 +290,7 @@ class _AIAccessibilityWidgetState extends State<AIAccessibilityWidget>
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: (isListening ? Colors.red : Colors.purple).withOpacity(0.5),
+                      color: (isListening ? Colors.red : Colors.purple).withValues(alpha: 0.5),
                       blurRadius: 4,
                       spreadRadius: 1,
                     ),
@@ -313,7 +313,7 @@ class _AIAccessibilityWidgetState extends State<AIAccessibilityWidget>
         return Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(

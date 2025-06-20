@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'dart:ui' as ui;
-import 'dart:typed_data';
 import 'dart:async';
 
 class PathGuideDetector {

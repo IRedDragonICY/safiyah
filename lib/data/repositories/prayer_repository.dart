@@ -1,10 +1,10 @@
 import 'package:adhan/adhan.dart';
 import '../models/prayer_time_model.dart';
-import '../../core/utils/prayer_time_calculator.dart';
+
 import '../../core/services/location_service.dart';
 
 class PrayerRepository {
-  final PrayerTimeCalculator _calculator = PrayerTimeCalculator();
+
 
   Future<PrayerTimeModel> getPrayerTimes({
     double? latitude,
@@ -74,7 +74,6 @@ class PrayerRepository {
   }) async {
     final List<PrayerTimeModel> monthlyPrayerTimes = [];
     final targetMonth = month ?? DateTime.now();
-    final firstDay = DateTime(targetMonth.year, targetMonth.month, 1);
     final lastDay = DateTime(targetMonth.year, targetMonth.month + 1, 0);
 
     for (int day = 1; day <= lastDay.day; day++) {

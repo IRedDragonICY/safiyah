@@ -361,7 +361,6 @@ class PrayerTimeCalculator {
     String method = 'MWL',
   }) {
     final adjustments = calculatePrayerAdjustments(latitude, longitude, date);
-    final sunPosition = calculateSunPosition(latitude, longitude, date);
 
     // More accurate calculations would use proper astronomical algorithms
     // This is a simplified version for demonstration

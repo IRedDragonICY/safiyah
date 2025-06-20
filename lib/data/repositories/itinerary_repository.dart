@@ -1,6 +1,5 @@
 import '../models/itinerary_model.dart';
 import '../datasources/local/local_storage.dart';
-import '../../core/services/storage_service.dart';
 
 class ItineraryRepository {
   final LocalStorage _localStorage = LocalStorage();

@@ -119,7 +119,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    Colors.black.withOpacity(0.7),
+                    Colors.black.withValues(alpha: 0.7),
                   ],
                 ),
               ),
@@ -153,7 +153,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                         shape: BoxShape.circle,
                         color: index == _currentImageIndex
                             ? Colors.white
-                            : Colors.white.withOpacity(0.4),
+                            : Colors.white.withValues(alpha: 0.4),
                       ),
                     ),
                   ),
@@ -213,7 +213,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
       decoration: BoxDecoration(
         color: event.priceInfo.isFree 
             ? Colors.green 
-            : AppColors.secondary.withOpacity(0.9),
+            : AppColors.secondary.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Text(
@@ -251,7 +251,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: _getCategoryColor(event.category).withOpacity(0.1),
+                        color: _getCategoryColor(event.category).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
@@ -314,7 +314,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
               return Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -373,7 +373,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.amber.withOpacity(0.1),
+        color: Colors.amber.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -446,7 +446,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -610,8 +610,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
                     decoration: BoxDecoration(
                       border: Border.all(
                         color: tier.isAvailable 
-                            ? AppColors.primary.withOpacity(0.3)
-                            : Colors.grey.withOpacity(0.3),
+                            ? AppColors.primary.withValues(alpha: 0.3)
+                            : Colors.grey.withValues(alpha: 0.3),
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -699,7 +699,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(

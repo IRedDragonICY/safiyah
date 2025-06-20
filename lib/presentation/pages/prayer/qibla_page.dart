@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'dart:math' as math;
 
 import '../../../core/constants/colors.dart';
 import '../../bloc/prayer/prayer_bloc.dart';

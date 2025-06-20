@@ -14,8 +14,8 @@ class AppColors {
   // Background Colors
   static const Color surface = Color(0xFFFFFBFE);
   static const Color surfaceDark = Color(0xFF1C1B1F);
-  static const Color surfaceVariant = Color(0xFFE7E0EC);
-  static const Color surfaceVariantDark = Color(0xFF49454F);
+  static const Color surfaceContainerHighest = Color(0xFFE7E0EC);
+  static const Color surfaceContainerHighestDark = Color(0xFF49454F);
   
   // Text Colors
   static const Color onPrimary = Color(0xFFFFFFFF);

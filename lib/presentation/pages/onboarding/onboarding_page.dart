@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/colors.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../routes/route_names.dart';
 import '../../bloc/onboarding/onboarding_bloc.dart';
 import '../../bloc/onboarding/onboarding_event.dart';
@@ -109,7 +110,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     }
   }
 
-  int _getTotalPages() => 4; // Welcome, Accessibility, Location, Complete
+  int _getTotalPages() => 5; // Welcome, Accessibility, Location, Notifications, Complete
 
   @override
   Widget build(BuildContext context) {
@@ -180,6 +181,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         onAccessibilitySet: _handleAccessibilityData,
                       ),
                       _buildLocationPage(context),
+                      _buildNotificationPage(context),
                       _buildCompletePage(context),
                     ],
                   ),
@@ -250,7 +252,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
           Container(
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -262,14 +264,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
           
           const SizedBox(height: 32),
           
-          // Welcome text
-          Text(
-            'Welcome to Safiyah',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
-            ),
-            textAlign: TextAlign.center,
+          // Safiyah Logo
+          Image.asset(
+            'assets/icons/icon.png',
+            height: 120,
+            width: 120,
           ),
           
           const SizedBox(height: 16),
@@ -300,7 +299,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
           Container(
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
+              color: Colors.blue.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -365,6 +364,212 @@ class _OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
+  Widget _buildNotificationPage(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      child: Column(
+        children: [
+          const Spacer(flex: 1),
+          
+          // Notification illustration
+          Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.orange.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.notifications_active,
+              size: 80,
+              color: Colors.orange,
+            ),
+          ),
+          
+          const SizedBox(height: 32),
+          
+          // Notification text
+          Text(
+            'Stay Updated',
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.orange,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          
+          const SizedBox(height: 16),
+          
+          Text(
+            'Get notified about prayer times, nearby halal places, and important travel updates to make your journey easier.',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              height: 1.5,
+              color: Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          
+          const SizedBox(height: 32),
+          
+          // Notification features
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.orange.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Colors.orange.withValues(alpha: 0.2),
+              ),
+            ),
+            child: Column(
+              children: [
+                _buildNotificationFeature(
+                  icon: Icons.access_time,
+                  title: 'Prayer Time Reminders',
+                  description: 'Never miss a prayer with timely notifications',
+                ),
+                const SizedBox(height: 16),
+                _buildNotificationFeature(
+                  icon: Icons.restaurant,
+                  title: 'Nearby Halal Places',
+                  description: 'Discover halal restaurants near your location',
+                ),
+                const SizedBox(height: 16),
+                _buildNotificationFeature(
+                  icon: Icons.flight,
+                  title: 'Travel Updates',
+                  description: 'Important updates for your itinerary',
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 32),
+          
+          // Permission button
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+                             onPressed: () async {
+                 final scaffoldMessenger = ScaffoldMessenger.of(context);
+                 // Request notification permission here
+                 final granted = await _requestNotificationPermission();
+                 if (!mounted) return;
+                 
+                 if (granted) {
+                   scaffoldMessenger.showSnackBar(
+                     const SnackBar(
+                       content: Text('✅ Notifications enabled! You\'ll receive prayer reminders and updates.'),
+                       backgroundColor: Colors.green,
+                       duration: Duration(seconds: 3),
+                     ),
+                   );
+                 } else {
+                   scaffoldMessenger.showSnackBar(
+                     const SnackBar(
+                       content: Text('⚠️ Notifications disabled. You can enable them later in Settings.'),
+                       backgroundColor: Colors.orange,
+                       duration: Duration(seconds: 3),
+                     ),
+                   );
+                 }
+                 // Continue to next page regardless of permission result
+                 _nextPage();
+               },
+              icon: const Icon(Icons.notifications),
+              label: const Text('Enable Notifications'),
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.orange,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: 12),
+          
+          // Skip option
+                     TextButton(
+             onPressed: () {
+               final scaffoldMessenger = ScaffoldMessenger.of(context);
+               scaffoldMessenger.showSnackBar(
+                 const SnackBar(
+                   content: Text('📱 You can enable notifications later in Settings.'),
+                   backgroundColor: Colors.grey,
+                   duration: Duration(seconds: 2),
+                 ),
+               );
+               _nextPage();
+             },
+            child: Text(
+              'Skip for now',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          
+          const Spacer(flex: 2),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationFeature({
+    required IconData icon,
+    required String title,
+    required String description,
+  }) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.orange.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
+            color: Colors.orange,
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                description,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<bool> _requestNotificationPermission() async {
+    try {
+      // Request notification permission using the NotificationService
+      final status = await NotificationService.requestNotificationPermission();
+      return status;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Widget _buildCompletePage(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -376,7 +581,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
           Container(
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
+              color: Colors.green.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -414,10 +619,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: AppColors.primary.withOpacity(0.3),
+                  color: AppColors.primary.withValues(alpha: 0.3),
                 ),
               ),
               child: Column(

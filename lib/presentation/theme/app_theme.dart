@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:material_color_utilities/material_color_utilities.dart';
 
-import '../../core/constants/colors.dart';
 
 class AppTheme {
   static ThemeData lightTheme({ColorScheme? dynamicScheme, required Color seedColor}) {

@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:safiyah/presentation/bloc/chatbot/chatbot_bloc.dart';
 import 'package:safiyah/presentation/bloc/chatbot/chatbot_event.dart';
 import 'package:safiyah/presentation/bloc/chatbot/chatbot_state.dart';
-import 'dart:math' as math;
 
 class ChatHistoryPage extends StatefulWidget {
   const ChatHistoryPage({super.key});

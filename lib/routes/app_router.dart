@@ -5,6 +5,9 @@ import 'package:safiyah/presentation/pages/chatbot/chatbot_page.dart';
 import 'package:safiyah/presentation/pages/chatbot/chat_history_page.dart';
 import 'package:safiyah/presentation/pages/chatbot/realtime_chatbot_page.dart';
 import 'package:safiyah/presentation/pages/onboarding/onboarding_page.dart';
+import 'package:safiyah/presentation/pages/guide_tour/guide_tour_page.dart';
+import 'package:safiyah/presentation/pages/guide_tour/guide_tour_detail_page.dart';
+import 'package:safiyah/presentation/pages/weather/weather_detail_page.dart';
 
 import '../presentation/pages/home/home_page.dart';
 import '../presentation/pages/settings/settings_page.dart';
@@ -118,15 +121,6 @@ class AppRouter {
               ),
             ],
           ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: RouteNames.events,
-                name: 'events',
-                builder: (context, state) => const EventsPage(),
-              ),
-            ],
-          ),
         ],
       ),
       GoRoute(
@@ -231,6 +225,33 @@ class AppRouter {
           create: (context) => NotificationsBloc(),
           child: const NotificationsPage(),
         ),
+      ),
+      GoRoute(
+        path: RouteNames.events,
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'events',
+        builder: (context, state) => const EventsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.guideTour,
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'guide_tour',
+        builder: (context, state) => const GuideTourPage(),
+      ),
+      GoRoute(
+        path: RouteNames.guideTourDetail,
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'guide_tour_detail',
+        builder: (context, state) {
+          final country = state.uri.queryParameters['country'] ?? 'Japan';
+          return GuideTourDetailPage(country: country);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.weather,
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'weather',
+        builder: (context, state) => const WeatherDetailPage(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

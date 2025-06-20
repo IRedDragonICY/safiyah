@@ -15,7 +15,7 @@ class CameraStabilizer {
   CameraStabilizer({this.onOrientationChanged});
 
   void init() {
-    _accelSubscription = accelerometerEvents.listen(_updateOrientation);
+    _accelSubscription = accelerometerEventStream().listen(_updateOrientation);
   }
 
   void enable() {

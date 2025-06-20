@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'dart:ui';
 import '../../../data/models/voucher_model.dart';
 import '../../../data/services/voucher_history_service.dart';
-import '../../../core/constants/colors.dart';
 
 class VoucherCard extends StatelessWidget {
   final VoucherModel voucher;
@@ -396,7 +395,7 @@ class VoucherCard extends StatelessWidget {
                   ),
                   label: Text(voucher.isValid ? 'Claim' : 'Expired'),
                   style: FilledButton.styleFrom(
-                    backgroundColor: voucher.isValid ? voucher.brandColor : colorScheme.surfaceVariant,
+                    backgroundColor: voucher.isValid ? voucher.brandColor : colorScheme.surfaceContainerHighest,
                     foregroundColor: voucher.isValid ? Colors.white : colorScheme.onSurfaceVariant,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -658,7 +657,7 @@ class VoucherCard extends StatelessWidget {
                           icon: Icon(voucher.isValid ? Icons.redeem : Icons.block),
                           label: Text(voucher.isValid ? 'Claim Now' : 'Expired'),
                           style: FilledButton.styleFrom(
-                            backgroundColor: voucher.isValid ? voucher.brandColor : colorScheme.surfaceVariant,
+                            backgroundColor: voucher.isValid ? voucher.brandColor : colorScheme.surfaceContainerHighest,
                           ),
                         ),
                       ),

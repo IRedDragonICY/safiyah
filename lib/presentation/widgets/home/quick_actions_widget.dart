@@ -79,10 +79,10 @@ class QuickActionsWidget extends StatelessWidget {
                 ),
                 _buildQuickActionItem(
                   context,
-                  icon: Icons.hotel,
-                  label: 'Hotels',
-                  color: AppColors.primary,
-                  onTap: () => context.push('/places?type=hotel'),
+                  icon: Icons.tour,
+                  label: 'Guide Tour',
+                  color: AppColors.secondary,
+                  onTap: () => context.push('/guide-tour'),
                 ),
                 _buildQuickActionItem(
                   context,
@@ -107,10 +107,10 @@ class QuickActionsWidget extends StatelessWidget {
                 ),
                 _buildQuickActionItem(
                   context,
-                  icon: Icons.store,
-                  label: 'Stores',
-                  color: AppColors.warning,
-                  onTap: () => context.push('/places?type=store'),
+                  icon: Icons.event,
+                  label: 'Events',
+                  color: AppColors.primary,
+                  onTap: () => context.push('/events'),
                 ),
                 _buildQuickActionItem(
                   context,

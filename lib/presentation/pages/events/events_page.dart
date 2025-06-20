@@ -85,7 +85,7 @@ class _EventsPageState extends State<EventsPage> with TickerProviderStateMixin {
       expandedHeight: 180,
       floating: false,
       pinned: true,
-      backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       surfaceTintColor: Colors.transparent,
       flexibleSpace: FlexibleSpaceBar(
         title: Text(
@@ -102,7 +102,7 @@ class _EventsPageState extends State<EventsPage> with TickerProviderStateMixin {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Theme.of(context).colorScheme.surfaceVariant,
+                Theme.of(context).colorScheme.surfaceContainerHighest,
                 Theme.of(context).colorScheme.surface,
               ],
             ),
@@ -119,7 +119,7 @@ class _EventsPageState extends State<EventsPage> with TickerProviderStateMixin {
                     height: 100,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
                     ),
                   ),
                 );
@@ -142,7 +142,7 @@ class _EventsPageState extends State<EventsPage> with TickerProviderStateMixin {
                     Text(
                       'Find amazing cultural events and experiences',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.8),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -243,7 +243,7 @@ class _EventsPageState extends State<EventsPage> with TickerProviderStateMixin {
                 color: Theme.of(context).colorScheme.surface,
                 border: Border(
                   bottom: BorderSide(
-                    color: Theme.of(context).dividerColor.withOpacity(0.1),
+                    color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
                     width: 1,
                   ),
                 ),
@@ -280,7 +280,7 @@ class _EventsPageState extends State<EventsPage> with TickerProviderStateMixin {
         color: Theme.of(context).colorScheme.surface,
         border: Border(
           bottom: BorderSide(
-            color: Theme.of(context).dividerColor.withOpacity(0.1),
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
@@ -452,7 +452,7 @@ class _EventsPageState extends State<EventsPage> with TickerProviderStateMixin {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(

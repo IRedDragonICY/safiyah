@@ -24,6 +24,11 @@ class RouteNames {
 
   static const String currency = '/currency';
 
+  static const String guideTour = '/guide-tour';
+  static const String guideTourDetail = '/guide-tour/detail';
+
+  static const String weather = '/weather';
+
   static const String events = '/events';
 
   static const String notifications = '/notifications';
