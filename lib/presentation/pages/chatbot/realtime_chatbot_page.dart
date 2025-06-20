@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:vibration/vibration.dart';
+import 'camera_stabilizer.dart';
+import 'path_guide_detector.dart';
 
 class RealtimeChatbotPage extends StatefulWidget {
   const RealtimeChatbotPage({super.key});
@@ -19,6 +22,14 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
   bool _tapToPush = true; // New: tap to push vs click to toggle
   String _selectedVoice = 'Female - Safiyah';
   
+  // Accessibility Features
+  bool _isDisabilityModeEnabled = false;
+  bool _isCameraStabilizationEnabled = false;
+  bool _isPathGuideEnabled = false;
+  late CameraStabilizer _cameraStabilizer;
+  late PathGuideDetector _pathGuideDetector;
+  PathGuideInfo? _currentPathInfo;
+  
   // Camera Controller
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
@@ -36,6 +47,7 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
   void initState() {
     super.initState();
     _initializeAnimations();
+    _initializeAccessibilityFeatures();
     if (_isCameraEnabled) {
       _initializeCamera();
     }
@@ -63,6 +75,56 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
       begin: Colors.blue.shade400,
       end: Colors.purple.shade400,
     ).animate(_orbController);
+  }
+
+  void _initializeAccessibilityFeatures() {
+    _cameraStabilizer = CameraStabilizer(
+      onOrientationChanged: (pitch, roll) {
+        if (mounted) {
+          setState(() {
+            // Update UI if needed based on orientation
+          });
+        }
+      },
+    );
+    _cameraStabilizer.init();
+    
+    _pathGuideDetector = PathGuideDetector(
+      onPathDetected: (pathInfo) {
+        if (mounted) {
+          setState(() {
+            _currentPathInfo = pathInfo;
+          });
+          
+          // Announce path changes for visually impaired
+          if (_isDisabilityModeEnabled && _isPathGuideEnabled) {
+            _announcePathGuidance(pathInfo);
+          }
+        }
+      },
+    );
+  }
+
+  void _announcePathGuidance(PathGuideInfo pathInfo) {
+    // In real implementation, use TTS to announce
+    final message = pathInfo.directionText;
+    if (pathInfo.hasCrosswalk) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Crosswalk detected ahead. $message'),
+          backgroundColor: Theme.of(context).colorScheme.tertiary,
+        ),
+      );
+    } else if (pathInfo.hasObstacles) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Obstacle detected! $message'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      // Extra vibration for obstacles
+      Vibration.vibrate(pattern: [0, 100, 50, 100, 50, 100]);
+    }
   }
 
   Future<void> _initializeCamera() async {
@@ -98,6 +160,21 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
 
       await _cameraController!.initialize();
 
+      // Start accessibility features if enabled
+      if (_isDisabilityModeEnabled) {
+        if (_isCameraStabilizationEnabled) {
+          _cameraStabilizer.enable();
+        }
+        if (_isPathGuideEnabled) {
+          _pathGuideDetector.startDetection();
+          
+          // Set up camera image stream for path detection
+          await _cameraController!.startImageStream((CameraImage image) {
+            _pathGuideDetector.processImage(image);
+          });
+        }
+      }
+
       if (mounted) {
         setState(() {
           _isCameraInitialized = true;
@@ -118,16 +195,27 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
     _waveController.dispose();
     _orbController.dispose();
     _cameraController?.dispose();
+    _cameraStabilizer.dispose();
+    _pathGuideDetector.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Smart AI Companion'),
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
+        title: Text(
+          'Smart AI Companion',
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        backgroundColor: colorScheme.surface,
+        foregroundColor: colorScheme.onSurface,
+        elevation: 0,
         actions: [
           IconButton(
             icon: Icon(_isArEnabled ? Icons.view_in_ar : Icons.view_in_ar_outlined),
@@ -141,11 +229,21 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
           ),
         ],
       ),
-      backgroundColor: Colors.black,
+      backgroundColor: colorScheme.surface,
       body: Stack(
         children: [
           // Camera/AR view or Voice Orb
           _buildMainView(),
+          // Path guide overlay for accessibility
+          if (_isDisabilityModeEnabled && _isPathGuideEnabled && _isCameraEnabled)
+            Positioned.fill(
+              child: CustomPaint(
+                painter: PathGuidePainter(
+                  pathInfo: _currentPathInfo,
+                  showGuides: true,
+                ),
+              ),
+            ),
           // Overlay controls
           _buildOverlayControls(),
           // Bottom controls
@@ -192,18 +290,21 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
   }
 
   Widget _buildVoiceOrbView() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       width: double.infinity,
       height: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFF0a0a0a),
-            Color(0xFF1a1a2e),
-            Color(0xFF16213e),
-            Color(0xFF0f3460),
+            colorScheme.surface,
+            colorScheme.surfaceContainerLow,
+            colorScheme.surfaceContainerLowest,
+            colorScheme.surfaceContainer,
           ],
         ),
       ),
@@ -221,9 +322,9 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
                   gradient: RadialGradient(
                     colors: _isListening 
                       ? [
-                          Colors.red.withValues(alpha: 0.8),
-                          Colors.red.withValues(alpha: 0.4),
-                          Colors.red.withValues(alpha: 0.1),
+                          colorScheme.error.withValues(alpha: 0.8),
+                          colorScheme.error.withValues(alpha: 0.4),
+                          colorScheme.error.withValues(alpha: 0.1),
                         ]
                       : [
                           _orbColorTween.value!.withValues(alpha: 0.8),
@@ -234,7 +335,7 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
                   boxShadow: [
                     BoxShadow(
                       color: _isListening 
-                        ? Colors.red.withValues(alpha: 0.5)
+                        ? colorScheme.error.withValues(alpha: 0.5)
                         : _orbColorTween.value!.withValues(alpha: 0.3),
                       blurRadius: 50,
                       spreadRadius: 10,
@@ -245,7 +346,7 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
                   ? _buildVoiceVisualizer()
                   : Icon(
                       Icons.mic_none,
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: colorScheme.onPrimaryContainer.withValues(alpha: 0.9),
                       size: 60,
                     ),
               ),
@@ -257,17 +358,22 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
   }
 
   Widget _buildLoadingView() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
-      color: Colors.black,
-      child: const Center(
+      color: colorScheme.surface,
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: Colors.white),
-            SizedBox(height: 16),
+            CircularProgressIndicator(color: colorScheme.primary),
+            const SizedBox(height: 16),
             Text(
               'Initializing Camera...',
-              style: TextStyle(color: Colors.white),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurface,
+              ),
             ),
           ],
         ),
@@ -276,8 +382,11 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
   }
 
   Widget _buildCameraErrorView() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
-      color: Colors.black,
+      color: colorScheme.surface,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -285,31 +394,31 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
             Icon(
               Icons.error_outline,
               size: 64,
-              color: Colors.red[400],
+              color: colorScheme.error,
             ),
             const SizedBox(height: 16),
             Text(
               'Camera Error',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.white,
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               _cameraError!,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[400],
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
-            ElevatedButton.icon(
+            FilledButton.icon(
               onPressed: _initializeCamera,
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
+              style: FilledButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
               ),
             ),
           ],
@@ -319,6 +428,9 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
   }
 
   Widget _buildArOverlay() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Stack(
       children: [
         // AR compass
@@ -329,16 +441,23 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.7),
+              color: colorScheme.surface.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(40),
-              border: Border.all(color: Colors.blue, width: 2),
+              border: Border.all(color: colorScheme.primary, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: colorScheme.shadow.withValues(alpha: 0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-            child: const Stack(
+            child: Stack(
               children: [
                 Center(
                   child: Icon(
                     Icons.navigation,
-                    color: Colors.red,
+                    color: colorScheme.error,
                     size: 32,
                   ),
                 ),
@@ -349,10 +468,9 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
                   child: Center(
                     child: Text(
                       'N',
-                      style: TextStyle(
-                        color: Colors.white,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
-                        fontSize: 12,
                       ),
                     ),
                   ),
@@ -365,12 +483,12 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
         Positioned(
           top: 200,
           left: 100,
-          child: _buildArWaypoint('Masjid Al-Haram', '500m', Icons.mosque, Colors.green),
+          child: _buildArWaypoint('Masjid Al-Haram', '500m', Icons.mosque, colorScheme.primary),
         ),
         Positioned(
           top: 300,
           right: 80,
-          child: _buildArWaypoint('Halal Restaurant', '200m', Icons.restaurant, Colors.orange),
+          child: _buildArWaypoint('Halal Restaurant', '200m', Icons.restaurant, colorScheme.tertiary),
         ),
         // AR info panel
         Positioned(
@@ -390,6 +508,9 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
   }
 
   Widget _buildArWaypoint(String name, String distance, IconData icon, Color color) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -399,16 +520,16 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
           decoration: BoxDecoration(
             color: color,
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
+            border: Border.all(color: colorScheme.surface, width: 2),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
+                color: colorScheme.shadow.withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
             ],
           ),
-          child: Icon(icon, color: Colors.white, size: 24),
+          child: Icon(icon, color: colorScheme.onPrimary, size: 24),
         ),
         Container(
           width: 2,
@@ -418,7 +539,7 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.8),
+            color: colorScheme.surface.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: color, width: 1),
           ),
@@ -427,17 +548,16 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
             children: [
               Text(
                 name,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurface,
                   fontWeight: FontWeight.bold,
-                  fontSize: 10,
                 ),
                 textAlign: TextAlign.center,
               ),
               Text(
                 distance,
-                style: const TextStyle(
-                  color: Colors.grey,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                   fontSize: 8,
                 ),
               ),
@@ -449,55 +569,95 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
   }
 
   Widget _buildInfoPanel() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.8),
+        color: colorScheme.surface.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.blue, width: 1),
+        border: Border.all(color: colorScheme.primary, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Row(
+          Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.location_on, color: Colors.blue, size: 14),
-              SizedBox(width: 4),
+              Icon(Icons.location_on, color: colorScheme.primary, size: 14),
+              const SizedBox(width: 4),
               Text(
                 'Current Location',
-                style: TextStyle(
-                  color: Colors.white,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: colorScheme.onSurface,
                   fontWeight: FontWeight.bold,
-                  fontSize: 10,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'Mecca, Saudi Arabia',
-            style: TextStyle(color: Colors.grey, fontSize: 9),
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 8),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.visibility, color: Colors.green, size: 14),
+              Icon(Icons.visibility, color: colorScheme.primary, size: 14),
               const SizedBox(width: 4),
               Text(
                 '${_isArEnabled ? '2' : '0'} places nearby',
-                style: const TextStyle(color: Colors.white, fontSize: 9),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
               ),
             ],
           ),
+          // Add camera stabilization indicator if enabled
+          if (_isDisabilityModeEnabled && _isCameraStabilizationEnabled) ...[
+            const SizedBox(height: 8),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  _cameraStabilizer.isWithinRange ? Icons.check_circle : Icons.adjust,
+                  color: _cameraStabilizer.isWithinRange ? colorScheme.primary : colorScheme.error,
+                  size: 14,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  _cameraStabilizer.isWithinRange ? 'Camera Stable' : 'Adjust Camera',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: _cameraStabilizer.isWithinRange 
+                        ? colorScheme.primary 
+                        : colorScheme.error,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
   }
 
   Widget _buildOverlayControls() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Positioned(
       top: 100,
       left: 20,
@@ -509,21 +669,40 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
           const SizedBox(height: 12),
           if (_isSpeaking)
             _buildStatusIndicator('AI Response', 'Speaking...', true),
+          // Path guidance status for accessibility
+          if (_isDisabilityModeEnabled && _isPathGuideEnabled && _currentPathInfo != null) ...[
+            const SizedBox(height: 12),
+            _buildStatusIndicator(
+              'Path Guidance',
+              _currentPathInfo!.directionText,
+              _currentPathInfo!.hasPath,
+            ),
+          ],
         ],
       ),
     );
   }
 
   Widget _buildStatusIndicator(String label, String status, bool isActive) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.8),
+        color: colorScheme.surface.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isActive ? Colors.green : Colors.grey,
+          color: isActive ? colorScheme.primary : colorScheme.outline,
           width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -532,7 +711,7 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
             width: 8,
             height: 8,
             decoration: BoxDecoration(
-              color: isActive ? Colors.green : Colors.grey,
+              color: isActive ? colorScheme.primary : colorScheme.outline,
               shape: BoxShape.circle,
             ),
           ),
@@ -543,13 +722,14 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
             children: [
               Text(
                 label,
-                style: const TextStyle(color: Colors.white70, fontSize: 10),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
               Text(
                 status,
-                style: TextStyle(
-                  color: isActive ? Colors.green : Colors.white,
-                  fontSize: 12,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: isActive ? colorScheme.primary : colorScheme.onSurface,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -587,6 +767,9 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
   }
 
   Widget _buildBottomControls() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -594,8 +777,9 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
           colors: [
-            Colors.black.withValues(alpha: 0.9),
-            Colors.transparent,
+            colorScheme.surface.withValues(alpha: 0.95),
+            colorScheme.surface.withValues(alpha: 0.7),
+            colorScheme.surface.withValues(alpha: 0),
           ],
         ),
       ),
@@ -631,6 +815,9 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
     required bool isActive,
     required VoidCallback onPressed,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return GestureDetector(
       onTap: onPressed,
       child: Column(
@@ -641,26 +828,25 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
             height: 60,
             decoration: BoxDecoration(
               color: isActive 
-                  ? Colors.blue.withValues(alpha: 0.3)
-                  : Colors.grey.withValues(alpha: 0.3),
+                  ? colorScheme.primaryContainer.withValues(alpha: 0.5)
+                  : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
               shape: BoxShape.circle,
               border: Border.all(
-                color: isActive ? Colors.blue : Colors.grey,
+                color: isActive ? colorScheme.primary : colorScheme.outline,
                 width: 2,
               ),
             ),
             child: Icon(
               icon,
-              color: isActive ? Colors.white : Colors.grey[400],
+              color: isActive ? colorScheme.primary : colorScheme.onSurfaceVariant,
               size: 24,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             label,
-            style: TextStyle(
-              color: isActive ? Colors.white : Colors.grey[400],
-              fontSize: 12,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: isActive ? colorScheme.primary : colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -669,6 +855,9 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
   }
 
   Widget _buildMainMicButton() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return GestureDetector(
       onTapDown: _tapToPush ? (_) => _startListening() : null,
       onTapUp: _tapToPush ? (_) => _stopListening() : null,
@@ -682,16 +871,16 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
             height: 80,
             decoration: BoxDecoration(
               color: _isListening 
-                  ? Colors.red.withValues(alpha: 0.3)
-                  : Colors.blue.withValues(alpha: 0.3),
+                  ? colorScheme.errorContainer.withValues(alpha: 0.5)
+                  : colorScheme.primaryContainer.withValues(alpha: 0.5),
               shape: BoxShape.circle,
               border: Border.all(
-                color: _isListening ? Colors.red : Colors.blue,
+                color: _isListening ? colorScheme.error : colorScheme.primary,
                 width: 3,
               ),
               boxShadow: _isListening ? [
                 BoxShadow(
-                  color: Colors.red.withValues(alpha: 0.5),
+                  color: colorScheme.error.withValues(alpha: 0.5),
                   blurRadius: 20 * _pulseController.value,
                   spreadRadius: 5 * _pulseController.value,
                 ),
@@ -699,7 +888,7 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
             ),
             child: Icon(
               _isListening ? Icons.mic : Icons.mic_none,
-              color: _isListening ? Colors.red : Colors.white,
+              color: _isListening ? colorScheme.error : colorScheme.primary,
               size: 32,
             ),
           );
@@ -714,10 +903,18 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
     if (_isCameraEnabled) {
       await _initializeCamera();
     } else {
+      // Stop accessibility features when camera is disabled
+      if (_cameraController?.value.isStreamingImages ?? false) {
+        await _cameraController!.stopImageStream();
+      }
+      _cameraStabilizer.disable();
+      _pathGuideDetector.stopDetection();
+      
       _cameraController?.dispose();
       _cameraController = null;
       setState(() {
         _isCameraInitialized = false;
+        _currentPathInfo = null;
       });
     }
   }
@@ -784,6 +981,9 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
   }
 
   void _showSettingsDialog() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -792,62 +992,167 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
         return StatefulBuilder(
           builder: (context, setModalState) {
             return Container(
-              decoration: const BoxDecoration(
-                color: Color(0xFF1E1E1E), // Dark background
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
                 ),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Smart AI Companion Settings',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
+              child: DraggableScrollableSheet(
+                initialChildSize: 0.9,
+                minChildSize: 0.5,
+                maxChildSize: 0.95,
+                expand: false,
+                builder: (context, scrollController) => SingleChildScrollView(
+                  controller: scrollController,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 40,
+                            height: 4,
+                            margin: const EdgeInsets.only(bottom: 20),
+                            decoration: BoxDecoration(
+                              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          'Smart AI Companion Settings',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
                     
-                    // Voice selection
-                    Text(
-                      'AI Voice',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    DropdownButtonFormField<String>(
-                      value: _selectedVoice,
-                      dropdownColor: const Color(0xFF2D2D2D),
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
+                        // Accessibility Section
+                        Text(
+                          'Accessibility Features',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.primary,
+                          ),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue),
+                        const SizedBox(height: 16),
+                        
+                        Card(
+                          elevation: 0,
+                          color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                _buildSwitchTile(
+                                  'Disability Mode',
+                                  'Enable features for visually impaired users',
+                                  _isDisabilityModeEnabled,
+                                  Icons.accessibility_new,
+                                  (value) {
+                                    setModalState(() => _isDisabilityModeEnabled = value);
+                                    setState(() => _isDisabilityModeEnabled = value);
+                                    if (value && _isCameraEnabled && _isCameraInitialized) {
+                                      if (_isCameraStabilizationEnabled) {
+                                        _cameraStabilizer.enable();
+                                      }
+                                      if (_isPathGuideEnabled) {
+                                        _pathGuideDetector.startDetection();
+                                      }
+                                    } else {
+                                      _cameraStabilizer.disable();
+                                      _pathGuideDetector.stopDetection();
+                                    }
+                                  },
+                                ),
+                                
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  height: _isDisabilityModeEnabled ? null : 0,
+                                  child: Column(
+                                    children: [
+                                      _buildSwitchTile(
+                                        'Camera Stabilization',
+                                        'Vibration feedback to help align camera',
+                                        _isCameraStabilizationEnabled,
+                                        Icons.vibration,
+                                        (value) {
+                                          setModalState(() => _isCameraStabilizationEnabled = value);
+                                          setState(() => _isCameraStabilizationEnabled = value);
+                                          if (value && _isDisabilityModeEnabled) {
+                                            _cameraStabilizer.enable();
+                                          } else {
+                                            _cameraStabilizer.disable();
+                                          }
+                                        },
+                                      ),
+                                      
+                                      _buildSwitchTile(
+                                        'Path Guide',
+                                        'Detect road lines and provide navigation guidance',
+                                        _isPathGuideEnabled,
+                                        Icons.navigation,
+                                        (value) {
+                                          setModalState(() => _isPathGuideEnabled = value);
+                                          setState(() => _isPathGuideEnabled = value);
+                                          if (value && _isDisabilityModeEnabled) {
+                                            _pathGuideDetector.startDetection();
+                                          } else {
+                                            _pathGuideDetector.stopDetection();
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                      items: const [
-                        DropdownMenuItem(value: 'Female - Safiyah', child: Text('Female - Safiyah')),
-                        DropdownMenuItem(value: 'Male - Ahmad', child: Text('Male - Ahmad')),
-                        DropdownMenuItem(value: 'Female - Aisha', child: Text('Female - Aisha')),
-                      ],
-                      onChanged: (value) {
-                        if (value != null) {
-                          setModalState(() => _selectedVoice = value);
-                          setState(() => _selectedVoice = value);
-                        }
-                      },
-                    ),
+                        
+                        const SizedBox(height: 24),
+                        const Divider(),
+                        const SizedBox(height: 24),
+                        
+                        // Voice selection
+                        Text(
+                          'AI Voice',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          value: _selectedVoice,
+                          dropdownColor: colorScheme.surfaceContainerHighest,
+                          decoration: InputDecoration(
+                            border: const OutlineInputBorder(),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: colorScheme.outline),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: colorScheme.primary),
+                            ),
+                          ),
+                          style: TextStyle(color: colorScheme.onSurface),
+                          items: const [
+                            DropdownMenuItem(value: 'Female - Safiyah', child: Text('Female - Safiyah')),
+                            DropdownMenuItem(value: 'Male - Ahmad', child: Text('Male - Ahmad')),
+                            DropdownMenuItem(value: 'Female - Aisha', child: Text('Female - Aisha')),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) {
+                              setModalState(() => _selectedVoice = value);
+                              setState(() => _selectedVoice = value);
+                            }
+                          },
+                        ),
                     
                     const SizedBox(height: 24),
                     
@@ -894,80 +1199,87 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
                     
                     const SizedBox(height: 24),
                     
-                    // Feature toggles
-                    _buildDarkSwitchTile(
-                      'AR Navigation',
-                      'Overlay navigation information',
-                      _isArEnabled,
-                      (value) {
-                        setModalState(() => _isArEnabled = value);
-                        setState(() => _isArEnabled = value);
-                      },
-                    ),
-                    
-                    _buildDarkSwitchTile(
-                      'Camera',
-                      'Enable visual AI features',
-                      _isCameraEnabled,
-                      (value) {
-                        setModalState(() => _isCameraEnabled = value);
-                        setState(() => _isCameraEnabled = value);
-                        if (value) {
-                          _initializeCamera();
-                        } else {
-                          _cameraController?.dispose();
-                          _cameraController = null;
-                          setState(() => _isCameraInitialized = false);
-                        }
-                      },
-                    ),
-                    
-                    _buildDarkSwitchTile(
-                      'Speaker Output',
-                      'Use speaker instead of earphone',
-                      _useSpeaker,
-                      (value) {
-                        setModalState(() => _useSpeaker = value);
-                        setState(() => _useSpeaker = value);
-                      },
-                    ),
+                        // Feature toggles
+                        _buildSwitchTile(
+                          'AR Navigation',
+                          'Overlay navigation information',
+                          _isArEnabled,
+                          Icons.view_in_ar,
+                          (value) {
+                            setModalState(() => _isArEnabled = value);
+                            setState(() => _isArEnabled = value);
+                          },
+                        ),
+                        
+                        _buildSwitchTile(
+                          'Camera',
+                          'Enable visual AI features',
+                          _isCameraEnabled,
+                          Icons.camera_alt,
+                          (value) {
+                            setModalState(() => _isCameraEnabled = value);
+                            setState(() => _isCameraEnabled = value);
+                            if (value) {
+                              _initializeCamera();
+                            } else {
+                              _cameraController?.dispose();
+                              _cameraController = null;
+                              setState(() => _isCameraInitialized = false);
+                            }
+                          },
+                        ),
+                        
+                        _buildSwitchTile(
+                          'Speaker Output',
+                          'Use speaker instead of earphone',
+                          _useSpeaker,
+                          Icons.volume_up,
+                          (value) {
+                            setModalState(() => _useSpeaker = value);
+                            setState(() => _useSpeaker = value);
+                          },
+                        ),
                     
                     const SizedBox(height: 24),
                     
-                    // Info section
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Smart Travel Companion Features',
-                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue[300],
-                            ),
+                        // Info section
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: colorScheme.primaryContainer.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
                           ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            '• Real-time environmental awareness\n'
-                            '• Voice-guided navigation with AR\n'
-                            '• Accessibility support for visually impaired\n'
-                            '• Cultural and religious guidance\n'
-                            '• Emergency assistance\n'
-                            '• Multimodal AI (see, hear, understand)',
-                            style: TextStyle(fontSize: 13, color: Colors.white70),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Smart Travel Companion Features',
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme.primary,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '• Real-time environmental awareness\n'
+                                '• Voice-guided navigation with AR\n'
+                                '• Accessibility support for visually impaired\n'
+                                '• Cultural and religious guidance\n'
+                                '• Emergency assistance\n'
+                                '• Multimodal AI (see, hear, understand)',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onPrimaryContainer,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                        
+                        const SizedBox(height: 16),
+                      ],
                     ),
-                    
-                    const SizedBox(height: 16),
-                  ],
+                  ),
                 ),
               ),
             );
@@ -977,12 +1289,36 @@ class _RealtimeChatbotPageState extends State<RealtimeChatbotPage> with TickerPr
     );
   }
 
-  Widget _buildDarkSwitchTile(String title, String subtitle, bool value, Function(bool) onChanged) {
+  Widget _buildSwitchTile(String title, String subtitle, bool value, IconData? icon, Function(bool) onChanged) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return SwitchListTile(
-      title: Text(title, style: const TextStyle(color: Colors.white)),
-      subtitle: Text(subtitle, style: const TextStyle(color: Colors.grey)),
+      title: Row(
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 20, color: colorScheme.primary),
+            const SizedBox(width: 12),
+          ],
+          Expanded(
+            child: Text(
+              title,
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+      subtitle: Text(
+        subtitle,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+      ),
       value: value,
-      activeColor: Colors.blue,
+      activeColor: colorScheme.primary,
       onChanged: onChanged,
     );
   }

@@ -67,6 +67,7 @@ dependencies:
   adhan: ^2.0.0
   flutter_compass: ^0.8.0
   sensors_plus: ^6.1.1
+  vibration: ^2.0.4
 
   # Camera & AR
   camera: ^0.11.1

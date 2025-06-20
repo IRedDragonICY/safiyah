@@ -740,27 +740,34 @@ class _CurrencyPageState extends State<CurrencyPage> {
 
   Widget _buildBottomCTA() {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final sourceAmount = double.tryParse(_sourceAmountController.text.replaceAll(',', '')) ?? 0;
     final isEnabled = sourceAmount > 0;
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.only(
+        left: 12,
+        right: 12,
+        top: 12,
+        bottom: 8,
+      ),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, -1),
           ),
         ],
       ),
       child: SafeArea(
+        top: false,
         child: FilledButton(
           onPressed: isEnabled ? _processTransfer : null,
           style: FilledButton.styleFrom(
-            backgroundColor: theme.colorScheme.primary,
-            foregroundColor: theme.colorScheme.onPrimary,
+            backgroundColor: colorScheme.primary,
+            foregroundColor: colorScheme.onPrimary,
             minimumSize: const Size(double.infinity, 48),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
