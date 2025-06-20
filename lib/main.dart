@@ -15,10 +15,12 @@ import 'core/services/location_service.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/storage_service.dart';
 import 'data/repositories/auth_repository.dart';
+import 'data/repositories/events_repository.dart';
 import 'data/repositories/itinerary_repository.dart';
 import 'data/repositories/place_repository.dart';
 import 'data/repositories/prayer_repository.dart';
 import 'presentation/bloc/auth/auth_bloc.dart';
+import 'presentation/bloc/events/events_bloc.dart';
 import 'presentation/bloc/home/home_bloc.dart';
 import 'presentation/bloc/itinerary/itinerary_bloc.dart';
 import 'presentation/bloc/places/places_bloc.dart';
@@ -74,6 +76,9 @@ class SafiyahApp extends StatelessWidget {
         RepositoryProvider<ChatbotRepository>(
           create: (context) => ChatbotRepository(),
         ),
+        RepositoryProvider<EventsRepository>(
+          create: (context) => EventsRepository(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -114,6 +119,11 @@ class SafiyahApp extends StatelessWidget {
           BlocProvider<ChatbotBloc>(
             create: (context) => ChatbotBloc(
               chatbotRepository: context.read<ChatbotRepository>(),
+            ),
+          ),
+          BlocProvider<EventsBloc>(
+            create: (context) => EventsBloc(
+              eventsRepository: context.read<EventsRepository>(),
             ),
           ),
         ],

@@ -40,6 +40,31 @@ class LocalStorage {
     await StorageService.removeItinerary(id);
   }
 
+  // Events methods
+  Future<List<Map<String, dynamic>>> getEvents() async {
+    final events = StorageService.getAllEvents();
+    return events.cast<Map<String, dynamic>>();
+  }
+
+  Future<Map<String, dynamic>?> getEventById(String id) async {
+    final event = StorageService.getEvent<Map<String, dynamic>>(id);
+    return event;
+  }
+
+  Future<void> saveEvent(Map<String, dynamic> eventData) async {
+    final id = eventData['id'] as String;
+    await StorageService.saveEvent(id, eventData);
+  }
+
+  Future<void> updateEvent(Map<String, dynamic> eventData) async {
+    final id = eventData['id'] as String;
+    await StorageService.saveEvent(id, eventData);
+  }
+
+  Future<void> deleteEvent(String id) async {
+    await StorageService.removeEvent(id);
+  }
+
   // Settings methods
   Future<void> savePrayerSettings(Map<String, dynamic> settings) async {
     await StorageService.saveSetting('prayer_settings', settings);

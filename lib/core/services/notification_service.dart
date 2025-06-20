@@ -1,10 +1,35 @@
+import 'dart:async';
+import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../data/models/notification_model.dart';
+
 class NotificationService {
+  static final NotificationService _instance = NotificationService._internal();
+  factory NotificationService() => _instance;
+  NotificationService._internal();
+
+  final StreamController<List<NotificationModel>> _notificationsController =
+      StreamController<List<NotificationModel>>.broadcast();
+
+  final List<NotificationModel> _notifications = [];
+  
+  Stream<List<NotificationModel>> get notificationsStream =>
+      _notificationsController.stream;
+
+  List<NotificationModel> get notifications => List.unmodifiable(_notifications);
+
+  int get unreadCount => _notifications.where((n) => !n.isRead).length;
+
+  Future<void> initializeData() async {
+    // Initialize with some demo notifications
+    await _loadDemoNotifications();
+  }
+
   static final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -549,11 +574,205 @@ class NotificationService {
       'has_permission': await hasPermission(),
     };
   }
+
+  Future<void> _loadDemoNotifications() async {
+    final demoNotifications = [
+      NotificationModel(
+        id: '1',
+        title: 'Special Voucher for Tokyo',
+        message: 'Get 20% off on Tokyo Halal restaurants! Valid until tomorrow. Enjoy authentic halal cuisine.',
+        type: NotificationType.voucher,
+        priority: NotificationPriority.high,
+        createdAt: DateTime.now().subtract(const Duration(minutes: 30)),
+        imageUrl: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?ixlib=rb-4.0.3',
+        deepLink: '/voucher',
+        actionData: {
+          'voucherId': 'TOKYO20',
+          'discount': 20,
+          'validUntil': DateTime.now().add(const Duration(days: 1)).toIso8601String(),
+        },
+      ),
+      NotificationModel(
+        id: '2',
+        title: 'Flight Reminder',
+        message: 'Your flight to Tokyo departs tomorrow at 14:30. Please ensure your passport, tickets, and health documents are ready.',
+        type: NotificationType.transportation,
+        priority: NotificationPriority.urgent,
+        createdAt: DateTime.now().subtract(const Duration(hours: 2)),
+        scheduledTime: DateTime.now().add(const Duration(days: 1, hours: -3)),
+        imageUrl: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3',
+        actionData: {
+          'flightNumber': 'JL123',
+          'departure': '14:30',
+          'gate': 'A12',
+          'terminal': '2',
+        },
+      ),
+      NotificationModel(
+        id: '3',
+        title: 'Hotel Check-in Reminder',
+        message: 'Your reservation at Grand Halal Hotel Tokyo is in 1 hour. Check-in starts at 15:00.',
+        type: NotificationType.accommodation,
+        priority: NotificationPriority.high,
+        createdAt: DateTime.now().subtract(const Duration(minutes: 45)),
+        scheduledTime: DateTime.now().add(const Duration(hours: 1)),
+        imageUrl: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?ixlib=rb-4.0.3',
+        actionData: {
+          'hotelName': 'Grand Halal Hotel Tokyo',
+          'checkInTime': '15:00',
+          'roomNumber': '1205',
+          'confirmationCode': 'GHH123456',
+        },
+      ),
+      NotificationModel(
+        id: '4',
+        title: 'Prayer Time Alert',
+        message: 'Maghrib prayer time is in 15 minutes. Direction to nearest mosque: Tokyo Camii (1.2 km away).',
+        type: NotificationType.prayer,
+        priority: NotificationPriority.normal,
+        createdAt: DateTime.now().subtract(const Duration(minutes: 10)),
+        scheduledTime: DateTime.now().add(const Duration(minutes: 15)),
+        deepLink: '/prayer',
+        actionData: {
+          'prayerName': 'Maghrib',
+          'time': '18:45',
+          'nearestMosque': 'Tokyo Camii',
+          'distance': '1.2 km',
+        },
+      ),
+      NotificationModel(
+        id: '5',
+        title: 'New Itinerary Shared',
+        message: 'Ahmad shared "Kyoto Temple Tour" itinerary with you. Check out the amazing places to visit!',
+        type: NotificationType.itinerary,
+        priority: NotificationPriority.normal,
+        createdAt: DateTime.now().subtract(const Duration(hours: 4)),
+        imageUrl: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?ixlib=rb-4.0.3',
+        deepLink: '/itinerary/detail/kyoto-tour',
+        actionData: {
+          'itineraryId': 'kyoto-tour',
+          'sharedBy': 'Ahmad',
+          'placesCount': 8,
+        },
+      ),
+      NotificationModel(
+        id: '6',
+        title: 'Transportation Update',
+        message: 'JR Yamanote Line experiencing 10-minute delays. Consider alternative routes for your evening plans.',
+        type: NotificationType.transportation,
+        priority: NotificationPriority.normal,
+        createdAt: DateTime.now().subtract(const Duration(minutes: 15)),
+        actionData: {
+          'line': 'JR Yamanote Line',
+          'delay': '10 minutes',
+          'affectedStations': ['Shibuya', 'Shinjuku', 'Tokyo'],
+        },
+      ),
+      NotificationModel(
+        id: '7',
+        title: 'Exclusive Hotel Deal',
+        message: 'Last-minute deal: 40% off luxury hotels in Osaka for next weekend. Book now before it\'s gone!',
+        type: NotificationType.voucher,
+        priority: NotificationPriority.high,
+        createdAt: DateTime.now().subtract(const Duration(hours: 1)),
+        imageUrl: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?ixlib=rb-4.0.3',
+        deepLink: '/voucher',
+        actionData: {
+          'discount': 40,
+          'location': 'Osaka',
+          'validUntil': DateTime.now().add(const Duration(days: 2)).toIso8601String(),
+        },
+      ),
+      NotificationModel(
+        id: '8',
+        title: 'Document Check Reminder',
+        message: 'Don\'t forget to check your visa validity. Your Japan visa expires in 30 days.',
+        type: NotificationType.general,
+        priority: NotificationPriority.normal,
+        createdAt: DateTime.now().subtract(const Duration(days: 1)),
+        isRead: true,
+        actionData: {
+          'documentType': 'Visa',
+          'expiryDate': DateTime.now().add(const Duration(days: 30)).toIso8601String(),
+          'country': 'Japan',
+        },
+      ),
+    ];
+
+    _notifications.addAll(demoNotifications);
+    _notificationsController.add(_notifications);
+  }
+
+  Future<void> addNotification(NotificationModel notification) async {
+    _notifications.insert(0, notification);
+    _notificationsController.add(_notifications);
+  }
+
+  Future<void> markAsRead(String notificationId) async {
+    final index = _notifications.indexWhere((n) => n.id == notificationId);
+    if (index != -1) {
+      _notifications[index] = _notifications[index].copyWith(isRead: true);
+      _notificationsController.add(_notifications);
+    }
+  }
+
+  Future<void> markAllAsRead() async {
+    for (int i = 0; i < _notifications.length; i++) {
+      if (!_notifications[i].isRead) {
+        _notifications[i] = _notifications[i].copyWith(isRead: true);
+      }
+    }
+    _notificationsController.add(_notifications);
+  }
+
+  Future<void> deleteNotification(String notificationId) async {
+    _notifications.removeWhere((n) => n.id == notificationId);
+    _notificationsController.add(_notifications);
+  }
+
+  Future<void> scheduleNotification({
+    required String title,
+    required String message,
+    required NotificationType type,
+    required DateTime scheduledTime,
+    NotificationPriority priority = NotificationPriority.normal,
+    Map<String, dynamic>? actionData,
+    String? imageUrl,
+    String? deepLink,
+  }) async {
+    final notification = NotificationModel(
+      id: _generateId(),
+      title: title,
+      message: message,
+      type: type,
+      priority: priority,
+      createdAt: DateTime.now(),
+      scheduledTime: scheduledTime,
+      actionData: actionData,
+      imageUrl: imageUrl,
+      deepLink: deepLink,
+    );
+
+    // For demo purposes, we'll add it immediately
+    // In a real app, you'd schedule this with a background service
+    await addNotification(notification);
+  }
+
+  List<NotificationModel> getNotificationsByType(NotificationType type) {
+    return _notifications.where((n) => n.type == type).toList();
+  }
+
+  List<NotificationModel> getUnreadNotifications() {
+    return _notifications.where((n) => !n.isRead).toList();
+  }
+
+  String _generateId() {
+    return 'notif_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(1000)}';
+  }
+
+  void dispose() {
+    _notificationsController.close();
+  }
 }
 
-enum NotificationPriority {
-  low,
-  normal,
-  high,
-  max,
-}
+

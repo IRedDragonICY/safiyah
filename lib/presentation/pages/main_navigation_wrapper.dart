@@ -83,7 +83,7 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> with Tick
         }
       } else {
         // Swipe left - go to next page  
-        if (currentIndex < 3) {
+        if (currentIndex < 4) {
           _animateSwipe(currentIndex + 1, isSwipeRight: false);
         }
       }
@@ -178,6 +178,7 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> with Tick
             const SizedBox(width: 40),
             _buildNavItem(context, icon: Icons.list_alt_outlined, index: 2),
             _buildNavItem(context, icon: Icons.map_outlined, index: 3),
+            _buildNavItem(context, icon: Icons.event_outlined, index: 4),
           ],
         ),
       ),

@@ -15,6 +15,7 @@ import '../../widgets/common/loading_widget.dart';
 import '../../widgets/common/ai_accessibility_widget.dart';
 import '../../widgets/home/quick_actions_widget.dart';
 import '../../widgets/home/currency_widget.dart';
+import '../../widgets/notifications/notification_badge.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -276,6 +277,13 @@ class _HomePageState extends State<HomePage> {
                         onPressed: () => context.push(RouteNames.chatbot),
                         tooltip: 'AI Assistant',
                       ),
+                                             NotificationBadge(
+                         child: IconButton(
+                           icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+                           onPressed: () => context.push(RouteNames.notifications),
+                           tooltip: 'Notifications',
+                         ),
+                       ),
                       IconButton(
                         icon: const Icon(Icons.settings_outlined, color: Colors.white),
                         onPressed: () => context.push(RouteNames.settings),

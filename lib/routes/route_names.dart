@@ -24,6 +24,10 @@ class RouteNames {
 
   static const String currency = '/currency';
 
+  static const String events = '/events';
+
+  static const String notifications = '/notifications';
+
   static const String personalization = '/personalization';
   static const String termsOfService = '/terms-of-service';
 

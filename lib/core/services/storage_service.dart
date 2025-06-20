@@ -6,6 +6,7 @@ class StorageService {
   static late Box _settingsBox;
   static late Box _itineraryBox;
   static late Box _placesBox;
+  static late Box _eventsBox;
 
   static Future<void> initialize() async {
     await Hive.initFlutter();
@@ -14,6 +15,7 @@ class StorageService {
     _settingsBox = await Hive.openBox(AppConstants.settingsBox);
     _itineraryBox = await Hive.openBox(AppConstants.itineraryBox);
     _placesBox = await Hive.openBox(AppConstants.placesBox);
+    _eventsBox = await Hive.openBox(AppConstants.eventsBox);
   }
 
   // User data methods
@@ -68,11 +70,29 @@ class StorageService {
     return _placesBox.values.toList();
   }
 
+  // Events methods
+  static Future<void> saveEvent(String key, dynamic value) async {
+    await _eventsBox.put(key, value);
+  }
+
+  static T? getEvent<T>(String key) {
+    return _eventsBox.get(key);
+  }
+
+  static List<dynamic> getAllEvents() {
+    return _eventsBox.values.toList();
+  }
+
+  static Future<void> removeEvent(String key) async {
+    await _eventsBox.delete(key);
+  }
+
   // Clear all data
   static Future<void> clearAll() async {
     await _userBox.clear();
     await _settingsBox.clear();
     await _itineraryBox.clear();
     await _placesBox.clear();
+    await _eventsBox.clear();
   }
 }

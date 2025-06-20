@@ -12,6 +12,7 @@ class AppConstants {
   static const String settingsBox = 'settings_box';
   static const String itineraryBox = 'itinerary_box';
   static const String placesBox = 'places_box';
+  static const String eventsBox = 'events_box';
 
   static const String onboardingCompletedKey = 'onboarding_completed';
 

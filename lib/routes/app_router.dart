@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safiyah/presentation/pages/chatbot/chatbot_page.dart';
 import 'package:safiyah/presentation/pages/chatbot/chat_history_page.dart';
@@ -25,6 +26,10 @@ import '../presentation/pages/itinerary/create_itinerary_page.dart';
 import '../presentation/pages/itinerary/itinerary_detail_page.dart';
 import '../presentation/pages/voucher/voucher_page.dart';
 import '../presentation/pages/voucher/voucher_history_page.dart';
+import '../presentation/pages/events/events_page.dart';
+import '../presentation/pages/events/event_detail_page.dart';
+import '../presentation/pages/notifications/notifications_page.dart';
+import '../presentation/bloc/notifications/notifications_bloc.dart';
 
 import 'route_names.dart';
 
@@ -110,6 +115,15 @@ class AppRouter {
                 path: RouteNames.places,
                 name: 'places',
                 builder: (context, state) => const PlacesMapPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: RouteNames.events,
+                name: 'events',
+                builder: (context, state) => const EventsPage(),
               ),
             ],
           ),
@@ -201,6 +215,22 @@ class AppRouter {
         parentNavigatorKey: _rootNavigatorKey,
         name: 'voucher_history',
         builder: (context, state) => const VoucherHistoryPage(),
+      ),
+      GoRoute(
+        path: '/events/detail/:id',
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'event_detail',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return EventDetailPage(eventId: id);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.notifications,
+        builder: (context, state) => BlocProvider(
+          create: (context) => NotificationsBloc(),
+          child: const NotificationsPage(),
+        ),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
