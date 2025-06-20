@@ -23,6 +23,8 @@ import '../presentation/pages/places/place_detail_page.dart';
 import '../presentation/pages/itinerary/itinerary_list_page.dart';
 import '../presentation/pages/itinerary/create_itinerary_page.dart';
 import '../presentation/pages/itinerary/itinerary_detail_page.dart';
+import '../presentation/pages/voucher/voucher_page.dart';
+import '../presentation/pages/voucher/voucher_history_page.dart';
 
 import 'route_names.dart';
 
@@ -187,6 +189,18 @@ class AppRouter {
         parentNavigatorKey: _rootNavigatorKey,
         name: 'currency',
         builder: (context, state) => const CurrencyPage(),
+      ),
+      GoRoute(
+        path: RouteNames.voucher,
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'voucher',
+        builder: (context, state) => const VoucherPage(),
+      ),
+      GoRoute(
+        path: '/voucher/history',
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'voucher_history',
+        builder: (context, state) => const VoucherHistoryPage(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

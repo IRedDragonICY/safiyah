@@ -44,9 +44,10 @@ class QuickActionsWidget extends StatelessWidget {
             GridView.count(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 4,
+              crossAxisCount: 5,
+              childAspectRatio: 0.8,
               mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
+              crossAxisSpacing: 8,
               children: [
                 _buildQuickActionItem(
                   context,
@@ -89,6 +90,13 @@ class QuickActionsWidget extends StatelessWidget {
                   label: 'Prayer Times',
                   color: AppColors.prayerTime,
                   onTap: () => context.push('/prayer'),
+                ),
+                _buildQuickActionItem(
+                  context,
+                  icon: Icons.local_offer,
+                  label: 'Vouchers',
+                  color: AppColors.primaryLight,
+                  onTap: () => context.push('/voucher'),
                 ),
                 _buildQuickActionItem(
                   context,
