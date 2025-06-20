@@ -258,7 +258,7 @@ class _ItineraryListPageState extends State<ItineraryListPage> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: _getStatusColor(status).withOpacity(0.1),
+                          color: _getStatusColor(status).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -398,7 +398,7 @@ class _ItineraryListPageState extends State<ItineraryListPage> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -459,7 +459,7 @@ class _ItineraryListPageState extends State<ItineraryListPage> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.primary.withOpacity(0.8),
+            AppColors.primary.withValues(alpha: 0.8),
             AppColors.primary,
           ],
         ),
@@ -471,7 +471,7 @@ class _ItineraryListPageState extends State<ItineraryListPage> {
             Icon(
               Icons.map,
               size: 48,
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
             ),
             const SizedBox(height: 8),
             Text(

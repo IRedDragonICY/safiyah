@@ -2,9 +2,65 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/constants/colors.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../data/models/currency_model.dart';
+
+enum RateCondition {
+  lessThan,
+  greaterThan,
+}
+
+class RateAlert {
+  final String id;
+  final String fromCurrency;
+  final String toCurrency;
+  final double targetRate;
+  final RateCondition condition;
+  final bool isEnabled;
+  final DateTime createdAt;
+
+  const RateAlert({
+    required this.id,
+    required this.fromCurrency,
+    required this.toCurrency,
+    required this.targetRate,
+    required this.condition,
+    required this.isEnabled,
+    required this.createdAt,
+  });
+
+  RateAlert copyWith({
+    String? id,
+    String? fromCurrency,
+    String? toCurrency,
+    double? targetRate,
+    RateCondition? condition,
+    bool? isEnabled,
+    DateTime? createdAt,
+  }) {
+    return RateAlert(
+      id: id ?? this.id,
+      fromCurrency: fromCurrency ?? this.fromCurrency,
+      toCurrency: toCurrency ?? this.toCurrency,
+      targetRate: targetRate ?? this.targetRate,
+      condition: condition ?? this.condition,
+      isEnabled: isEnabled ?? this.isEnabled,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  String get conditionText {
+    switch (condition) {
+      case RateCondition.lessThan:
+        return 'kurang dari';
+      case RateCondition.greaterThan:
+        return 'lebih dari';
+    }
+  }
+
+  String get description {
+    return 'Ingatkan saya kalau kurs $toCurrency 1 $conditionText ${NumberFormat('#,###.######').format(targetRate)} $fromCurrency';
+  }
+}
 
 class CurrencyPage extends StatefulWidget {
   const CurrencyPage({super.key});
@@ -41,6 +97,28 @@ class _CurrencyPageState extends State<CurrencyPage> {
   String? _appliedPromoCode;
   double? _discountAmount;
   
+  // Rate alerts
+  final List<RateAlert> _rateAlerts = [
+    RateAlert(
+      id: '1',
+      fromCurrency: 'IDR',
+      toCurrency: 'MYR',
+      targetRate: 0.00032,
+      condition: RateCondition.lessThan,
+      isEnabled: true,
+      createdAt: DateTime.now().subtract(const Duration(days: 2)),
+    ),
+    RateAlert(
+      id: '2',
+      fromCurrency: 'IDR',
+      toCurrency: 'JPY',
+      targetRate: 0.0070,
+      condition: RateCondition.greaterThan,
+      isEnabled: false,
+      createdAt: DateTime.now().subtract(const Duration(days: 5)),
+    ),
+  ];
+  
   // Mock data
   final List<CurrencyModel> _currencies = [
     const CurrencyModel(code: 'IDR', name: 'Indonesian Rupiah', symbol: 'Rp', flagUrl: '🇮🇩', rate: 1.0),
@@ -48,6 +126,16 @@ class _CurrencyPageState extends State<CurrencyPage> {
     const CurrencyModel(code: 'USD', name: 'US Dollar', symbol: '\$', flagUrl: '🇺🇸', rate: 0.000067),
     const CurrencyModel(code: 'EUR', name: 'Euro', symbol: '€', flagUrl: '🇪🇺', rate: 0.000062),
     const CurrencyModel(code: 'GBP', name: 'British Pound', symbol: '£', flagUrl: '🇬🇧', rate: 0.000053),
+    const CurrencyModel(code: 'MYR', name: 'Malaysian Ringgit', symbol: 'RM', flagUrl: '🇲🇾', rate: 0.00031),
+    const CurrencyModel(code: 'SGD', name: 'Singapore Dollar', symbol: 'S\$', flagUrl: '🇸🇬', rate: 0.000095),
+    const CurrencyModel(code: 'THB', name: 'Thai Baht', symbol: '฿', flagUrl: '🇹🇭', rate: 0.0024),
+    const CurrencyModel(code: 'AUD', name: 'Australian Dollar', symbol: 'A\$', flagUrl: '🇦🇺', rate: 0.0001),
+    const CurrencyModel(code: 'CAD', name: 'Canadian Dollar', symbol: 'C\$', flagUrl: '🇨🇦', rate: 0.000092),
+    const CurrencyModel(code: 'CNY', name: 'Chinese Yuan', symbol: '¥', flagUrl: '🇨🇳', rate: 0.00048),
+    const CurrencyModel(code: 'KRW', name: 'South Korean Won', symbol: '₩', flagUrl: '🇰🇷', rate: 0.089),
+    const CurrencyModel(code: 'SAR', name: 'Saudi Riyal', symbol: 'SR', flagUrl: '🇸🇦', rate: 0.00025),
+    const CurrencyModel(code: 'AED', name: 'UAE Dirham', symbol: 'د.إ', flagUrl: '🇦🇪', rate: 0.00024),
+    const CurrencyModel(code: 'TRY', name: 'Turkish Lira', symbol: '₺', flagUrl: '🇹🇷', rate: 0.0019),
   ];
 
   final List<PromoModel> _availablePromos = [
@@ -121,187 +209,42 @@ class _CurrencyPageState extends State<CurrencyPage> {
     
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: const Text(
-          'Transfer Luar Negeri',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
-          ),
-        ),
-        elevation: 0,
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16, top: 8, bottom: 8),
-            child: FilledButton.icon(
-              onPressed: () => _showRateAlertDialog(),
-              icon: const Icon(Icons.notifications_outlined, size: 18),
-              label: const Text('Pengingat Kurs'),
-              style: FilledButton.styleFrom(
-                backgroundColor: colorScheme.primaryContainer,
-                foregroundColor: colorScheme.onPrimaryContainer,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: _buildModernTransferPage(),
+      appBar: _buildAppBar(),
+      body: _buildNoScrollLayout(),
+      bottomNavigationBar: _buildBottomCTA(),
     );
   }
 
-  Widget _buildModernTransferPage() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          _buildCountrySelector(),
-          const SizedBox(height: 24),
-          _buildAmountSection(),
-          const SizedBox(height: 24),
-          _buildRateAndFeeInfo(),
-          const SizedBox(height: 24),
-          _buildPromoSection(),
-          const SizedBox(height: 24),
-          _buildSummaryCard(),
-          const SizedBox(height: 32),
-          _buildContinueButton(),
-          const SizedBox(height: 32),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCountrySelector() {
+  PreferredSizeWidget _buildAppBar() {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: colorScheme.outlineVariant,
-          width: 1,
+    return AppBar(
+      title: Text(
+        'Transfer Luar Negeri',
+        style: theme.textTheme.headlineSmall?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: colorScheme.onPrimary,
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Transfer Details',
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: _buildCurrencyField(
-                  label: 'From',
-                  currency: _sourceCurrency,
-                  onTap: () => _showCurrencyPicker(true),
-                ),
+      elevation: 0,
+      backgroundColor: colorScheme.primary,
+      foregroundColor: colorScheme.onPrimary,
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 16, top: 8, bottom: 8),
+          child: FilledButton.tonalIcon(
+            onPressed: () => _showRateAlertDialog(),
+            icon: const Icon(Icons.notifications_outlined, size: 18),
+            label: const Text('Pengingat'),
+            style: FilledButton.styleFrom(
+              foregroundColor: colorScheme.onPrimary,
+              backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.1),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
               ),
-              const SizedBox(width: 16),
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.swap_horiz,
-                  color: colorScheme.onPrimaryContainer,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildCurrencyField(
-                  label: 'To',
-                  currency: _destinationCurrency,
-                  onTap: () => _showCurrencyPicker(false),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCurrencyField({
-    required String label,
-    required CurrencyModel currency,
-    required VoidCallback onTap,
-  }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: theme.textTheme.labelMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: colorScheme.outline.withOpacity(0.5),
-              ),
-            ),
-            child: Row(
-              children: [
-                Text(currency.flagUrl, style: const TextStyle(fontSize: 24)),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        currency.code,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                      Text(
-                        _getCountryName(currency.code),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.edit_outlined,
-                  color: colorScheme.primary,
-                  size: 20,
-                ),
-              ],
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             ),
           ),
         ),
@@ -309,129 +252,143 @@ class _CurrencyPageState extends State<CurrencyPage> {
     );
   }
 
-  String _getCountryName(String code) {
-    switch (code) {
-      case 'JPY': return 'Jepang';
-      case 'USD': return 'Amerika Serikat';
-      case 'EUR': return 'Eropa';
-      case 'GBP': return 'Inggris';
-      case 'AUD': return 'Australia';
-      default: return code;
-    }
+  Widget _buildNoScrollLayout() {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // Currency Selector - Compact
+            _buildCurrencySelector(),
+            
+            const SizedBox(height: 12),
+            
+            // Amount Input - Fixed height
+            _buildAmountSection(),
+            
+            const SizedBox(height: 12),
+            
+            // Rate & Fee Info - Compact
+            _buildRateInfo(),
+            
+            const SizedBox(height: 12),
+            
+            // Promo Section - Compact
+            _buildCompactPromoSection(),
+            
+            const SizedBox(height: 12),
+            
+            // Summary - Compact
+            _buildSummaryCard(),
+          ],
+        ),
+      ),
+    );
   }
 
-  Widget _buildCurrencyToggle() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Mata Uang Tujuan',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF666666),
+  Widget _buildCurrencySelector() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return Card.filled(
+      color: colorScheme.surfaceContainerLow,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // From Currency
+            Expanded(
+              child: _buildCompactCurrencyButton(
+                currency: _sourceCurrency,
+                label: 'From',
+                onTap: () => _showCurrencyPicker(true),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: _buildCurrencyToggleButton(
-                  _destinationCurrency.code,
-                  true,
-                  () {},
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildCurrencyToggleButton(
-                  'USD',
-                  _destinationCurrency.code == 'USD',
-                  () {
-                    setState(() {
-                      _destinationCurrency = _currencies.firstWhere((c) => c.code == 'USD');
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCurrencyToggleButton(String currency, bool isSelected, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withOpacity(0.1) : Colors.transparent,
-          border: Border.all(
-            color: isSelected ? AppColors.primary : const Color(0xFFE5E5E5),
-            width: 1.5,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          currency,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: isSelected ? AppColors.primary : const Color(0xFF666666),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTransferMethodTabs() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: AppColors.primary,
-                    width: 2,
+            
+            // Swap Button - Properly centered
+            SizedBox(
+              width: 60,
+              child: Center(
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    onPressed: _switchCurrencies,
+                    icon: Icon(
+                      Icons.swap_horiz,
+                      color: colorScheme.onPrimaryContainer,
+                      size: 20,
+                    ),
+                    padding: EdgeInsets.zero,
                   ),
                 ),
               ),
-              child: Text(
-                'Bank',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
-                ),
+            ),
+            
+            // To Currency
+            Expanded(
+              child: _buildCompactCurrencyButton(
+                currency: _destinationCurrency,
+                label: 'To',
+                onTap: () => _showCurrencyPicker(false),
               ),
             ),
-          ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Text(
-                'TnG eWallet',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildCompactCurrencyButton({
+    required CurrencyModel currency,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 6),
+        FilledButton.tonal(
+          onPressed: onTap,
+          style: FilledButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            minimumSize: Size.zero,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(currency.flagUrl, style: const TextStyle(fontSize: 16)),
+              const SizedBox(width: 6),
+              Text(
+                currency.code,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Icon(Icons.expand_more, size: 14, color: colorScheme.onSurfaceVariant),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -439,336 +396,388 @@ class _CurrencyPageState extends State<CurrencyPage> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    return Card.filled(
+      color: colorScheme.surfaceContainerLow,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // Centered title
+            Center(
+              child: Text(
+                'Transfer Amount',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            
+            // You Send - Compact
+            _buildCompactAmountInput(
+              label: 'You Send',
+              currency: _sourceCurrency,
+              controller: _sourceAmountController,
+              isPrimary: true,
+              onChanged: (value) {
+                setState(() {
+                  _isSourceInput = true;
+                });
+              },
+            ),
+            
+            // Conversion Arrow
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 6),
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: colorScheme.secondaryContainer,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.south,
+                color: colorScheme.onSecondaryContainer,
+                size: 16,
+              ),
+            ),
+            
+            // Recipient Gets - Compact
+            _buildCompactAmountInput(
+              label: 'Recipient Gets',
+              currency: _destinationCurrency,
+              controller: _destinationAmountController,
+              isPrimary: false,
+              onChanged: (value) {
+                setState(() {
+                  _isSourceInput = false;
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompactAmountInput({
+    required String label,
+    required CurrencyModel currency,
+    required TextEditingController controller,
+    required bool isPrimary,
+    required ValueChanged<String> onChanged,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(24),
+        color: isPrimary 
+            ? colorScheme.primaryContainer.withValues(alpha: 0.3)
+            : colorScheme.secondaryContainer.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: colorScheme.outlineVariant,
-          width: 1,
+          color: isPrimary 
+              ? colorScheme.primary.withValues(alpha: 0.3)
+              : colorScheme.outline.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            'Transfer Amount',
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 20),
-          _buildAmountInput(
-            'You Send',
-            _sourceCurrency.code,
-            _sourceAmountController,
-            _sourceCurrency.symbol,
-            onChanged: (value) {
-              setState(() {
-                _isSourceInput = true;
-              });
-            },
-          ),
-          const SizedBox(height: 16),
-          Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: colorScheme.secondaryContainer,
-                borderRadius: BorderRadius.circular(16),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: isPrimary 
+                      ? colorScheme.primary.withValues(alpha: 0.1)
+                      : colorScheme.secondary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  currency.code,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: isPrimary 
+                        ? colorScheme.primary
+                        : colorScheme.secondary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 10,
+                  ),
+                ),
               ),
-              child: Text(
-                'Recipient gets',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: colorScheme.onSecondaryContainer,
+              const Spacer(),
+              Text(
+                label,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-            ),
+            ],
           ),
-          const SizedBox(height: 16),
-          _buildAmountInput(
-            'Recipient Gets',
-            _destinationCurrency.code,
-            _destinationAmountController,
-            _destinationCurrency.symbol,
-            onChanged: (value) {
-              setState(() {
-                _isSourceInput = false;
-              });
-            },
+          const SizedBox(height: 4),
+          TextField(
+            controller: controller,
+            onChanged: onChanged,
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: colorScheme.onSurface,
+            ),
+            decoration: InputDecoration(
+              hintText: '0',
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              isDense: true,
+              hintStyle: theme.textTheme.headlineSmall?.copyWith(
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildAmountInput(String label, String currency, TextEditingController controller, String symbol, {required ValueChanged<String> onChanged}) {
+  Widget _buildRateInfo() {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: theme.textTheme.labelMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: colorScheme.outline.withOpacity(0.5),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: colorScheme.tertiaryContainer,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  currency,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onTertiaryContainer,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: controller,
-                onChanged: onChanged,
-                keyboardType: TextInputType.number,
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: colorScheme.onSurface,
-                ),
-                decoration: InputDecoration(
-                  hintText: '0',
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
-                  hintStyle: theme.textTheme.headlineMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant.withOpacity(0.5),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRateAndFeeInfo() {
     final rate = _destinationCurrency.rate / _sourceCurrency.rate;
     final transferFee = 31700.0;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          _buildInfoRow(
-            Icons.sync_alt,
-            'Kurs ${_destinationCurrency.code} 1',
-            'IDR ${NumberFormat('#,###.##').format(1 / rate)}',
-          ),
-          const SizedBox(height: 12),
-          _buildInfoRow(
-            Icons.account_balance_wallet_outlined,
-            'Biaya Transfer',
-            'IDR ${NumberFormat('#,###').format(transferFee)}',
-          ),
-          const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF0F9FF),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
+    return Card.outlined(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            Row(
               children: [
-                Icon(
-                  Icons.access_time,
-                  color: Colors.blue[600],
-                  size: 20,
+                Icon(Icons.trending_up, color: colorScheme.primary, size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  '1 ${_destinationCurrency.code}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Uang diperkirakan sampai kurang dari ${_getEstimatedTime()}.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.blue[800],
-                      fontWeight: FontWeight.w500,
-                    ),
+                const Spacer(),
+                Text(
+                  'IDR ${NumberFormat('#,###.##').format(1 / rate)}',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.primary,
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+            const Divider(height: 12),
+            Row(
+              children: [
+                Icon(Icons.receipt, color: colorScheme.secondary, size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  'Transfer Fee',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  'IDR ${NumberFormat('#,###').format(transferFee)}',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: Colors.grey[600]),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-          ),
-        ),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF1A1A1A),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPromoSection() {
+  Widget _buildCompactPromoSection() {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: colorScheme.outlineVariant,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    if (_appliedPromoCode != null) {
+      return Card.filled(
+        color: colorScheme.tertiaryContainer,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
             children: [
-              Icon(Icons.local_offer, color: colorScheme.primary),
+              Icon(Icons.check_circle, color: colorScheme.tertiary, size: 16),
               const SizedBox(width: 8),
-              Text(
-                'Promo Code',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSurface,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Promo: $_appliedPromoCode',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: colorScheme.onTertiaryContainer,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (_discountAmount != null)
+                      Text(
+                        'Saved: ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(_discountAmount)}',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onTertiaryContainer,
+                        ),
+                      ),
+                  ],
                 ),
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _appliedPromoCode = null;
+                    _discountAmount = null;
+                    _promoCodeController.clear();
+                  });
+                },
+                icon: const Icon(Icons.close),
+                iconSize: 16,
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          if (_appliedPromoCode != null) ...[
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: colorScheme.tertiaryContainer,
-                borderRadius: BorderRadius.circular(12),
+        ),
+      );
+    }
+
+    return Card.outlined(
+      child: InkWell(
+        onTap: _showPromoBottomSheet,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              Icon(Icons.local_offer, color: colorScheme.primary, size: 16),
+              const SizedBox(width: 8),
+              Text(
+                'Add Promo Code',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              child: Row(
+              const Spacer(),
+              Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant, size: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryCard() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final sourceAmount = double.tryParse(_sourceAmountController.text.replaceAll(',', '')) ?? 0;
+    final baseFee = 31700.0;
+    final transferFee = _discountAmount != null ? (baseFee - _discountAmount!) : baseFee;
+    final finalTransferFee = transferFee < 0 ? 0 : transferFee;
+    final totalCost = sourceAmount + finalTransferFee;
+
+    return Card.filled(
+      color: colorScheme.primaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.check_circle, color: colorScheme.tertiary),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Promo Applied: $_appliedPromoCode',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onTertiaryContainer,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        if (_discountAmount != null)
-                          Text(
-                            'Discount: ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(_discountAmount)}',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onTertiaryContainer,
-                            ),
-                          ),
-                      ],
+                  Text(
+                    'Total Transfer',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _appliedPromoCode = null;
-                        _discountAmount = null;
-                        _promoCodeController.clear();
-                      });
-                    },
-                    icon: const Icon(Icons.close),
-                    iconSize: 20,
+                  Text(
+                    'IDR ${NumberFormat('#,###').format(totalCost)}',
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: colorScheme.onPrimaryContainer,
+                    ),
                   ),
                 ],
               ),
             ),
-          ] else ...[
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _promoCodeController,
-                    decoration: InputDecoration(
-                      hintText: 'Enter promo code (e.g., NEWUSER50)',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                    ),
+            if (_discountAmount != null)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: colorScheme.tertiaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'Saved ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(_discountAmount)}',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onTertiaryContainer,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 10,
                   ),
                 ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: _applyPromoCode,
-                  child: const Text('Apply'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            TextButton.icon(
-              onPressed: _showAvailablePromos,
-              icon: Icon(Icons.list_alt, color: colorScheme.primary),
-              label: Text(
-                'View Available Promos',
-                style: TextStyle(color: colorScheme.primary),
               ),
-            ),
           ],
-        ],
+        ),
       ),
     );
   }
 
-  void _showAvailablePromos() {
+  Widget _buildBottomCTA() {
+    final theme = Theme.of(context);
+    final sourceAmount = double.tryParse(_sourceAmountController.text.replaceAll(',', '')) ?? 0;
+    final isEnabled = sourceAmount > 0;
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, -1),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: FilledButton(
+          onPressed: isEnabled ? _processTransfer : null,
+          style: FilledButton.styleFrom(
+            backgroundColor: theme.colorScheme.primary,
+            foregroundColor: theme.colorScheme.onPrimary,
+            minimumSize: const Size(double.infinity, 48),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          child: Text(
+            'Continue Transfer',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showPromoBottomSheet() {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
@@ -786,13 +795,46 @@ class _CurrencyPageState extends State<CurrencyPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Available Promotions',
+              'Promo Code',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _promoCodeController,
+                    decoration: InputDecoration(
+                      hintText: 'Enter promo code',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: colorScheme.surfaceContainerHighest,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                FilledButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _applyPromoCode();
+                  },
+                  child: const Text('Apply'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Available Promos',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 12),
             ..._availablePromos.map((promo) => _buildPromoCard(promo)),
             const SizedBox(height: 20),
           ],
@@ -805,161 +847,69 @@ class _CurrencyPageState extends State<CurrencyPage> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
-    return Container(
+    return Card.outlined(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outlineVariant),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      child: InkWell(
+        onTap: () {
+          _promoCodeController.text = promo.code;
+          Navigator.pop(context);
+          _applyPromoCode();
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  promo.code,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.bold,
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      promo.code,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: colorScheme.tertiaryContainer,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '${promo.discountPercentage.toInt()}% OFF',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: colorScheme.onTertiaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                promo.title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
                 ),
               ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: colorScheme.tertiaryContainer,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '${promo.discountPercentage.toInt()}% OFF',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: colorScheme.onTertiaryContainer,
-                    fontWeight: FontWeight.bold,
-                  ),
+              const SizedBox(height: 4),
+              Text(
+                promo.description,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            promo.title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            promo.description,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: () {
-                _promoCodeController.text = promo.code;
-                Navigator.pop(context);
-                _applyPromoCode();
-              },
-              child: const Text('Use This Promo'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSummaryCard() {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final sourceAmount = double.tryParse(_sourceAmountController.text.replaceAll(',', '')) ?? 0;
-    final baseFee = 31700.0;
-    final transferFee = _discountAmount != null ? (baseFee - _discountAmount!) : baseFee;
-    final finalTransferFee = transferFee < 0 ? 0 : transferFee;
-    final totalCost = sourceAmount + finalTransferFee;
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colorScheme.outlineVariant),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Total Transfer',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'IDR ${NumberFormat('#,###').format(totalCost)}',
-            style: theme.textTheme.headlineLarge?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: colorScheme.primary,
-            ),
-          ),
-          if (_discountAmount != null) ...[
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: colorScheme.tertiaryContainer,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                'You saved ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(_discountAmount)}!',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onTertiaryContainer,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildContinueButton() {
-    final theme = Theme.of(context);
-    final sourceAmount = double.tryParse(_sourceAmountController.text.replaceAll(',', '')) ?? 0;
-    final isEnabled = sourceAmount > 0;
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      width: double.infinity,
-      child: FilledButton(
-        onPressed: isEnabled ? _processTransfer : null,
-        style: FilledButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        child: Text(
-          'Lanjutkan',
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
           ),
         ),
       ),
@@ -967,142 +917,125 @@ class _CurrencyPageState extends State<CurrencyPage> {
   }
 
   void _showRateAlertDialog() {
-    showDialog(
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+      isScrollControlled: true,
+      backgroundColor: colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
         ),
-        title: Row(
-          children: [
-            Icon(Icons.notifications_outlined, color: AppColors.primary),
-            const SizedBox(width: 8),
-            const Text(
-              'Pengingat Kurs',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-          ],
-        ),
-        content: Column(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Dapatkan notifikasi saat kurs mencapai target Anda',
-              style: TextStyle(
-                color: Color(0xFF666666),
-                fontSize: 14,
-              ),
+            Row(
+              children: [
+                Icon(Icons.notifications_outlined, color: colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  'Pengingat Kurs',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                const Spacer(),
+                FilledButton.icon(
+                  onPressed: () => _showAddRateAlertDialog(),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Tambah'),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Target Kurs IDR → JPY',
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                hintText: 'Contoh: 0.0070',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+            
+            if (_rateAlerts.isEmpty) 
+              _buildEmptyRateAlerts()
+            else
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _rateAlerts.length,
+                  itemBuilder: (context, index) {
+                    final alert = _rateAlerts[index];
+                    return _buildRateAlertItem(alert, index);
+                  },
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue[50],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, size: 16, color: Colors.blue[600]),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Kurs saat ini: 0.0067\nAnda akan diberitahu jika kurs naik 4% atau lebih',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.blue[800],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            
+            const SizedBox(height: 20),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Batal',
-              style: TextStyle(color: Colors.grey[600]),
+      ),
+    );
+  }
+
+  String _getEstimatedTime() {
+    switch (_destinationCurrency.code) {
+      case 'JPY':
+        return '15 menit';
+      case 'USD':
+        return '2-3 hari kerja';
+      case 'EUR':
+        return '3-4 hari kerja';
+      case 'GBP':
+        return '2-3 hari kerja';
+      default:
+        return '2-4 hari kerja';
+    }
+  }
+
+  Widget _buildEmptyRateAlerts() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return Container(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        children: [
+          Icon(
+            Icons.notifications_off_outlined,
+            size: 64,
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Belum Ada Pengingat Kurs',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('✅ Pengingat kurs berhasil diatur!'),
-                  backgroundColor: AppColors.success,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+          const SizedBox(height: 8),
+          Text(
+            'Tambahkan pengingat untuk mendapatkan notifikasi saat kurs mencapai target Anda',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
             ),
-            child: const Text('Atur Pengingat'),
           ),
         ],
       ),
-         );
-   }
+    );
+  }
 
-   String _getEstimatedTime() {
-     switch (_destinationCurrency.code) {
-       case 'JPY':
-         return '15 menit';
-       case 'USD':
-         return '2-3 hari kerja';
-       case 'EUR':
-         return '3-4 hari kerja';
-       case 'GBP':
-         return '2-3 hari kerja';
-       default:
-         return '2-4 hari kerja';
-     }
-   }
- 
-   Widget _buildExchangeRateCard() {
-    final rate = _destinationCurrency.rate / _sourceCurrency.rate;
-    final change = 0.05; // Mock change
-    final isPositive = change >= 0;
-
-    return Card(
-      elevation: AppConstants.cardElevation,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-      ),
+  Widget _buildRateAlertItem(RateAlert alert, int index) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return Card.outlined(
+      margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -1110,201 +1043,476 @@ class _CurrencyPageState extends State<CurrencyPage> {
           children: [
             Row(
               children: [
-                Text(_sourceCurrency.flagUrl, style: const TextStyle(fontSize: 24)),
+                // Currency flags
+                Text(
+                  _getCurrencyFlag(alert.toCurrency),
+                  style: const TextStyle(fontSize: 20),
+                ),
                 const SizedBox(width: 8),
-                Text(
-                  '1 ${_sourceCurrency.code}',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Spacer(),
-                Icon(
-                  Icons.arrow_forward,
-                  color: AppColors.primary,
-                ),
-                const Spacer(),
-                Text(_destinationCurrency.flagUrl, style: const TextStyle(fontSize: 24)),
-                const SizedBox(width: 8),
-                Text(
-                  '${NumberFormat('#,##0.####').format(rate)} ${_destinationCurrency.code}',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(
-                  isPositive ? Icons.trending_up : Icons.trending_down,
-                  color: isPositive ? AppColors.success : AppColors.error,
-                  size: 16,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '${isPositive ? '+' : ''}${(change * 100).toStringAsFixed(2)}% (24h)',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: isPositive ? AppColors.success : AppColors.error,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  'Updated: ${DateFormat('HH:mm').format(DateTime.now())}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTransferCard() {
-    return Card(
-      elevation: AppConstants.cardElevation,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Transfer Amount',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildCurrencyInput(
-              label: 'You Send',
-              currency: _sourceCurrency,
-              controller: _sourceAmountController,
-              onCurrencyTap: () => _showCurrencyPicker(true),
-              onChanged: (value) {
-                setState(() {
-                  _isSourceInput = true;
-                });
-              },
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  onPressed: _switchCurrencies,
-                  icon: Icon(
-                    Icons.swap_vert,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildCurrencyInput(
-              label: 'Recipient Gets',
-              currency: _destinationCurrency,
-              controller: _destinationAmountController,
-              onCurrencyTap: () => _showCurrencyPicker(false),
-              onChanged: (value) {
-                setState(() {
-                  _isSourceInput = false;
-                });
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCurrencyInput({
-    required String label,
-    required CurrencyModel currency,
-    required TextEditingController controller,
-    required VoidCallback onCurrencyTap,
-    required ValueChanged<String> onChanged,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            InkWell(
-              onTap: onCurrencyTap,
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(currency.flagUrl, style: const TextStyle(fontSize: 20)),
-                    const SizedBox(width: 8),
-                    Text(
-                      currency.code,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                Expanded(
+                  child: Text(
+                    alert.description,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
                     ),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.keyboard_arrow_down),
-                  ],
+                  ),
                 ),
-              ),
+                // Enable/Disable Switch
+                Switch(
+                  value: alert.isEnabled,
+                  onChanged: (value) {
+                    setState(() {
+                      _rateAlerts[index] = alert.copyWith(isEnabled: value);
+                    });
+                  },
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: TextField(
-                controller: controller,
-                onChanged: onChanged,
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[\d,.]')),
-                ],
-                decoration: InputDecoration(
-                  hintText: '0',
-                  border: OutlineInputBorder(
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                // Status badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: alert.isEnabled 
+                        ? colorScheme.primaryContainer
+                        : colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
+                  child: Text(
+                    alert.isEnabled ? 'Aktif' : 'Nonaktif',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: alert.isEnabled 
+                          ? colorScheme.onPrimaryContainer
+                          : colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
+                const SizedBox(width: 8),
+                Text(
+                  'Dibuat ${_formatDate(alert.createdAt)}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
+                const Spacer(),
+                // Action buttons
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: () => _editRateAlert(alert, index),
+                      icon: const Icon(Icons.edit_outlined),
+                      iconSize: 20,
+                      style: IconButton.styleFrom(
+                        foregroundColor: colorScheme.primary,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => _deleteRateAlert(index),
+                      icon: const Icon(Icons.delete_outlined),
+                      iconSize: 20,
+                      style: IconButton.styleFrom(
+                        foregroundColor: colorScheme.error,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
-      ],
+      ),
     );
   }
 
+  String _getCurrencyFlag(String currencyCode) {
+    switch (currencyCode) {
+      case 'IDR': return '🇮🇩';
+      case 'MYR': return '🇲🇾';
+      case 'JPY': return '🇯🇵';
+      case 'USD': return '🇺🇸';
+      case 'EUR': return '🇪🇺';
+      case 'GBP': return '🇬🇧';
+      case 'SGD': return '🇸🇬';
+      case 'THB': return '🇹🇭';
+      case 'AUD': return '🇦🇺';
+      case 'CAD': return '🇨🇦';
+      default: return '🏳️';
+    }
+  }
 
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date).inDays;
+    
+    if (difference == 0) {
+      return 'hari ini';
+    } else if (difference == 1) {
+      return 'kemarin';
+    } else if (difference < 7) {
+      return '$difference hari lalu';
+    } else {
+      return DateFormat('dd MMM yyyy').format(date);
+    }
+  }
+
+  void _editRateAlert(RateAlert alert, int index) {
+    _showAddRateAlertDialog(editAlert: alert, editIndex: index);
+  }
+
+  void _deleteRateAlert(int index) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hapus Pengingat'),
+        content: const Text('Apakah Anda yakin ingin menghapus pengingat kurs ini?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            onPressed: () {
+              setState(() {
+                _rateAlerts.removeAt(index);
+              });
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Pengingat kurs telah dihapus'),
+                  backgroundColor: colorScheme.primary,
+                ),
+              );
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.error,
+            ),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddRateAlertDialog({RateAlert? editAlert, int? editIndex}) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    // Available currencies for search
+    final availableCurrencies = [
+      {'code': 'MYR', 'name': 'Malaysian Ringgit', 'country': 'Malaysia', 'flag': '🇲🇾'},
+      {'code': 'SGD', 'name': 'Singapore Dollar', 'country': 'Singapura', 'flag': '🇸🇬'},
+      {'code': 'THB', 'name': 'Thai Baht', 'country': 'Thailand', 'flag': '🇹🇭'},
+      {'code': 'JPY', 'name': 'Japanese Yen', 'country': 'Jepang', 'flag': '🇯🇵'},
+      {'code': 'USD', 'name': 'US Dollar', 'country': 'Amerika Serikat', 'flag': '🇺🇸'},
+      {'code': 'EUR', 'name': 'Euro', 'country': 'Eropa', 'flag': '🇪🇺'},
+      {'code': 'GBP', 'name': 'British Pound', 'country': 'Inggris', 'flag': '🇬🇧'},
+      {'code': 'AUD', 'name': 'Australian Dollar', 'country': 'Australia', 'flag': '🇦🇺'},
+      {'code': 'CAD', 'name': 'Canadian Dollar', 'country': 'Kanada', 'flag': '🇨🇦'},
+    ];
+    
+    // Form controllers
+    final searchController = TextEditingController();
+    final rateController = TextEditingController(
+      text: editAlert?.targetRate.toString() ?? '',
+    );
+    
+    // Form state
+    String selectedCurrency = editAlert?.toCurrency ?? 'MYR';
+    RateCondition selectedCondition = editAlert?.condition ?? RateCondition.lessThan;
+    List<Map<String, String>> filteredCurrencies = List.from(availableCurrencies);
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) {
+          return Container(
+            padding: const EdgeInsets.all(24),
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.9,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.add_alert, color: colorScheme.primary),
+                    const SizedBox(width: 8),
+                    Text(
+                      editAlert != null ? 'Edit Pengingat Kurs' : 'Tambah Pengingat Kurs',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                
+                // Currency Search
+                Text(
+                  'Pilih Mata Uang Tujuan',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Cari negara atau mata uang...',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    filled: true,
+                    fillColor: colorScheme.surfaceContainerHighest,
+                  ),
+                  onChanged: (query) {
+                    setModalState(() {
+                      if (query.isEmpty) {
+                        filteredCurrencies = List.from(availableCurrencies);
+                      } else {
+                        filteredCurrencies = availableCurrencies
+                            .where((currency) =>
+                                currency['country']!.toLowerCase().contains(query.toLowerCase()) ||
+                                currency['name']!.toLowerCase().contains(query.toLowerCase()) ||
+                                currency['code']!.toLowerCase().contains(query.toLowerCase()))
+                            .toList();
+                      }
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+                
+                // Currency List
+                Container(
+                  height: 200,
+                                     decoration: BoxDecoration(
+                     border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
+                     borderRadius: BorderRadius.circular(12),
+                   ),
+                  child: ListView.builder(
+                    itemCount: filteredCurrencies.length,
+                    itemBuilder: (context, index) {
+                      final currency = filteredCurrencies[index];
+                      final isSelected = selectedCurrency == currency['code'];
+                      
+                      return ListTile(
+                        leading: Text(currency['flag']!, style: const TextStyle(fontSize: 24)),
+                        title: Text(
+                          currency['country']!,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        subtitle: Text('${currency['code']} - ${currency['name']}'),
+                        trailing: isSelected 
+                            ? Icon(Icons.check_circle, color: colorScheme.primary)
+                            : null,
+                        selected: isSelected,
+                        selectedTileColor: colorScheme.primaryContainer.withValues(alpha: 0.3),
+                        onTap: () {
+                          setModalState(() {
+                            selectedCurrency = currency['code']!;
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 24),
+                
+                // Condition and Rate
+                Text(
+                  'Pengaturan Pengingat',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                
+                // Condition Selector
+                Row(
+                  children: [
+                    Expanded(
+                      child: RadioListTile<RateCondition>(
+                        value: RateCondition.lessThan,
+                        groupValue: selectedCondition,
+                        onChanged: (value) {
+                          setModalState(() {
+                            selectedCondition = value!;
+                          });
+                        },
+                        title: const Text('Kurang dari'),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                    Expanded(
+                      child: RadioListTile<RateCondition>(
+                        value: RateCondition.greaterThan,
+                        groupValue: selectedCondition,
+                        onChanged: (value) {
+                          setModalState(() {
+                            selectedCondition = value!;
+                          });
+                        },
+                        title: const Text('Lebih dari'),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                
+                // Rate Input
+                TextField(
+                  controller: rateController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Target Kurs ($selectedCurrency 1 = ? IDR)',
+                    hintText: 'Contoh: 3100.50',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    filled: true,
+                    fillColor: colorScheme.surfaceContainerHighest,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                
+                // Preview
+                Container(
+                  padding: const EdgeInsets.all(16),
+                                     decoration: BoxDecoration(
+                     color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+                     borderRadius: BorderRadius.circular(12),
+                     border: Border.all(
+                       color: colorScheme.primary.withValues(alpha: 0.3),
+                     ),
+                   ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Preview:',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Ingatkan saya kalau kurs $selectedCurrency 1 ${selectedCondition == RateCondition.lessThan ? 'kurang dari' : 'lebih dari'} ${rateController.text.isEmpty ? '___' : rateController.text} IDR',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                
+                // Action Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Batal'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: () {
+                          final rate = double.tryParse(rateController.text);
+                          if (rate != null && rate > 0) {
+                            final newAlert = RateAlert(
+                              id: editAlert?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+                              fromCurrency: 'IDR',
+                              toCurrency: selectedCurrency,
+                              targetRate: rate / 15000, // Convert to relative rate
+                              condition: selectedCondition,
+                              isEnabled: editAlert?.isEnabled ?? true,
+                              createdAt: editAlert?.createdAt ?? DateTime.now(),
+                            );
+                            
+                            setState(() {
+                              if (editAlert != null && editIndex != null) {
+                                _rateAlerts[editIndex] = newAlert;
+                              } else {
+                                _rateAlerts.add(newAlert);
+                              }
+                            });
+                            
+                            Navigator.pop(context); // Close add dialog
+                            Navigator.pop(context); // Close alerts list dialog
+                            
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(editAlert != null 
+                                    ? '✅ Pengingat kurs berhasil diperbarui!'
+                                    : '✅ Pengingat kurs berhasil ditambahkan!'),
+                                backgroundColor: colorScheme.primary,
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text('Masukkan target kurs yang valid'),
+                                backgroundColor: colorScheme.error,
+                              ),
+                            );
+                          }
+                        },
+                        child: Text(editAlert != null ? 'Perbarui' : 'Simpan'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  String _getCountryName(String code) {
+    switch (code) {
+      case 'IDR': return 'Indonesia';
+      case 'JPY': return 'Jepang';
+      case 'USD': return 'Amerika Serikat';
+      case 'EUR': return 'Eropa';
+      case 'GBP': return 'Inggris';
+      case 'MYR': return 'Malaysia';
+      case 'SGD': return 'Singapura';
+      case 'THB': return 'Thailand';
+      case 'AUD': return 'Australia';
+      case 'CAD': return 'Kanada';
+      case 'CNY': return 'Tiongkok';
+      case 'KRW': return 'Korea Selatan';
+      case 'SAR': return 'Arab Saudi';
+      case 'AED': return 'Uni Emirat Arab';
+      case 'TRY': return 'Turki';
+      default: return code;
+    }
+  }
 
   void _applyPromoCode() {
     final theme = Theme.of(context);
@@ -1364,8 +1572,6 @@ class _CurrencyPageState extends State<CurrencyPage> {
     }
   }
 
-
-
   void _switchCurrencies() {
     setState(() {
       final temp = _sourceCurrency;
@@ -1381,6 +1587,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
   void _showCurrencyPicker(bool isSource) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final searchController = TextEditingController();
     
     showModalBottomSheet(
       context: context,
@@ -1389,26 +1596,106 @@ class _CurrencyPageState extends State<CurrencyPage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Select ${isSource ? 'Source' : 'Destination'} Currency',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: colorScheme.onSurface,
-              ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) {
+          // Filter currencies based on search
+          final availableCurrencies = _currencies.where((currency) => 
+            isSource || currency.code != 'IDR' // For destination, exclude IDR
+          ).toList();
+          
+          final filteredCurrencies = searchController.text.isEmpty
+              ? availableCurrencies
+              : availableCurrencies.where((currency) {
+                  final query = searchController.text.toLowerCase();
+                  return currency.code.toLowerCase().contains(query) ||
+                         currency.name.toLowerCase().contains(query) ||
+                         _getCountryName(currency.code).toLowerCase().contains(query);
+                }).toList();
+          
+          return Container(
+            padding: const EdgeInsets.all(24),
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
             ),
-            const SizedBox(height: 20),
-            ...(_currencies.where((currency) => 
-              isSource || currency.code != 'IDR' // For destination, exclude IDR
-            ).map((currency) => _buildCurrencyPickerItem(currency, isSource))),
-            const SizedBox(height: 20),
-          ],
-        ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Select ${isSource ? 'Source' : 'Destination'} Currency',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                
+                // Search Field
+                TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search currency or country...',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    filled: true,
+                    fillColor: colorScheme.surfaceContainerHighest,
+                  ),
+                  onChanged: (query) {
+                    setModalState(() {
+                      // Trigger rebuild to update filtered results
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+                
+                // Currency List
+                Flexible(
+                  child: filteredCurrencies.isEmpty
+                      ? Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(32),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.search_off,
+                                  size: 48,
+                                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No currencies found',
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Try a different search term',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: filteredCurrencies.length,
+                          itemBuilder: (context, index) {
+                            final currency = filteredCurrencies[index];
+                            return _buildCurrencyPickerItem(currency, isSource);
+                          },
+                        ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -1420,7 +1707,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
         ? _sourceCurrency.code == currency.code 
         : _destinationCurrency.code == currency.code;
     
-    return Container(
+    return Card.outlined(
       margin: const EdgeInsets.only(bottom: 8),
       child: InkWell(
         onTap: () {
@@ -1434,20 +1721,18 @@ class _CurrencyPageState extends State<CurrencyPage> {
           });
           Navigator.pop(context);
         },
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: isSelected 
-                ? colorScheme.primaryContainer.withOpacity(0.5)
-                : colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isSelected 
-                  ? colorScheme.primary 
-                  : colorScheme.outline.withOpacity(0.5),
-              width: isSelected ? 2 : 1,
-            ),
+                ? colorScheme.primaryContainer.withValues(alpha: 0.5)
+                : null,
+            borderRadius: BorderRadius.circular(12),
+            border: isSelected ? Border.all(
+              color: colorScheme.primary,
+              width: 2,
+            ) : null,
           ),
           child: Row(
             children: [
@@ -1512,13 +1797,13 @@ class _CurrencyPageState extends State<CurrencyPage> {
               onPressed: () => Navigator.pop(context),
               child: const Text('Cancel'),
             ),
-            ElevatedButton(
+            FilledButton(
               onPressed: () {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: const Text('Transfer initiated successfully!'),
-                    backgroundColor: AppColors.success,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
                 );
               },
@@ -1530,3 +1815,5 @@ class _CurrencyPageState extends State<CurrencyPage> {
     );
   }
 }
+
+

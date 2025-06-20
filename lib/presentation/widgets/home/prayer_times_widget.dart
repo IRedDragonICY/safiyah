@@ -33,7 +33,7 @@ class PrayerTimesWidget extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
@@ -69,7 +69,7 @@ class PrayerTimesWidget extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.prayerTime.withOpacity(0.1),
+                      color: AppColors.prayerTime.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -156,7 +156,7 @@ class PrayerTimesWidget extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: isNext 
-                  ? AppColors.primary.withOpacity(0.1)
+                  ? AppColors.primary.withValues(alpha: 0.1)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(6),
             ),

@@ -240,7 +240,7 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
                 border: Border.all(color: Colors.white, width: 3),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -256,13 +256,13 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
             Container(
               width: 2,
               height: 30,
-              color: color.withOpacity(0.7),
+              color: color.withValues(alpha: 0.7),
             ),
 
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.8),
+                color: Colors.black.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: color, width: 1),
               ),
@@ -300,7 +300,7 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
       width: 80,
       height: 80,
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
+        color: Colors.black.withValues(alpha: 0.7),
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white, width: 2),
       ),
@@ -312,7 +312,7 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
               height: 60,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withOpacity(0.3)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
               ),
             ),
           ),
@@ -347,7 +347,7 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
+        color: Colors.black.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppColors.primary, width: 1),
       ),
@@ -411,7 +411,7 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
           colors: [
-            Colors.black.withOpacity(0.8),
+            Colors.black.withValues(alpha: 0.8),
             Colors.transparent,
           ],
         ),
@@ -456,7 +456,7 @@ class _ARNavigationPageState extends State<ARNavigationPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
+          color: Colors.white.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(25),
           border: Border.all(color: AppColors.primary, width: 1),
         ),
@@ -662,7 +662,7 @@ class AROverlayPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
+      ..color = Colors.white.withValues(alpha: 0.1)
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
 
@@ -682,7 +682,7 @@ class AROverlayPainter extends CustomPainter {
     );
 
     final bracketPaint = Paint()
-      ..color = AppColors.primary.withOpacity(0.7)
+      ..color = AppColors.primary.withValues(alpha: 0.7)
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke;
 

@@ -146,7 +146,7 @@ class _PrayerTimesPageState extends State<PrayerTimesPage> {
                   Text(
                     DateFormat('EEEE, MMMM d, y').format(state.prayerTimes.date),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
                 ],
@@ -194,7 +194,7 @@ class _PrayerTimesPageState extends State<PrayerTimesPage> {
             Text(
               'Next Prayer',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
               ),
             ),
             const SizedBox(height: 8),
@@ -221,7 +221,7 @@ class _PrayerTimesPageState extends State<PrayerTimesPage> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -270,9 +270,9 @@ class _PrayerTimesPageState extends State<PrayerTimesPage> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: isNext 
-                      ? AppColors.primary.withOpacity(0.1)
+                      ? AppColors.primary.withValues(alpha: 0.1)
                       : isPassed 
-                          ? Colors.grey.withOpacity(0.1)
+                          ? Colors.grey.withValues(alpha: 0.1)
                           : null,
                   borderRadius: BorderRadius.circular(8),
                   border: isNext 
@@ -288,7 +288,7 @@ class _PrayerTimesPageState extends State<PrayerTimesPage> {
                             ? AppColors.primary
                             : isPassed 
                                 ? Colors.grey
-                                : AppColors.primary.withOpacity(0.1),
+                                : AppColors.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
@@ -366,7 +366,7 @@ class _PrayerTimesPageState extends State<PrayerTimesPage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.qiblaDirection.withOpacity(0.1),
+                  color: AppColors.qiblaDirection.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(

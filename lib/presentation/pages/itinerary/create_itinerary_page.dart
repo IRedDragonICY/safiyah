@@ -185,7 +185,7 @@ class _CreateItineraryPageState extends State<CreateItineraryPage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -352,7 +352,7 @@ class _CreateItineraryPageState extends State<CreateItineraryPage> {
                         _tags.remove(tag);
                       });
                     },
-                    backgroundColor: AppColors.primary.withOpacity(0.1),
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                     deleteIconColor: AppColors.primary,
                   );
                 }).toList(),

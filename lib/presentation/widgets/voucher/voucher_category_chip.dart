@@ -36,7 +36,7 @@ class VoucherCategoryChip extends StatelessWidget {
         ),
         backgroundColor: isSelected
             ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
         selected: isSelected,
         showCheckmark: false,
         shape: RoundedRectangleBorder(
@@ -44,7 +44,7 @@ class VoucherCategoryChip extends StatelessWidget {
           side: BorderSide(
             color: isSelected
                 ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                : Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
           ),
         ),
         elevation: isSelected ? 2 : 0,

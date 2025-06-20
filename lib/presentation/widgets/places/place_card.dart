@@ -131,7 +131,7 @@ class PlaceCard extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.halalFood.withOpacity(0.1),
+                          color: AppColors.halalFood.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -218,7 +218,7 @@ class PlaceCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: _getPlaceColor(place.type).withOpacity(0.1),
+                      color: _getPlaceColor(place.type).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -296,7 +296,7 @@ class PlaceCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.halalFood.withOpacity(0.1),
+                        color: AppColors.halalFood.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -328,8 +328,8 @@ class PlaceCard extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: place.openingHours!.isOpenNow
-                            ? AppColors.success.withOpacity(0.1)
-                            : AppColors.error.withOpacity(0.1),
+                            ? AppColors.success.withValues(alpha: 0.1)
+                            : AppColors.error.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(

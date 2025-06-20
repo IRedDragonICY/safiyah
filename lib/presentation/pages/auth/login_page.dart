@@ -85,7 +85,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                colorScheme.primaryContainer.withOpacity(0.3),
+                colorScheme.primaryContainer.withValues(alpha: 0.3),
                 colorScheme.surface,
                 colorScheme.surface,
               ],
@@ -158,7 +158,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             borderRadius: BorderRadius.circular(22),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.primary.withOpacity(0.3),
+                color: colorScheme.primary.withValues(alpha: 0.3),
                 blurRadius: 16,
                 offset: const Offset(0, 6),
                 spreadRadius: -3,
@@ -185,7 +185,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         Text(
           'Sign in to continue your halal journey',
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface.withOpacity(0.7),
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
           ),
           textAlign: TextAlign.center,
         ),
@@ -201,7 +201,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
             side: BorderSide(
-              color: colorScheme.outline.withOpacity(0.2),
+              color: colorScheme.outline.withValues(alpha: 0.2),
             ),
           ),
                 child: Padding(
@@ -232,7 +232,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               suffixIcon: IconButton(
                 icon: Icon(
                   _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                  color: colorScheme.onSurface.withOpacity(0.6),
+                  color: colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 onPressed: () {
                   setState(() {
@@ -264,7 +264,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.4),
+                color: AppColors.primary.withValues(alpha: 0.4),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
                 spreadRadius: -2,
@@ -349,7 +349,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               gradient: LinearGradient(
                 colors: [
                   Colors.transparent,
-                  theme.colorScheme.outline.withOpacity(0.3),
+                  theme.colorScheme.outline.withValues(alpha: 0.3),
                 ],
               ),
             ),
@@ -360,13 +360,13 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+              color: theme.colorScheme.surfaceVariant.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
               'OR',
               style: theme.textTheme.labelMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -378,7 +378,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  theme.colorScheme.outline.withOpacity(0.3),
+                  theme.colorScheme.outline.withValues(alpha: 0.3),
                   Colors.transparent,
                 ],
               ),
@@ -395,7 +395,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         Text(
           'Or continue with',
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            color: colorScheme.onSurface.withOpacity(0.7),
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -410,7 +410,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 onTap: () => _handleSocialLogin('Google'),
                 backgroundColor: Colors.white,
                 textColor: Colors.black87,
-                borderColor: colorScheme.outline.withOpacity(0.3),
+                borderColor: colorScheme.outline.withValues(alpha: 0.3),
               ),
             ),
             const SizedBox(width: 6),
@@ -469,7 +469,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         border: borderColor != null ? Border.all(color: borderColor) : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
@@ -541,7 +541,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 12),
         side: BorderSide(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -572,7 +572,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant.withOpacity(0.3),
+        color: colorScheme.surfaceVariant.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -581,7 +581,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           Text(
             AppStrings.dontHaveAccount,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.7),
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(width: 4),
@@ -615,7 +615,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       child: Text(
         'Terms of Service',
         style: TextStyle(
-          color: colorScheme.primary.withOpacity(0.8),
+          color: colorScheme.primary.withValues(alpha: 0.8),
           fontSize: 13,
           fontWeight: FontWeight.w500,
         ),
@@ -629,7 +629,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         Text(
           'Powered by',
           style: theme.textTheme.labelMedium?.copyWith(
-            color: colorScheme.onSurface.withOpacity(0.7),
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -647,7 +647,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               width: 1,
               height: 28,
               margin: const EdgeInsets.symmetric(horizontal: 16),
-              color: colorScheme.outline.withOpacity(0.4),
+              color: colorScheme.outline.withValues(alpha: 0.4),
             ),
             Image.asset(
               'assets/logos/mtqmn-logo.png',

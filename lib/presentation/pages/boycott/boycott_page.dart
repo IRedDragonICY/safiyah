@@ -369,7 +369,7 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
             colors: [
               colorScheme.surface,
               colorScheme.surface,
-              colorScheme.errorContainer.withOpacity(0.1),
+              colorScheme.errorContainer.withValues(alpha: 0.1),
             ],
           ),
         ),
@@ -431,7 +431,7 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
                     color: colorScheme.surfaceVariant,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: colorScheme.outline.withOpacity(0.2),
+                      color: colorScheme.outline.withValues(alpha: 0.2),
                     ),
                   ),
                   child: TextField(
@@ -491,7 +491,7 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
                       side: BorderSide(
                         color: isSelected 
                             ? colorScheme.primary
-                            : colorScheme.outline.withOpacity(0.3),
+                            : colorScheme.outline.withValues(alpha: 0.3),
                       ),
                     );
                   },
@@ -558,7 +558,7 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: colorScheme.outline.withOpacity(0.2),
+          color: colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: InkWell(
@@ -574,8 +574,8 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      item.color.withOpacity(0.8),
-                      item.color.withOpacity(0.6),
+                      item.color.withValues(alpha: 0.8),
+                      item.color.withValues(alpha: 0.6),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(16),
@@ -609,7 +609,7 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: item.color.withOpacity(0.1),
+                            color: item.color.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -693,7 +693,7 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
                   end: Alignment.bottomCenter,
                   colors: [
                     colorScheme.surface,
-                    item.color.withOpacity(0.05),
+                    item.color.withValues(alpha: 0.05),
                   ],
                 ),
               ),
@@ -712,8 +712,8 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                item.color.withOpacity(0.8),
-                                item.color.withOpacity(0.6),
+                                item.color.withValues(alpha: 0.8),
+                                item.color.withValues(alpha: 0.6),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(20),
@@ -744,7 +744,7 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
                                   vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: item.color.withOpacity(0.1),
+                                  color: item.color.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
@@ -834,10 +834,10 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: colorScheme.errorContainer.withOpacity(0.3),
+                        color: colorScheme.errorContainer.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: colorScheme.error.withOpacity(0.3),
+                          color: colorScheme.error.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Column(
@@ -918,10 +918,10 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: colorScheme.tertiaryContainer.withOpacity(0.3),
+                          color: colorScheme.tertiaryContainer.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: colorScheme.tertiary.withOpacity(0.3),
+                            color: colorScheme.tertiary.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Column(
@@ -952,9 +952,9 @@ class _BoycottPageState extends State<BoycottPage> with TickerProviderStateMixin
                                 return Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                   decoration: BoxDecoration(
-                                    color: colorScheme.tertiary.withOpacity(0.1),
+                                    color: colorScheme.tertiary.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(color: colorScheme.tertiary.withOpacity(0.3)),
+                                    border: Border.all(color: colorScheme.tertiary.withValues(alpha: 0.3)),
                                   ),
                                   child: Text(
                                     alt,

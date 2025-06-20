@@ -87,7 +87,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                colorScheme.primaryContainer.withOpacity(0.3),
+                colorScheme.primaryContainer.withValues(alpha: 0.3),
                 colorScheme.surface,
                 colorScheme.surface,
               ],
@@ -145,7 +145,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
             color: colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: colorScheme.outline.withOpacity(0.2),
+              color: colorScheme.outline.withValues(alpha: 0.2),
             ),
           ),
           child: IconButton(
@@ -179,7 +179,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.3),
+                color: AppColors.primary.withValues(alpha: 0.3),
                 blurRadius: 16,
                 offset: const Offset(0, 6),
                 spreadRadius: -3,
@@ -204,7 +204,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
         Text(
           'Join Safiyah and start your halal travel journey',
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface.withOpacity(0.7),
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
           ),
           textAlign: TextAlign.center,
         ),
@@ -218,7 +218,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: colorScheme.outline.withOpacity(0.2),
+          color: colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Padding(
@@ -260,7 +260,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
               suffixIcon: IconButton(
                 icon: Icon(
                   _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                  color: colorScheme.onSurface.withOpacity(0.6),
+                  color: colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 onPressed: () {
                   setState(() {
@@ -282,7 +282,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
               suffixIcon: IconButton(
                 icon: Icon(
                   _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                  color: colorScheme.onSurface.withOpacity(0.6),
+                  color: colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 onPressed: () {
                   setState(() {
@@ -301,10 +301,10 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant.withOpacity(0.3),
+        color: colorScheme.surfaceVariant.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: colorScheme.outline.withOpacity(0.2),
+          color: colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -338,7 +338,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
                 child: RichText(
                   text: TextSpan(
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.8),
+                      color: colorScheme.onSurface.withValues(alpha: 0.8),
                       height: 1.3,
                     ),
                     children: [
@@ -385,11 +385,11 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
                     ],
                   )
                 : null,
-            color: _agreeToTerms ? null : Colors.grey.withOpacity(0.3),
+            color: _agreeToTerms ? null : Colors.grey.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(16),
             boxShadow: _agreeToTerms ? [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.4),
+                color: AppColors.primary.withValues(alpha: 0.4),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
                 spreadRadius: -2,
@@ -457,7 +457,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
               gradient: LinearGradient(
                 colors: [
                   Colors.transparent,
-                  theme.colorScheme.outline.withOpacity(0.3),
+                  theme.colorScheme.outline.withValues(alpha: 0.3),
                 ],
               ),
             ),
@@ -468,13 +468,13 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+              color: theme.colorScheme.surfaceVariant.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
               'OR',
               style: theme.textTheme.labelMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -486,7 +486,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  theme.colorScheme.outline.withOpacity(0.3),
+                  theme.colorScheme.outline.withValues(alpha: 0.3),
                   Colors.transparent,
                 ],
               ),
@@ -503,7 +503,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
         Text(
           'Or sign up with',
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            color: colorScheme.onSurface.withOpacity(0.7),
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -518,7 +518,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
                 onTap: () => _handleSocialRegistration('Google'),
                 backgroundColor: Colors.white,
                 textColor: Colors.black87,
-                borderColor: colorScheme.outline.withOpacity(0.3),
+                borderColor: colorScheme.outline.withValues(alpha: 0.3),
                 iconColor: Colors.red,
               ),
             ),
@@ -582,7 +582,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
         border: borderColor != null ? Border.all(color: borderColor) : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
@@ -622,7 +622,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant.withOpacity(0.3),
+        color: colorScheme.surfaceVariant.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -631,7 +631,7 @@ class _RegisterPageState extends State<RegisterPage> with TickerProviderStateMix
           Text(
             AppStrings.alreadyHaveAccount,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.7),
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(width: 4),

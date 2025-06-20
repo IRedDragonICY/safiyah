@@ -137,9 +137,9 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppColors.primary.withOpacity(0.9 * _backgroundAnimation.value),
-                    AppColors.primaryLight.withOpacity(0.8 * _backgroundAnimation.value),
-                    AppColors.secondary.withOpacity(0.7 * _backgroundAnimation.value),
+                    AppColors.primary.withValues(alpha: 0.9 * _backgroundAnimation.value),
+                    AppColors.primaryLight.withValues(alpha: 0.8 * _backgroundAnimation.value),
+                    AppColors.secondary.withValues(alpha: 0.7 * _backgroundAnimation.value),
                   ],
                   stops: const [0.0, 0.6, 1.0],
                 ),
@@ -224,13 +224,13 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
+                  color: Colors.black.withValues(alpha: 0.15),
                   blurRadius: 22,
                   offset: const Offset(0, 12),
                   spreadRadius: -4,
                 ),
                 BoxShadow(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                   blurRadius: 12,
                   offset: const Offset(-4, -4),
                 ),
@@ -265,7 +265,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                 letterSpacing: 1.2,
                 shadows: [
                   Shadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     offset: const Offset(0, 3),
                     blurRadius: 6,
                   ),
@@ -289,10 +289,10 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.3),
+                  color: Colors.white.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),
@@ -331,7 +331,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
               Text(
                 'v1.0.0',
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -348,7 +348,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
         Text(
           'Powered by',
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -366,7 +366,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
               width: 1,
               height: 32,
               margin: const EdgeInsets.symmetric(horizontal: 20),
-              color: Colors.white.withOpacity(0.4),
+              color: Colors.white.withValues(alpha: 0.4),
             ),
             Image.asset(
               'assets/logos/mtqmn-logo.png',
@@ -393,7 +393,7 @@ class IslamicPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.05)
+      ..color = Colors.white.withValues(alpha: 0.05)
       ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
 

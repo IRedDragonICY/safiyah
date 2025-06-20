@@ -193,7 +193,7 @@ class _PersonalizationPageState extends State<PersonalizationPage>
             colors: [
               colorScheme.surface,
               colorScheme.surface,
-              colorScheme.primaryContainer.withOpacity(0.1),
+              colorScheme.primaryContainer.withValues(alpha: 0.1),
             ],
           ),
         ),
@@ -331,7 +331,7 @@ class _PersonalizationPageState extends State<PersonalizationPage>
                 
                 return Card(
                   elevation: isSelected ? 8 : 0,
-                  shadowColor: colorScheme.primary.withOpacity(0.3),
+                  shadowColor: colorScheme.primary.withValues(alpha: 0.3),
                   color: isSelected
                       ? colorScheme.primaryContainer
                       : colorScheme.surfaceVariant,
@@ -426,7 +426,7 @@ class _PersonalizationPageState extends State<PersonalizationPage>
 
                 return Card(
                   elevation: isSelected ? 8 : 0,
-                  shadowColor: colorScheme.primary.withOpacity(0.3),
+                  shadowColor: colorScheme.primary.withValues(alpha: 0.3),
                   color: isSelected
                       ? colorScheme.primaryContainer
                       : colorScheme.surfaceVariant,
@@ -543,7 +543,7 @@ class _PersonalizationPageState extends State<PersonalizationPage>
                       color: colorScheme.surfaceVariant,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: colorScheme.outline.withOpacity(0.2),
+                        color: colorScheme.outline.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Row(
@@ -608,7 +608,7 @@ class _PersonalizationPageState extends State<PersonalizationPage>
                         border: Border.all(
                           color: isSelected
                               ? colorScheme.primary
-                              : colorScheme.outline.withOpacity(0.2),
+                              : colorScheme.outline.withValues(alpha: 0.2),
                           width: isSelected ? 2 : 1,
                         ),
                       ),
@@ -715,7 +715,7 @@ class _PersonalizationPageState extends State<PersonalizationPage>
                 gradient: LinearGradient(
                   colors: [
                     colorScheme.secondaryContainer,
-                    colorScheme.secondaryContainer.withOpacity(0.8),
+                    colorScheme.secondaryContainer.withValues(alpha: 0.8),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(16),

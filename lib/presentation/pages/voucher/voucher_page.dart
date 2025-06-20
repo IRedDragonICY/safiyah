@@ -127,7 +127,7 @@ class _VoucherPageState extends State<VoucherPage> {
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

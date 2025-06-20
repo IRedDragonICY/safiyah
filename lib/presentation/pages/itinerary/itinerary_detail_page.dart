@@ -139,7 +139,7 @@ class _ItineraryDetailPageState extends State<ItineraryDetailPage> {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.7),
+                      Colors.black.withValues(alpha: 0.7),
                     ],
                   ),
                 ),
@@ -221,7 +221,7 @@ class _ItineraryDetailPageState extends State<ItineraryDetailPage> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -340,7 +340,7 @@ class _ItineraryDetailPageState extends State<ItineraryDetailPage> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -430,7 +430,7 @@ class _ItineraryDetailPageState extends State<ItineraryDetailPage> {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
@@ -550,11 +550,11 @@ class _ItineraryDetailPageState extends State<ItineraryDetailPage> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: activity.isCompleted
-            ? AppColors.success.withOpacity(0.1)
+            ? AppColors.success.withValues(alpha: 0.1)
             : Colors.white,
         border: Border.all(
           color: activity.isCompleted
-              ? AppColors.success.withOpacity(0.3)
+              ? AppColors.success.withValues(alpha: 0.3)
               : Colors.grey[200]!,
         ),
         borderRadius: BorderRadius.circular(8),
@@ -621,7 +621,7 @@ class _ItineraryDetailPageState extends State<ItineraryDetailPage> {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: _getActivityTypeColor(activity.type).withOpacity(0.1),
+                        color: _getActivityTypeColor(activity.type).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(

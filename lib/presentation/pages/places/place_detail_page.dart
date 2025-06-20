@@ -179,7 +179,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: _getPlaceColor(place.type).withOpacity(0.1),
+                  color: _getPlaceColor(place.type).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -260,7 +260,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.halalFood.withOpacity(0.1),
+                    color: AppColors.halalFood.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -301,8 +301,8 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                   ),
                   decoration: BoxDecoration(
                     color: place.openingHours!.isOpenNow
-                        ? AppColors.success.withOpacity(0.1)
-                        : AppColors.error.withOpacity(0.1),
+                        ? AppColors.success.withValues(alpha: 0.1)
+                        : AppColors.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -490,7 +490,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
@@ -516,7 +516,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -662,7 +662,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
             children: [
               CircleAvatar(
                 radius: 16,
-                backgroundColor: AppColors.primary.withOpacity(0.1),
+                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                 child: Text(
                   name[0],
                   style: TextStyle(

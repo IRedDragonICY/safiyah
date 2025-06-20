@@ -54,13 +54,13 @@ class WeatherWidget extends StatelessWidget {
                   Text(
                     weather!.condition,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
                   Text(
                     weather!.location,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -75,13 +75,13 @@ class WeatherWidget extends StatelessWidget {
                     Icon(
                       Icons.water_drop,
                       size: 16,
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '${weather!.humidity}%',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -93,13 +93,13 @@ class WeatherWidget extends StatelessWidget {
                     Icon(
                       Icons.air,
                       size: 16,
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '${weather!.windSpeed} km/h',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
                   ],

@@ -99,7 +99,7 @@ class _QiblaCompassState extends State<QiblaCompass> {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withValues(alpha: 0.2),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -124,10 +124,10 @@ class _QiblaCompassState extends State<QiblaCompass> {
       width: 300,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.1),
+        color: Colors.grey.withValues(alpha: 0.1),
         shape: BoxShape.circle,
         border: Border.all(
-          color: Colors.grey.withOpacity(0.3),
+          color: Colors.grey.withValues(alpha: 0.3),
           width: 2,
         ),
       ),
@@ -168,7 +168,7 @@ class CompassPainter extends CustomPainter {
     final radius = size.width / 2 - 20;
 
     final paint = Paint()
-      ..color = Colors.grey.withOpacity(0.3)
+      ..color = Colors.grey.withValues(alpha: 0.3)
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
@@ -202,7 +202,7 @@ class CompassPainter extends CustomPainter {
       );
     }
 
-    paint.color = Colors.grey.withOpacity(0.5);
+    paint.color = Colors.grey.withValues(alpha: 0.5);
     paint.strokeWidth = 1;
 
     for (int i = 0; i < 360; i += 10) {
@@ -242,13 +242,13 @@ class QiblaNeedlePainter extends CustomPainter {
     path.close();
 
     final shadowPaint = Paint()
-      ..color = Colors.black.withOpacity(0.3)
+      ..color = Colors.black.withValues(alpha: 0.3)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
 
     canvas.drawPath(path, shadowPaint);
     canvas.drawPath(path, paint);
 
-    paint.color = AppColors.qiblaDirection.withOpacity(0.8);
+    paint.color = AppColors.qiblaDirection.withValues(alpha: 0.8);
     canvas.drawCircle(Offset(center.dx, center.dy + 15), 4, paint);
   }
 
