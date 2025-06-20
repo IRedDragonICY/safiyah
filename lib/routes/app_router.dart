@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safiyah/presentation/pages/chatbot/chatbot_page.dart';
+import 'package:safiyah/presentation/pages/chatbot/chat_history_page.dart';
+import 'package:safiyah/presentation/pages/chatbot/realtime_chatbot_page.dart';
 import 'package:safiyah/presentation/pages/onboarding/onboarding_page.dart';
 
 import '../presentation/pages/home/home_page.dart';
 import '../presentation/pages/settings/settings_page.dart';
+import '../presentation/pages/subscription/subscription_page.dart';
 import '../presentation/pages/splash/splash_page.dart';
 import '../presentation/pages/auth/login_page.dart';
 import '../presentation/pages/auth/register_page.dart';
@@ -20,7 +23,7 @@ import '../presentation/pages/places/place_detail_page.dart';
 import '../presentation/pages/itinerary/itinerary_list_page.dart';
 import '../presentation/pages/itinerary/create_itinerary_page.dart';
 import '../presentation/pages/itinerary/itinerary_detail_page.dart';
-import '../presentation/pages/ar/ar_navigation_page.dart';
+
 import 'route_names.dart';
 
 class AppRouter {
@@ -116,6 +119,12 @@ class AppRouter {
         builder: (context, state) => const SettingsPage(),
       ),
       GoRoute(
+        path: RouteNames.subscription,
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'subscription',
+        builder: (context, state) => const SubscriptionPage(),
+      ),
+      GoRoute(
         path: RouteNames.qibla,
         parentNavigatorKey: _rootNavigatorKey,
         name: 'qibla',
@@ -154,17 +163,24 @@ class AppRouter {
           return CreateItineraryPage(itineraryId: id);
         },
       ),
-      GoRoute(
-        path: RouteNames.arNavigation,
-        parentNavigatorKey: _rootNavigatorKey,
-        name: 'ar_navigation',
-        builder: (context, state) => const ARNavigationPage(),
-      ),
+
       GoRoute(
         path: RouteNames.chatbot,
         parentNavigatorKey: _rootNavigatorKey,
         name: 'chatbot',
         builder: (context, state) => const ChatbotPage(),
+      ),
+      GoRoute(
+        path: RouteNames.chatHistory,
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'chat_history',
+        builder: (context, state) => const ChatHistoryPage(),
+      ),
+      GoRoute(
+        path: RouteNames.realtimeChatbot,
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'realtime_chatbot',
+        builder: (context, state) => const RealtimeChatbotPage(),
       ),
       GoRoute(
         path: RouteNames.currency,

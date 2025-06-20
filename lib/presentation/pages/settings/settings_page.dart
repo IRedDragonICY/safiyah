@@ -166,6 +166,15 @@ class SettingsPage extends StatelessWidget {
               ),
               const Divider(height: 1),
               ListTile(
+                leading: const Icon(Icons.workspace_premium),
+                title: const Text('Subscription'),
+                subtitle: const Text('Upgrade to Pro for premium features'),
+                onTap: () {
+                  context.go(RouteNames.subscription);
+                },
+              ),
+              const Divider(height: 1),
+              ListTile(
                 leading: const Icon(Icons.lock),
                 title: const Text('Change Password'),
                 onTap: () {},

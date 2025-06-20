@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:safiyah/data/models/chat_message_model.dart';
 import 'package:safiyah/presentation/bloc/chatbot/chatbot_bloc.dart';
 import 'package:safiyah/presentation/bloc/chatbot/chatbot_event.dart';
 import 'package:safiyah/presentation/bloc/chatbot/chatbot_state.dart';
 import 'package:safiyah/presentation/widgets/chatbot/chat_message_bubble.dart';
+import 'package:safiyah/presentation/pages/chatbot/chat_history_page.dart';
+import 'package:safiyah/presentation/pages/chatbot/realtime_chatbot_page.dart';
 
 class ChatbotPage extends StatefulWidget {
   const ChatbotPage({super.key});
@@ -21,6 +22,9 @@ class _ChatbotPageState extends State<ChatbotPage> {
   void initState() {
     super.initState();
     context.read<ChatbotBloc>().add(LoadChatHistory());
+    _textController.addListener(() {
+      setState(() {}); // Rebuild to update the send/voice icon
+    });
   }
 
   void _sendMessage() {
@@ -45,6 +49,13 @@ class _ChatbotPageState extends State<ChatbotPage> {
     });
   }
 
+  void _navigateToRealtimeChat() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const RealtimeChatbotPage()),
+    );
+  }
+
   @override
   void dispose() {
     _textController.dispose();
@@ -60,6 +71,16 @@ class _ChatbotPageState extends State<ChatbotPage> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 1,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ChatHistoryPage()),
+              );
+            },
+            tooltip: 'Chat History',
+          ),
           IconButton(
             icon: const Icon(Icons.add_comment_outlined),
             onPressed: () {
@@ -194,10 +215,10 @@ class _ChatbotPageState extends State<ChatbotPage> {
           ),
           _buildSuggestionChip(
             context,
-            icon: Icons.image_search_outlined,
-            text: 'Find from Image',
+            icon: Icons.auto_awesome,
+            text: 'Smart AI',
             onTap: () {
-               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Image analysis feature is coming soon!')));
+               _navigateToRealtimeChat();
             }
           ),
       ],
@@ -241,10 +262,21 @@ class _ChatbotPageState extends State<ChatbotPage> {
                 onPressed: () {
                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Voice input feature is coming soon!')));
                 },
+                tooltip: 'Voice Input',
               ),
               IconButton(
-                icon: Icon(Icons.send, color: Theme.of(context).colorScheme.primary),
-                onPressed: _sendMessage,
+                icon: Icon(
+                  _textController.text.trim().isEmpty 
+                    ? Icons.graphic_eq 
+                    : Icons.send, 
+                  color: Theme.of(context).colorScheme.primary
+                ),
+                onPressed: _textController.text.trim().isEmpty 
+                  ? _navigateToRealtimeChat 
+                  : _sendMessage,
+                tooltip: _textController.text.trim().isEmpty 
+                  ? 'Start Smart AI Chat' 
+                  : 'Send Message',
               ),
             ],
           ),

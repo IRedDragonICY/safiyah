@@ -6,6 +6,7 @@ class RouteNames {
 
   static const String home = '/';
   static const String settings = '/settings';
+  static const String subscription = '/subscription';
 
   static const String prayer = '/prayer';
   static const String qibla = '/prayer/qibla';
@@ -17,9 +18,9 @@ class RouteNames {
 
   static const String voucher = '/voucher';
 
-  static const String arNavigation = '/ar-navigation';
-
   static const String chatbot = '/chatbot';
+  static const String chatHistory = '/chatbot/history';
+  static const String realtimeChatbot = '/chatbot/realtime';
 
   static const String currency = '/currency';
 

@@ -71,10 +71,10 @@ class QuickActionsWidget extends StatelessWidget {
                 ),
                 _buildQuickActionItem(
                   context,
-                  icon: Icons.map,
-                  label: 'AR Nav',
+                  icon: Icons.auto_awesome,
+                  label: 'Smart AI',
                   color: AppColors.info,
-                  onTap: () => context.push('/ar-navigation'),
+                  onTap: () => context.push('/chatbot/realtime'),
                 ),
                 _buildQuickActionItem(
                   context,
