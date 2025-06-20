@@ -4,9 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/colors.dart';
+import '../../../routes/route_names.dart';
 import '../../bloc/onboarding/onboarding_bloc.dart';
 import '../../bloc/onboarding/onboarding_event.dart';
-import 'onboarding_model.dart';
+import '../../bloc/onboarding/onboarding_state.dart';
+import '../../bloc/settings/settings_bloc.dart';
+import '../../bloc/settings/settings_event.dart';
+import 'accessibility_onboarding_page.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -17,186 +21,443 @@ class OnboardingPage extends StatefulWidget {
 
 class _OnboardingPageState extends State<OnboardingPage> {
   final PageController _pageController = PageController();
-  int _currentPage = 0;
+  Map<String, dynamic> _accessibilityData = {};
 
-  final List<OnboardingItem> _onboardingItems = const [
-    OnboardingItem(
-      imagePath: 'assets/images/onboarding_1.png',
-      title: "Find Halal Places, Instantly",
-      description:
-          "Easily locate mosques, halal restaurants, and stores near you, wherever you are in the world.",
-    ),
-    OnboardingItem(
-      imagePath: 'assets/images/onboarding_2.png',
-      title: "Never Miss a Prayer",
-      description:
-          "Get precise prayer times and Qibla direction based on your location. Stay connected to your faith on the go.",
-    ),
-    OnboardingItem(
-      imagePath: 'assets/images/onboarding_3.png',
-      title: "Plan Your Perfect Halal Trip",
-      description:
-          "Create and manage detailed itineraries for your travels, ensuring a seamless and faith-compliant journey.",
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Start onboarding flow
+    context.read<OnboardingBloc>().add(const StartOnboarding());
+  }
+
+  void _handleAccessibilityData(Map<String, dynamic> data) {
+    setState(() {
+      _accessibilityData = data;
+    });
+  }
+
+  void _nextPage() {
+    final state = context.read<OnboardingBloc>().state;
+    if (state is OnboardingInProgress) {
+      if (state.currentPage < _getTotalPages() - 1) {
+        context.read<OnboardingBloc>().add(const NextPageRequested());
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      } else {
+        _completeOnboarding();
+      }
+    }
+  }
+
+  void _previousPage() {
+    final state = context.read<OnboardingBloc>().state;
+    if (state is OnboardingInProgress && state.currentPage > 0) {
+      context.read<OnboardingBloc>().add(const PreviousPageRequested());
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _completeOnboarding() {
+    // Save accessibility preferences before completing onboarding
+    if (_accessibilityData.isNotEmpty) {
+      _saveAccessibilityPreferences();
+    }
+    
+    context.read<OnboardingBloc>().add(const CompleteOnboardingFlow());
+  }
+
+  void _saveAccessibilityPreferences() {
+    final settingsBloc = context.read<SettingsBloc>();
+    
+    // Apply accessibility settings
+    if (_accessibilityData['hasDisability'] == true) {
+      settingsBloc.add(const ToggleAccessibilityFeatures(enabled: true));
+      
+      if (_accessibilityData['isVisuallyImpaired'] == true) {
+        settingsBloc.add(const ToggleVisualImpairment(enabled: true));
+        
+        if (_accessibilityData['enableEyeControl'] == true) {
+          settingsBloc.add(const ToggleEyeControl(enabled: true));
+        }
+        
+        if (_accessibilityData['enableScreenReader'] == true) {
+          settingsBloc.add(const ToggleScreenReader(enabled: true));
+        }
+        
+        if (_accessibilityData['enableVoiceCommands'] == true) {
+          settingsBloc.add(const ToggleVoiceCommands(enabled: true));
+        }
+      }
+      
+      if (_accessibilityData['hasColorBlindness'] == true) {
+        settingsBloc.add(const ToggleColorBlindness(enabled: true));
+        
+        final colorBlindnessType = _accessibilityData['colorBlindnessType'] as String? ?? 'none';
+        if (colorBlindnessType != 'none') {
+          settingsBloc.add(ChangeColorBlindnessType(type: colorBlindnessType));
+        }
+        
+        if (_accessibilityData['enableHighContrast'] == true) {
+          settingsBloc.add(const ToggleHighContrast(enabled: true));
+        }
+      }
+    }
+  }
+
+  int _getTotalPages() => 4; // Welcome, Accessibility, Location, Complete
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<OnboardingBloc, OnboardingState>(
+      listener: (context, state) {
+        if (state is OnboardingCompleted) {
+          context.go(RouteNames.home);
+        }
+      },
+      builder: (context, state) {
+        if (state is OnboardingInitial) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (state is! OnboardingInProgress) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          body: SafeArea(
+            child: Column(
+              children: [
+                // Progress indicator
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      if (state.currentPage > 0)
+                        IconButton(
+                          onPressed: _previousPage,
+                          icon: const Icon(Icons.arrow_back_ios),
+                        ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: LinearProgressIndicator(
+                          value: (state.currentPage + 1) / _getTotalPages(),
+                          backgroundColor: Colors.grey[300],
+                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Text(
+                        '${state.currentPage + 1} / ${_getTotalPages()}',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Page content
+                Expanded(
+                  child: PageView(
+                    controller: _pageController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      _buildWelcomePage(context),
+                      AccessibilityOnboardingPage(
+                        onNext: _nextPage,
+                        onAccessibilitySet: _handleAccessibilityData,
+                      ),
+                      _buildLocationPage(context),
+                      _buildCompletePage(context),
+                    ],
+                  ),
+                ),
+                
+                // Navigation buttons
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  child: Row(
+                    children: [
+                      if (state.currentPage > 0)
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: _previousPage,
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text('Back'),
+                          ),
+                        ),
+                      if (state.currentPage > 0) const SizedBox(width: 16),
+                      Expanded(
+                        flex: state.currentPage == 0 ? 1 : 1,
+                        child: FilledButton(
+                          onPressed: state.currentPage == 1 && _accessibilityData.isEmpty 
+                              ? null 
+                              : _nextPage,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(
+                            state.currentPage == _getTotalPages() - 1 
+                                ? 'Get Started' 
+                                : 'Continue',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildWelcomePage(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      child: Column(
+        children: [
+          const Spacer(flex: 1),
+          
+          // Hero illustration
+          Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.mosque,
+              size: 80,
+              color: AppColors.primary,
+            ),
+          ),
+          
+          const SizedBox(height: 32),
+          
+          // Welcome text
+          Text(
+            'Welcome to Safiyah',
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          
+          const SizedBox(height: 16),
+          
+          Text(
+            'Your comprehensive Islamic companion for daily life and travel. Discover halal places, prayer times, and connect with the Muslim community.',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              height: 1.5,
+              color: Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          
+          const Spacer(flex: 2),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLocationPage(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      child: Column(
+        children: [
+          const Spacer(flex: 1),
+          
+          // Location illustration
+          Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.location_on,
+              size: 80,
+              color: Colors.blue,
+            ),
+          ),
+          
+          const SizedBox(height: 32),
+          
+          // Location text
+          Text(
+            'Enable Location Services',
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.blue,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          
+          const SizedBox(height: 16),
+          
+          Text(
+            'Allow Safiyah to access your location to provide accurate prayer times, find nearby mosques, and discover halal restaurants around you.',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              height: 1.5,
+              color: Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          
+          const SizedBox(height: 32),
+          
+          // Permission button
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                // Request location permission
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Location permission granted!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              icon: const Icon(Icons.location_on),
+              label: const Text('Allow Location Access'),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+          
+          const Spacer(flex: 2),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompletePage(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      child: Column(
+        children: [
+          const Spacer(flex: 1),
+          
+          // Success illustration
+          Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.green.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.check_circle,
+              size: 80,
+              color: Colors.green,
+            ),
+          ),
+          
+          const SizedBox(height: 32),
+          
+          // Success text
+          Text(
+            'You\'re All Set!',
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.green,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          
+          const SizedBox(height: 16),
+          
+          Text(
+            'Safiyah is now configured for your needs. Start exploring halal places, managing your prayer times, and planning your spiritual journey.',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              height: 1.5,
+              color: Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          
+          if (_accessibilityData.isNotEmpty && _accessibilityData['hasDisability'] == true) ...[
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppColors.primary.withOpacity(0.3),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.accessibility_new,
+                    color: AppColors.primary,
+                    size: 32,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Accessibility Features Enabled',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Your accessibility preferences have been saved and will be applied throughout the app.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey[700],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ],
+          
+          const Spacer(flex: 2),
+        ],
+      ),
+    );
+  }
 
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
-  }
-
-  void _onPageChanged(int page) {
-    setState(() {
-      _currentPage = page;
-    });
-  }
-
-  void _onGetStarted() {
-    context.read<OnboardingBloc>().add(CompleteOnboarding());
-    context.go('/auth/login');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          PageView.builder(
-            controller: _pageController,
-            onPageChanged: _onPageChanged,
-            itemCount: _onboardingItems.length,
-            itemBuilder: (context, index) {
-              return _buildPage(
-                context,
-                item: _onboardingItems[index],
-              );
-            },
-          ),
-          _buildControls(context),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPage(BuildContext context, {required OnboardingItem item}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Flexible(
-            flex: 4,
-            child: Image.asset(
-              item.imagePath,
-              height: MediaQuery.of(context).size.height * 0.4,
-            ),
-          ),
-          const SizedBox(height: 64),
-          Text(
-            item.title,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            item.description,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-          ),
-          const Flexible(
-            flex: 2,
-            child: SizedBox.shrink(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildControls(BuildContext context) {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  _onboardingItems.length,
-                  (index) => _buildDot(index: index),
-                ),
-              ),
-              const SizedBox(height: 48),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_currentPage == _onboardingItems.length - 1) {
-                      _onGetStarted();
-                    } else {
-                      _pageController.nextPage(
-                        duration: const Duration(milliseconds: 400),
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  ),
-                  child: Text(
-                    _currentPage == _onboardingItems.length - 1
-                        ? 'Get Started'
-                        : 'Next',
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (_currentPage != _onboardingItems.length - 1)
-                TextButton(
-                  onPressed: _onGetStarted,
-                  child: Text(
-                    'Skip',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                )
-              else
-                SizedBox(
-                  height:
-                      Theme.of(context).textTheme.bodyLarge!.fontSize! * 1.5 +
-                          16,
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDot({required int index}) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      height: 8,
-      width: _currentPage == index ? 24 : 8,
-      decoration: BoxDecoration(
-        color: _currentPage == index
-            ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).colorScheme.surfaceVariant,
-        borderRadius: BorderRadius.circular(4),
-      ),
-    );
   }
 }

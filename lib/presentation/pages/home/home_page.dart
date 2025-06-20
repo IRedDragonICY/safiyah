@@ -7,15 +7,42 @@ import 'package:safiyah/routes/route_names.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/strings.dart';
+import '../../../core/services/ai_accessibility_service.dart';
 import '../../bloc/home/home_bloc.dart';
 import '../../bloc/home/home_event.dart';
 import '../../bloc/home/home_state.dart';
 import '../../widgets/common/loading_widget.dart';
+import '../../widgets/common/ai_accessibility_widget.dart';
 import '../../widgets/home/quick_actions_widget.dart';
 import '../../widgets/home/currency_widget.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final AIAccessibilityService _aiService = AIAccessibilityService();
+
+  @override
+  void initState() {
+    super.initState();
+    // Demo: Enable AI features for demonstration
+    _enableDemoAccessibilityFeatures();
+  }
+
+  void _enableDemoAccessibilityFeatures() {
+    // For demo purposes, let's enable some accessibility features
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        _aiService.enableEyeControl();
+        _aiService.enableRealtimeAssistance();
+        _aiService.enableVoiceCommands();
+      }
+    });
+  }
 
   IconData _getWeatherIcon(String condition) {
     switch (condition.toLowerCase()) {
@@ -41,67 +68,81 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocBuilder<HomeBloc, HomeState>(
-        builder: (context, state) {
-          if (state is HomeLoading) {
-            return const Center(child: LoadingWidget());
-          }
+    return Stack(
+      children: [
+        Scaffold(
+          body: BlocBuilder<HomeBloc, HomeState>(
+            builder: (context, state) {
+              if (state is HomeLoading) {
+                return const Center(child: LoadingWidget());
+              }
 
-          if (state is HomeError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: AppColors.error,
+              if (state is HomeError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: AppColors.error,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        state.message,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    state.message,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
-          }
+                );
+              }
 
-          if (state is HomeLoaded) {
-            return RefreshIndicator(
-              onRefresh: () async {
-                context.read<HomeBloc>().add(const LoadHomeData());
-              },
-              child: CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: _buildHeroHeader(context, state),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.all(16.0),
-                    sliver: SliverList(
-                      delegate: SliverChildListDelegate([
-                        const CurrencyWidget(),
-                        const SizedBox(height: 16),
-                        const QuickActionsWidget(),
-                        const SizedBox(height: 24),
-                        _buildRecentItineraries(context),
-                        const SizedBox(height: 24),
-                        _buildNearbyPlaces(context),
-                        const SizedBox(height: 100),
-                      ]),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
+              if (state is HomeLoaded) {
+                // Announce content for screen reader
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _aiService.announceContent(
+                    'Home page loaded. Next prayer: ${state.prayerTimes.getNextPrayer()?.name ?? 'None'}. '
+                    'Weather: ${state.weather.temperature.round()} degrees, ${state.weather.condition}.'
+                  );
+                });
 
-          return const SizedBox.shrink();
-        },
-      ),
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    context.read<HomeBloc>().add(const LoadHomeData());
+                  },
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: _buildHeroHeader(context, state),
+                      ),
+                      SliverPadding(
+                        padding: const EdgeInsets.all(16.0),
+                        sliver: SliverList(
+                          delegate: SliverChildListDelegate([
+                            const CurrencyWidget(),
+                            const SizedBox(height: 16),
+                            const QuickActionsWidget(),
+                            const SizedBox(height: 24),
+                            _buildRecentItineraries(context),
+                            const SizedBox(height: 24),
+                            _buildNearbyPlaces(context),
+                            const SizedBox(height: 100),
+                          ]),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+        // AI Accessibility Widget overlay
+        const AIAccessibilityWidget(),
+      ],
     );
   }
 

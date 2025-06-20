@@ -8,8 +8,25 @@ abstract class OnboardingState extends Equatable {
   List<Object> get props => [];
 }
 
-class OnboardingInitial extends OnboardingState {}
+class OnboardingInitial extends OnboardingState {
+  const OnboardingInitial();
+}
 
-class OnboardingShow extends OnboardingState {}
+class OnboardingInProgress extends OnboardingState {
+  final int currentPage;
 
-class OnboardingCompleted extends OnboardingState {}
+  const OnboardingInProgress({required this.currentPage});
+
+  OnboardingInProgress copyWith({int? currentPage}) {
+    return OnboardingInProgress(
+      currentPage: currentPage ?? this.currentPage,
+    );
+  }
+
+  @override
+  List<Object> get props => [currentPage];
+}
+
+class OnboardingCompleted extends OnboardingState {
+  const OnboardingCompleted();
+}

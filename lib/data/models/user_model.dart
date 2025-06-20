@@ -69,6 +69,18 @@ class UserPreferences extends Equatable {
   final int prayerNotificationMinutes;
   final String language;
   final String themeMode; // 'system', 'light', 'dark'
+  
+  // Accessibility features
+  final bool hasDisability;
+  final bool isVisuallyImpaired;
+  final bool enableEyeControl;
+  final bool enableAIRealtime;
+  final bool hasColorBlindness;
+  final String colorBlindnessType; // 'none', 'deuteranopia', 'protanopia', 'tritanopia'
+  final bool enableHighContrast;
+  final double textScaleFactor;
+  final bool enableScreenReader;
+  final bool enableVoiceCommands;
 
   const UserPreferences({
     this.enablePrayerNotifications = true,
@@ -78,6 +90,17 @@ class UserPreferences extends Equatable {
     this.prayerNotificationMinutes = 15,
     this.language = 'en',
     this.themeMode = 'system',
+    // Accessibility defaults
+    this.hasDisability = false,
+    this.isVisuallyImpaired = false,
+    this.enableEyeControl = false,
+    this.enableAIRealtime = false,
+    this.hasColorBlindness = false,
+    this.colorBlindnessType = 'none',
+    this.enableHighContrast = false,
+    this.textScaleFactor = 1.0,
+    this.enableScreenReader = false,
+    this.enableVoiceCommands = false,
   });
 
   factory UserPreferences.fromJson(Map<String, dynamic> json) =>
@@ -93,6 +116,16 @@ class UserPreferences extends Equatable {
     int? prayerNotificationMinutes,
     String? language,
     String? themeMode,
+    bool? hasDisability,
+    bool? isVisuallyImpaired,
+    bool? enableEyeControl,
+    bool? enableAIRealtime,
+    bool? hasColorBlindness,
+    String? colorBlindnessType,
+    bool? enableHighContrast,
+    double? textScaleFactor,
+    bool? enableScreenReader,
+    bool? enableVoiceCommands,
   }) {
     return UserPreferences(
       enablePrayerNotifications:
@@ -105,6 +138,16 @@ class UserPreferences extends Equatable {
           prayerNotificationMinutes ?? this.prayerNotificationMinutes,
       language: language ?? this.language,
       themeMode: themeMode ?? this.themeMode,
+      hasDisability: hasDisability ?? this.hasDisability,
+      isVisuallyImpaired: isVisuallyImpaired ?? this.isVisuallyImpaired,
+      enableEyeControl: enableEyeControl ?? this.enableEyeControl,
+      enableAIRealtime: enableAIRealtime ?? this.enableAIRealtime,
+      hasColorBlindness: hasColorBlindness ?? this.hasColorBlindness,
+      colorBlindnessType: colorBlindnessType ?? this.colorBlindnessType,
+      enableHighContrast: enableHighContrast ?? this.enableHighContrast,
+      textScaleFactor: textScaleFactor ?? this.textScaleFactor,
+      enableScreenReader: enableScreenReader ?? this.enableScreenReader,
+      enableVoiceCommands: enableVoiceCommands ?? this.enableVoiceCommands,
     );
   }
 
@@ -117,5 +160,15 @@ class UserPreferences extends Equatable {
         prayerNotificationMinutes,
         language,
         themeMode,
+        hasDisability,
+        isVisuallyImpaired,
+        enableEyeControl,
+        enableAIRealtime,
+        hasColorBlindness,
+        colorBlindnessType,
+        enableHighContrast,
+        textScaleFactor,
+        enableScreenReader,
+        enableVoiceCommands,
       ];
 }

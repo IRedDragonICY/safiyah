@@ -38,6 +38,16 @@ UserPreferences _$UserPreferencesFromJson(Map<String, dynamic> json) =>
           (json['prayerNotificationMinutes'] as num?)?.toInt() ?? 15,
       language: json['language'] as String? ?? 'en',
       themeMode: json['themeMode'] as String? ?? 'system',
+      hasDisability: json['hasDisability'] as bool? ?? false,
+      isVisuallyImpaired: json['isVisuallyImpaired'] as bool? ?? false,
+      enableEyeControl: json['enableEyeControl'] as bool? ?? false,
+      enableAIRealtime: json['enableAIRealtime'] as bool? ?? false,
+      hasColorBlindness: json['hasColorBlindness'] as bool? ?? false,
+      colorBlindnessType: json['colorBlindnessType'] as String? ?? 'none',
+      enableHighContrast: json['enableHighContrast'] as bool? ?? false,
+      textScaleFactor: (json['textScaleFactor'] as num?)?.toDouble() ?? 1.0,
+      enableScreenReader: json['enableScreenReader'] as bool? ?? false,
+      enableVoiceCommands: json['enableVoiceCommands'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$UserPreferencesToJson(UserPreferences instance) =>
@@ -49,4 +59,14 @@ Map<String, dynamic> _$UserPreferencesToJson(UserPreferences instance) =>
       'prayerNotificationMinutes': instance.prayerNotificationMinutes,
       'language': instance.language,
       'themeMode': instance.themeMode,
+      'hasDisability': instance.hasDisability,
+      'isVisuallyImpaired': instance.isVisuallyImpaired,
+      'enableEyeControl': instance.enableEyeControl,
+      'enableAIRealtime': instance.enableAIRealtime,
+      'hasColorBlindness': instance.hasColorBlindness,
+      'colorBlindnessType': instance.colorBlindnessType,
+      'enableHighContrast': instance.enableHighContrast,
+      'textScaleFactor': instance.textScaleFactor,
+      'enableScreenReader': instance.enableScreenReader,
+      'enableVoiceCommands': instance.enableVoiceCommands,
     };

@@ -109,7 +109,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
           listener: (context, state) async {
             await Future.delayed(const Duration(milliseconds: 3500));
             if (mounted) {
-              if (state is OnboardingShow) {
+              if (state is OnboardingInProgress) {
                 context.go('/onboarding');
               } else if (state is OnboardingCompleted) {
                 context.read<AuthBloc>().add(const CheckAuthStatus());
