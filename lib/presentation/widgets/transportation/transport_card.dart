@@ -18,6 +18,7 @@ class TransportCard extends StatelessWidget {
   final bool isHalalFriendly;
   final double? rating;
   final String? additionalInfo;
+  final bool isRoundTrip;
   final VoidCallback onTap;
 
   const TransportCard({
@@ -35,6 +36,7 @@ class TransportCard extends StatelessWidget {
     this.isHalalFriendly = false,
     this.rating,
     this.additionalInfo,
+    this.isRoundTrip = false,
     required this.onTap,
   });
 
@@ -274,6 +276,14 @@ class TransportCard extends StatelessWidget {
                 additionalInfo!,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Colors.grey[600],
+                    ),
+              ),
+            if (isRoundTrip)
+              Text(
+                'Round Trip',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.secondary,
+                      fontWeight: FontWeight.w500,
                     ),
               ),
           ],
