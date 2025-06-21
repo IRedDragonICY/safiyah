@@ -37,6 +37,9 @@ class AppColors {
   
   // Voucher Color
   static const Color voucherSpecial = Color(0xFFD32F2F);
+  
+  // Zakat Color
+  static const Color zakatFund = Color(0xFF4CAF50); // Green for charity
 
   // Gradient Colors
   static const List<Color> primaryGradient = [

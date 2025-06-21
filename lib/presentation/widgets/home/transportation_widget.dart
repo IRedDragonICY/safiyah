@@ -42,110 +42,55 @@ class TransportationWidget extends StatelessWidget {
                         ),
                   ),
                 ),
-                TextButton(
-                  onPressed: () => context.push('/transportation'),
-                  child: const Text('View All'),
-                ),
               ],
             ),
-            const SizedBox(height: 16),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 3,
-              childAspectRatio: 1.2,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              children: [
-                _buildTransportOption(
-                  context,
-                  'Flights',
-                  Icons.flight,
-                  AppColors.info,
-                  () => context.push('/transportation?tab=0'),
-                ),
-                _buildTransportOption(
-                  context,
-                  'Trains',
-                  Icons.train,
-                  AppColors.success,
-                  () => context.push('/transportation?tab=1'),
-                ),
-                _buildTransportOption(
-                  context,
-                  'Buses',
-                  Icons.directions_bus,
-                  AppColors.warning,
-                  () => context.push('/transportation?tab=2'),
-                ),
-                _buildTransportOption(
-                  context,
-                  'Ride-hailing',
-                  Icons.local_taxi,
-                  AppColors.secondary,
-                  () => context.push('/transportation?tab=3'),
-                ),
-                _buildTransportOption(
-                  context,
-                  'Rentals',
-                  Icons.directions_car,
-                  AppColors.primaryLight,
-                  () => context.push('/transportation?tab=4'),
-                ),
-                _buildTransportOption(
-                  context,
-                  'Transport Guide',
-                  Icons.info_outline,
-                  AppColors.primary,
-                  () => context.push('/transportation/guide'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: AppColors.primaryGradient,
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 75,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
                 children: [
-                  const Icon(
-                    Icons.nfc,
-                    color: Colors.white,
-                    size: 20,
+                  _buildTransportOption(
+                    context,
+                    'Flights',
+                    Icons.flight,
+                    AppColors.info,
+                    () => context.push('/transportation?tab=0'),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'NFC Payment Ready',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleSmall
-                              ?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        Text(
-                          'Pay for transportation with your phone',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(
-                                color: Colors.white70,
-                              ),
-                        ),
-                      ],
-                    ),
+                  _buildTransportOption(
+                    context,
+                    'Trains',
+                    Icons.train,
+                    AppColors.success,
+                    () => context.push('/transportation?tab=1'),
+                  ),
+                  _buildTransportOption(
+                    context,
+                    'Buses',
+                    Icons.directions_bus,
+                    AppColors.warning,
+                    () => context.push('/transportation?tab=2'),
+                  ),
+                  _buildTransportOption(
+                    context,
+                    'Ride-hailing',
+                    Icons.local_taxi,
+                    AppColors.secondary,
+                    () => context.push('/transportation?tab=3'),
+                  ),
+                  _buildTransportOption(
+                    context,
+                    'Rentals',
+                    Icons.directions_car,
+                    AppColors.primaryLight,
+                    () => context.push('/transportation?tab=4'),
+                  ),
+                  _buildTransportOption(
+                    context,
+                    'Guide',
+                    Icons.info_outline,
+                    AppColors.primary,
+                    () => context.push('/transportation/guide'),
                   ),
                 ],
               ),
@@ -163,43 +108,48 @@ class TransportationWidget extends StatelessWidget {
     Color color,
     VoidCallback onTap,
   ) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: color.withValues(alpha: 0.2),
-            width: 1,
+    return Container(
+      width: 70,
+      margin: const EdgeInsets.only(right: 8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: color.withValues(alpha: 0.2),
+              width: 1,
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 18,
+                ),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 20,
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 10,
+                    ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

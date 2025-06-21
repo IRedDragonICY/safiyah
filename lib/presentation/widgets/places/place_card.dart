@@ -47,7 +47,7 @@ class PlaceCard extends StatelessWidget {
             height: 60,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              color: Colors.grey[200],
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
             ),
             child: place.imageUrls.isNotEmpty
                 ? ClipRRect(
@@ -103,7 +103,7 @@ class PlaceCard extends StatelessWidget {
                     Text(
                       '(${place.reviewCount})',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
@@ -114,13 +114,13 @@ class PlaceCard extends StatelessWidget {
                     Icon(
                       Icons.location_on,
                       size: 14,
-                      color: Colors.grey[600],
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                     const SizedBox(width: 2),
                     Text(
                       place.distanceText,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                     if (place.isHalalCertified) ...[
@@ -164,7 +164,7 @@ class PlaceCard extends StatelessWidget {
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            color: Colors.grey[200],
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
           ),
           child: place.imageUrls.isNotEmpty
               ? ClipRRect(
@@ -238,7 +238,7 @@ class PlaceCard extends StatelessWidget {
               Text(
                 place.description,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[700],
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -265,14 +265,14 @@ class PlaceCard extends StatelessWidget {
                   Text(
                     '(${place.reviewCount} reviews)',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey[600],
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                   const Spacer(),
                   Icon(
                     Icons.location_on,
                     size: 16,
-                    color: Colors.grey[600],
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                   const SizedBox(width: 2),
                   Text(

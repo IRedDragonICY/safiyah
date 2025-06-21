@@ -13,7 +13,12 @@ import 'package:safiyah/presentation/pages/chatbot/chat_history_page.dart';
 import 'package:safiyah/presentation/pages/chatbot/realtime_chatbot_page.dart';
 
 class ChatbotPage extends StatefulWidget {
-  const ChatbotPage({super.key});
+  final String? initialMessage;
+  
+  const ChatbotPage({
+    super.key,
+    this.initialMessage,
+  });
 
   @override
   State<ChatbotPage> createState() => _ChatbotPageState();
@@ -114,6 +119,16 @@ class _ChatbotPageState extends State<ChatbotPage>
     });
     
     _refreshSuggestions();
+    
+    // Handle initial message if provided
+    if (widget.initialMessage != null && widget.initialMessage!.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<ChatbotBloc>().add(SendMessage(
+          text: widget.initialMessage!,
+          attachments: [],
+        ));
+      });
+    }
   }
 
   void _refreshSuggestions() {

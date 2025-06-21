@@ -14,6 +14,7 @@ import '../../widgets/common/loading_widget.dart';
 import '../../widgets/common/ai_accessibility_widget.dart';
 import '../../widgets/home/quick_actions_widget.dart';
 import '../../widgets/home/currency_widget.dart';
+import '../../widgets/home/ai_quick_chat_widget.dart';
 import '../../widgets/notifications/notification_badge.dart';
 import '../../widgets/insurance/insurance_card.dart';
 import '../../widgets/holiday_package/holiday_package_card.dart';
@@ -125,6 +126,8 @@ class _HomePageState extends State<HomePage> {
                         sliver: SliverList(
                           delegate: SliverChildListDelegate([
                             const CurrencyWidget(),
+                            const SizedBox(height: 16),
+                            const AIQuickChatWidget(),
                             const SizedBox(height: 16),
                             const QuickActionsWidget(),
                             const SizedBox(height: 24),
@@ -315,18 +318,13 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: Row(
                     children: [
-                       IconButton(
-                        icon: const Icon(Icons.auto_awesome_outlined, color: Colors.white),
-                        onPressed: () => context.push(RouteNames.chatbot),
-                        tooltip: 'AI Assistant',
+                      NotificationBadge(
+                        child: IconButton(
+                          icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+                          onPressed: () => context.push(RouteNames.notifications),
+                          tooltip: 'Notifications',
+                        ),
                       ),
-                                             NotificationBadge(
-                         child: IconButton(
-                           icon: const Icon(Icons.notifications_outlined, color: Colors.white),
-                           onPressed: () => context.push(RouteNames.notifications),
-                           tooltip: 'Notifications',
-                         ),
-                       ),
                       IconButton(
                         icon: const Icon(Icons.settings_outlined, color: Colors.white),
                         onPressed: () => context.push(RouteNames.settings),
@@ -556,7 +554,7 @@ class _HomePageState extends State<HomePage> {
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 120,
+          height: 135,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: 4,
@@ -604,12 +602,13 @@ class _HomePageState extends State<HomePage> {
                     borderRadius:
                         BorderRadius.circular(AppConstants.borderRadius),
                     child: Padding(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(10),
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            width: 40,
-                            height: 40,
+                            width: 36,
+                            height: 36,
                             decoration: BoxDecoration(
                               color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
@@ -617,15 +616,15 @@ class _HomePageState extends State<HomePage> {
                             child: Icon(
                               place['icon'] as IconData,
                               color: AppColors.primary,
-                              size: 20,
+                              size: 18,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 6),
                           Text(
                             place['name'] as String,
                             style: Theme.of(context)
                                 .textTheme
-                                .bodyMedium
+                                .bodySmall
                                 ?.copyWith(
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -633,17 +632,19 @@ class _HomePageState extends State<HomePage> {
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
                           ),
+                          const SizedBox(height: 2),
                           Text(
                             place['type'] as String,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall
                                 ?.copyWith(
-                                  color: Colors.grey[600],
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                  fontSize: 11,
                                 ),
                             textAlign: TextAlign.center,
                           ),
-                          const Spacer(),
+                          const SizedBox(height: 4),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 6,
@@ -651,7 +652,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.secondary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               place['distance'] as String,
@@ -661,6 +662,7 @@ class _HomePageState extends State<HomePage> {
                                   ?.copyWith(
                                     color: AppColors.secondary,
                                     fontWeight: FontWeight.w500,
+                                    fontSize: 10,
                                   ),
                             ),
                           ),

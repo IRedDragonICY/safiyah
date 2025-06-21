@@ -41,6 +41,11 @@ import '../presentation/pages/currency/currency_page.dart';
 import '../presentation/pages/main_navigation_wrapper.dart';
 import '../presentation/pages/prayer/prayer_times_page.dart';
 import '../presentation/pages/prayer/qibla_page.dart';
+import '../presentation/pages/prayer/quran_page.dart';
+import '../presentation/pages/prayer/surah_info_page.dart';
+import '../presentation/pages/prayer/hadith_page.dart';
+import '../presentation/pages/prayer/dhikr_page.dart';
+import '../presentation/pages/prayer/islamic_books_page.dart';
 import '../presentation/pages/places/places_map_page.dart';
 import '../presentation/pages/places/place_detail_page.dart';
 import '../presentation/pages/itinerary/itinerary_list_page.dart';
@@ -71,6 +76,14 @@ import '../presentation/pages/help/report_issue_page.dart';
 import '../presentation/pages/payment/payment_page.dart';
 import '../presentation/pages/payment/payment_success_page.dart';
 import '../data/models/transaction_model.dart';
+import '../data/models/quran_model.dart';
+
+// Zakat imports
+import '../presentation/pages/zakat/zakat_page.dart';
+import '../presentation/pages/zakat/zakat_calculator_page.dart';
+import '../presentation/pages/zakat/zakat_reminder_page.dart';
+import '../presentation/pages/zakat/zakat_recipients_page.dart';
+import '../data/models/zakat_model.dart';
 
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -115,6 +128,33 @@ class AppRouter {
         parentNavigatorKey: _rootNavigatorKey,
         name: 'boycott',
         builder: (context, state) => const BoycottPage(),
+      ),
+      GoRoute(
+        path: '/zakat',
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'zakat',
+        builder: (context, state) => const ZakatPage(),
+      ),
+      GoRoute(
+        path: '/zakat/calculator',
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'zakat_calculator',
+        builder: (context, state) {
+          final zakatType = state.extra as ZakatType;
+          return ZakatCalculatorPage(zakatType: zakatType);
+        },
+      ),
+      GoRoute(
+        path: '/zakat/reminder',
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'zakat_reminder',
+        builder: (context, state) => const ZakatReminderPage(),
+      ),
+      GoRoute(
+        path: '/zakat/recipients',
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'zakat_recipients',
+        builder: (context, state) => const ZakatRecipientsPage(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -188,6 +228,45 @@ class AppRouter {
         name: 'qibla',
         builder: (context, state) => const QiblaPage(),
       ),
+      // Islamic Features Routes
+      GoRoute(
+        path: '/prayer/quran',
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'quran',
+        builder: (context, state) => const QuranPage(),
+      ),
+      GoRoute(
+        path: '/prayer/hadith',
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'hadith',
+        builder: (context, state) => const HadithPage(),
+      ),
+      GoRoute(
+        path: '/prayer/dhikr',
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'dhikr',
+        builder: (context, state) => const DhikrPage(),
+      ),
+      GoRoute(
+        path: '/prayer/books',
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'islamic_books',
+        builder: (context, state) => const IslamicBooksPage(),
+      ),
+      GoRoute(
+        path: '/prayer/surah/:number',
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'surah_info',
+        builder: (context, state) {
+          final surahNumber = int.parse(state.pathParameters['number']!);
+          final allSurahs = QuranData.getAllSurahs();
+          final surahInfo = allSurahs.firstWhere(
+            (s) => s.number == surahNumber,
+            orElse: () => allSurahs[0],
+          );
+          return SurahInfoPage(surahInfo: surahInfo);
+        },
+      ),
       GoRoute(
         path: '/places/detail/:id',
         parentNavigatorKey: _rootNavigatorKey,
@@ -226,7 +305,11 @@ class AppRouter {
         path: RouteNames.chatbot,
         parentNavigatorKey: _rootNavigatorKey,
         name: 'chatbot',
-        builder: (context, state) => const ChatbotPage(),
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final initialMessage = extra?['initialMessage'] as String?;
+          return ChatbotPage(initialMessage: initialMessage);
+        },
       ),
       GoRoute(
         path: RouteNames.chatHistory,

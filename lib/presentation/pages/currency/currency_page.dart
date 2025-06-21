@@ -50,14 +50,14 @@ class RateAlert {
   String get conditionText {
     switch (condition) {
       case RateCondition.lessThan:
-        return 'kurang dari';
+        return 'less than';
       case RateCondition.greaterThan:
-        return 'lebih dari';
+        return 'greater than';
     }
   }
 
   String get description {
-    return 'Ingatkan saya kalau kurs $toCurrency 1 $conditionText ${NumberFormat('#,###.######').format(targetRate)} $fromCurrency';
+    return 'Remind me when $toCurrency 1 is $conditionText ${NumberFormat('#,###.######').format(targetRate)} $fromCurrency';
   }
 }
 
@@ -220,7 +220,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
     
     return AppBar(
       title: Text(
-        'Transfer Luar Negeri',
+        'International Transfer',
         style: theme.textTheme.headlineSmall?.copyWith(
           fontWeight: FontWeight.w600,
           color: colorScheme.onPrimary,
@@ -235,7 +235,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
           child: FilledButton.tonalIcon(
             onPressed: () => _showRateAlertDialog(),
             icon: const Icon(Icons.notifications_outlined, size: 18),
-            label: const Text('Pengingat'),
+            label: const Text('Reminders'),
             style: FilledButton.styleFrom(
               foregroundColor: colorScheme.onPrimary,
               backgroundColor: colorScheme.onPrimary.withValues(alpha: 0.1),
@@ -947,7 +947,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
                 Icon(Icons.notifications_outlined, color: colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(
-                  'Pengingat Kurs',
+                  'Rate Alerts',
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: colorScheme.onSurface,
@@ -957,7 +957,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
                 FilledButton.icon(
                   onPressed: () => _showAddRateAlertDialog(),
                   icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Tambah'),
+                  label: const Text('Add'),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   ),
@@ -987,8 +987,6 @@ class _CurrencyPageState extends State<CurrencyPage> {
     );
   }
 
-
-
   Widget _buildEmptyRateAlerts() {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -1004,7 +1002,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Belum Ada Pengingat Kurs',
+            'No Rate Alerts Yet',
             style: theme.textTheme.titleMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w600,
@@ -1012,7 +1010,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Tambahkan pengingat untuk mendapatkan notifikasi saat kurs mencapai target Anda',
+            'Add alerts to get notifications when rates reach your target',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
@@ -1075,7 +1073,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    alert.isEnabled ? 'Aktif' : 'Nonaktif',
+                    alert.isEnabled ? 'Active' : 'Inactive',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: alert.isEnabled 
                           ? colorScheme.onPrimaryContainer
@@ -1086,7 +1084,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Dibuat ${_formatDate(alert.createdAt)}',
+                  'Created ${_formatDate(alert.createdAt)}',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -1143,11 +1141,11 @@ class _CurrencyPageState extends State<CurrencyPage> {
     final difference = now.difference(date).inDays;
     
     if (difference == 0) {
-      return 'hari ini';
+      return 'today';
     } else if (difference == 1) {
-      return 'kemarin';
+      return 'yesterday';
     } else if (difference < 7) {
-      return '$difference hari lalu';
+      return '$difference days ago';
     } else {
       return DateFormat('dd MMM yyyy').format(date);
     }
@@ -1164,12 +1162,12 @@ class _CurrencyPageState extends State<CurrencyPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Hapus Pengingat'),
-        content: const Text('Apakah Anda yakin ingin menghapus pengingat kurs ini?'),
+        title: const Text('Delete Alert'),
+        content: const Text('Are you sure you want to delete this rate alert?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
+            child: const Text('Cancel'),
           ),
           FilledButton(
             onPressed: () {
@@ -1179,7 +1177,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: const Text('Pengingat kurs telah dihapus'),
+                  content: const Text('Rate alert has been deleted'),
                   backgroundColor: colorScheme.primary,
                 ),
               );
@@ -1187,7 +1185,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
             style: FilledButton.styleFrom(
               backgroundColor: colorScheme.error,
             ),
-            child: const Text('Hapus'),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -1201,14 +1199,14 @@ class _CurrencyPageState extends State<CurrencyPage> {
     // Available currencies for search
     final availableCurrencies = [
       {'code': 'MYR', 'name': 'Malaysian Ringgit', 'country': 'Malaysia', 'flag': '🇲🇾'},
-      {'code': 'SGD', 'name': 'Singapore Dollar', 'country': 'Singapura', 'flag': '🇸🇬'},
+      {'code': 'SGD', 'name': 'Singapore Dollar', 'country': 'Singapore', 'flag': '🇸🇬'},
       {'code': 'THB', 'name': 'Thai Baht', 'country': 'Thailand', 'flag': '🇹🇭'},
-      {'code': 'JPY', 'name': 'Japanese Yen', 'country': 'Jepang', 'flag': '🇯🇵'},
-      {'code': 'USD', 'name': 'US Dollar', 'country': 'Amerika Serikat', 'flag': '🇺🇸'},
-      {'code': 'EUR', 'name': 'Euro', 'country': 'Eropa', 'flag': '🇪🇺'},
-      {'code': 'GBP', 'name': 'British Pound', 'country': 'Inggris', 'flag': '🇬🇧'},
+      {'code': 'JPY', 'name': 'Japanese Yen', 'country': 'Japan', 'flag': '🇯🇵'},
+      {'code': 'USD', 'name': 'US Dollar', 'country': 'United States', 'flag': '🇺🇸'},
+      {'code': 'EUR', 'name': 'Euro', 'country': 'Europe', 'flag': '🇪🇺'},
+      {'code': 'GBP', 'name': 'British Pound', 'country': 'United Kingdom', 'flag': '🇬🇧'},
       {'code': 'AUD', 'name': 'Australian Dollar', 'country': 'Australia', 'flag': '🇦🇺'},
-      {'code': 'CAD', 'name': 'Canadian Dollar', 'country': 'Kanada', 'flag': '🇨🇦'},
+      {'code': 'CAD', 'name': 'Canadian Dollar', 'country': 'Canada', 'flag': '🇨🇦'},
     ];
     
     // Form controllers
@@ -1245,7 +1243,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
                     Icon(Icons.add_alert, color: colorScheme.primary),
                     const SizedBox(width: 8),
                     Text(
-                      editAlert != null ? 'Edit Pengingat Kurs' : 'Tambah Pengingat Kurs',
+                      editAlert != null ? 'Edit Rate Alert' : 'Add Rate Alert',
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: colorScheme.onSurface,
@@ -1257,7 +1255,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
                 
                 // Currency Search
                 Text(
-                  'Pilih Mata Uang Tujuan',
+                  'Select Target Currency',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -1266,7 +1264,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
                 TextField(
                   controller: searchController,
                   decoration: InputDecoration(
-                    hintText: 'Cari negara atau mata uang...',
+                    hintText: 'Search country or currency...',
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -1294,10 +1292,10 @@ class _CurrencyPageState extends State<CurrencyPage> {
                 // Currency List
                 Container(
                   height: 200,
-                                     decoration: BoxDecoration(
-                     border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
-                     borderRadius: BorderRadius.circular(12),
-                   ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: ListView.builder(
                     itemCount: filteredCurrencies.length,
                     itemBuilder: (context, index) {
@@ -1331,7 +1329,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
                 
                 // Condition and Rate
                 Text(
-                  'Pengaturan Pengingat',
+                  'Alert Settings',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -1350,7 +1348,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
                             selectedCondition = value!;
                           });
                         },
-                        title: const Text('Kurang dari'),
+                        title: const Text('Less than'),
                         contentPadding: EdgeInsets.zero,
                       ),
                     ),
@@ -1363,7 +1361,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
                             selectedCondition = value!;
                           });
                         },
-                        title: const Text('Lebih dari'),
+                        title: const Text('Greater than'),
                         contentPadding: EdgeInsets.zero,
                       ),
                     ),
@@ -1376,8 +1374,8 @@ class _CurrencyPageState extends State<CurrencyPage> {
                   controller: rateController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: 'Target Kurs ($selectedCurrency 1 = ? IDR)',
-                    hintText: 'Contoh: 3100.50',
+                    labelText: 'Target Rate ($selectedCurrency 1 = ? IDR)',
+                    hintText: 'Example: 3100.50',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -1390,13 +1388,13 @@ class _CurrencyPageState extends State<CurrencyPage> {
                 // Preview
                 Container(
                   padding: const EdgeInsets.all(16),
-                                     decoration: BoxDecoration(
-                     color: colorScheme.primaryContainer.withValues(alpha: 0.3),
-                     borderRadius: BorderRadius.circular(12),
-                     border: Border.all(
-                       color: colorScheme.primary.withValues(alpha: 0.3),
-                     ),
-                   ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: colorScheme.primary.withValues(alpha: 0.3),
+                    ),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1409,7 +1407,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Ingatkan saya kalau kurs $selectedCurrency 1 ${selectedCondition == RateCondition.lessThan ? 'kurang dari' : 'lebih dari'} ${rateController.text.isEmpty ? '___' : rateController.text} IDR',
+                        'Remind me when $selectedCurrency 1 is ${selectedCondition == RateCondition.lessThan ? 'less than' : 'greater than'} ${rateController.text.isEmpty ? '___' : rateController.text} IDR',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w500,
                         ),
@@ -1425,7 +1423,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(context),
-                        child: const Text('Batal'),
+                        child: const Text('Cancel'),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -1458,21 +1456,21 @@ class _CurrencyPageState extends State<CurrencyPage> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(editAlert != null 
-                                    ? '✅ Pengingat kurs berhasil diperbarui!'
-                                    : '✅ Pengingat kurs berhasil ditambahkan!'),
+                                    ? '✅ Rate alert updated successfully!'
+                                    : '✅ Rate alert added successfully!'),
                                 backgroundColor: colorScheme.primary,
                               ),
                             );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: const Text('Masukkan target kurs yang valid'),
+                                content: const Text('Enter a valid target rate'),
                                 backgroundColor: colorScheme.error,
                               ),
                             );
                           }
                         },
-                        child: Text(editAlert != null ? 'Perbarui' : 'Simpan'),
+                        child: Text(editAlert != null ? 'Update' : 'Save'),
                       ),
                     ),
                   ],
@@ -1489,20 +1487,20 @@ class _CurrencyPageState extends State<CurrencyPage> {
   String _getCountryName(String code) {
     switch (code) {
       case 'IDR': return 'Indonesia';
-      case 'JPY': return 'Jepang';
-      case 'USD': return 'Amerika Serikat';
-      case 'EUR': return 'Eropa';
-      case 'GBP': return 'Inggris';
+      case 'JPY': return 'Japan';
+      case 'USD': return 'United States';
+      case 'EUR': return 'Europe';
+      case 'GBP': return 'United Kingdom';
       case 'MYR': return 'Malaysia';
-      case 'SGD': return 'Singapura';
+      case 'SGD': return 'Singapore';
       case 'THB': return 'Thailand';
       case 'AUD': return 'Australia';
-      case 'CAD': return 'Kanada';
-      case 'CNY': return 'Tiongkok';
-      case 'KRW': return 'Korea Selatan';
-      case 'SAR': return 'Arab Saudi';
-      case 'AED': return 'Uni Emirat Arab';
-      case 'TRY': return 'Turki';
+      case 'CAD': return 'Canada';
+      case 'CNY': return 'China';
+      case 'KRW': return 'South Korea';
+      case 'SAR': return 'Saudi Arabia';
+      case 'AED': return 'United Arab Emirates';
+      case 'TRY': return 'Turkey';
       default: return code;
     }
   }

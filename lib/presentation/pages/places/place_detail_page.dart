@@ -210,13 +210,17 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
               Text(
                 '(${place.reviewCount} reviews)',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[600],
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
               const Spacer(),
-              Row(
+                              Row(
                 children: [
-                  Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
+                  Icon(
+                    Icons.location_on, 
+                    size: 16, 
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     place.distanceText,
@@ -235,13 +239,17 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.place, color: Colors.grey[600], size: 20),
+              Icon(
+                Icons.place, 
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), 
+                size: 20
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   place.address,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[700],
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
                   ),
                 ),
               ),
@@ -377,7 +385,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -393,7 +401,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
           Text(
             place.description,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[700],
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
               height: 1.5,
             ),
           ),
@@ -409,7 +417,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -448,7 +456,9 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                         : '${hours.open} - ${hours.close}',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                      color: isToday ? AppColors.primary : Colors.grey[700],
+                      color: isToday 
+                          ? AppColors.primary 
+                          : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -467,7 +477,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -569,7 +579,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -607,7 +617,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
               Text(
                 'out of 5',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[600],
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
             ],
@@ -616,7 +626,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
           Text(
             'Based on ${place.reviewCount} reviews',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Colors.grey[600],
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
           const SizedBox(height: 16),
@@ -651,9 +661,11 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2)
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -697,7 +709,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                         Text(
                           time,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[600],
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
                         ),
                       ],
@@ -711,7 +723,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
           Text(
             comment,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[700],
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
             ),
           ),
         ],

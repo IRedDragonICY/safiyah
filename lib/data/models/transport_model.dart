@@ -25,8 +25,8 @@ class BusModel extends TransportModel {
     required super.isAvailable,
   }) : super(
           type: TransportType.bus,
-          departureTime: null,
-          arrivalTime: null,
+          departureTime: departureTime,
+          arrivalTime: arrivalTime,
         );
 
   factory BusModel.fromJson(Map<String, dynamic> json) {

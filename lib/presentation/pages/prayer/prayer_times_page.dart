@@ -32,11 +32,6 @@ class _PrayerTimesPageState extends State<PrayerTimesPage> {
         foregroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: const Icon(Icons.explore),
-            onPressed: () => context.push('/prayer/qibla'),
-            tooltip: 'Qibla Direction',
-          ),
-          IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
               // Open prayer settings
@@ -94,6 +89,8 @@ class _PrayerTimesPageState extends State<PrayerTimesPage> {
                     _buildNextPrayerCard(context, state),
                     const SizedBox(height: 16),
                     _buildPrayerTimesList(context, state),
+                    const SizedBox(height: 16),
+                    _buildIslamicFeaturesGrid(context),
                     const SizedBox(height: 16),
                     _buildQiblaCard(context, state),
                   ],
@@ -432,5 +429,119 @@ class _PrayerTimesPageState extends State<PrayerTimesPage> {
     } else {
       return '${duration.inMinutes}m remaining';
     }
+  }
+
+  Widget _buildIslamicFeaturesGrid(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Islamic Library',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 3.5,
+              children: [
+                _buildFeatureCard(
+                  context,
+                  'Al-Quran',
+                  Icons.auto_stories,
+                  Colors.green.shade600,
+                  () => context.push('/prayer/quran'),
+                ),
+                _buildFeatureCard(
+                  context,
+                  'Hadith',
+                  Icons.import_contacts,
+                  Colors.orange.shade600,
+                  () => context.push('/prayer/hadith'),
+                ),
+                _buildFeatureCard(
+                  context,
+                  'Dhikr',
+                  Icons.favorite,
+                  Colors.purple.shade600,
+                  () => context.push('/prayer/dhikr'),
+                ),
+                _buildFeatureCard(
+                  context,
+                  'Islamic Books',
+                  Icons.library_books,
+                  Colors.blue.shade600,
+                  () => context.push('/prayer/books'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeatureCard(
+    BuildContext context,
+    String title,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: color.withValues(alpha: 0.2),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Icon(
+                icon,
+                color: Colors.white,
+                size: 16,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

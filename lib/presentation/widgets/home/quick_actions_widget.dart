@@ -41,14 +41,11 @@ class QuickActionsWidget extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 5,
-              childAspectRatio: 0.8,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 8,
-              children: [
+            SizedBox(
+              height: 85,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
                 _buildQuickActionItem(
                   context,
                   icon: Icons.explore,
@@ -86,24 +83,10 @@ class QuickActionsWidget extends StatelessWidget {
                 ),
                 _buildQuickActionItem(
                   context,
-                  icon: Icons.schedule,
-                  label: 'Prayer Times',
-                  color: AppColors.prayerTime,
-                  onTap: () => context.push('/prayer'),
-                ),
-                _buildQuickActionItem(
-                  context,
                   icon: Icons.local_offer,
                   label: 'Vouchers',
                   color: AppColors.primaryLight,
                   onTap: () => context.push('/voucher'),
-                ),
-                _buildQuickActionItem(
-                  context,
-                  icon: Icons.list_alt,
-                  label: 'Itinerary',
-                  color: AppColors.secondary,
-                  onTap: () => context.push('/itinerary'),
                 ),
                 _buildQuickActionItem(
                   context,
@@ -119,7 +102,15 @@ class QuickActionsWidget extends StatelessWidget {
                   color: AppColors.error,
                   onTap: () => context.push('/boycott'),
                 ),
-              ],
+                _buildQuickActionItem(
+                  context,
+                  icon: Icons.account_balance_wallet,
+                  label: 'Zakat',
+                  color: AppColors.success,
+                  onTap: () => context.push('/zakat'),
+                ),
+                ],
+              ),
             ),
           ],
         ),
@@ -134,43 +125,48 @@ class QuickActionsWidget extends StatelessWidget {
     required Color color,
     required VoidCallback onTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: color.withValues(alpha: 0.2),
-            width: 1,
+    return Container(
+      width: 75,
+      margin: const EdgeInsets.only(right: 8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: color.withValues(alpha: 0.2),
+              width: 1,
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 20,
+                ),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 24,
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 11,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
