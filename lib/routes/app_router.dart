@@ -18,6 +18,8 @@ import 'package:safiyah/presentation/pages/hajj_umroh/hajj_umroh_guide_detail_pa
 import 'package:safiyah/presentation/pages/insurance/insurance_detail_page.dart';
 import 'package:safiyah/presentation/pages/holiday_package/holiday_package_detail_page.dart';
 import 'package:safiyah/presentation/pages/insurance/insurance_comparison_page.dart';
+import 'package:safiyah/presentation/pages/hotel/hotel_search_page.dart';
+import 'package:safiyah/presentation/pages/purchase/purchase_history_page.dart';
 
 import '../presentation/pages/home/home_page.dart';
 import '../presentation/pages/settings/settings_page.dart';
@@ -354,6 +356,21 @@ class AppRouter {
          parentNavigatorKey: _rootNavigatorKey,
          name: 'insurance_comparison',
          builder: (context, state) => const InsuranceComparisonPage(),
+       ),
+       GoRoute(
+         path: RouteNames.hotelSearch,
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'hotel_search',
+         builder: (context, state) {
+           final filters = state.uri.queryParameters;
+           return HotelSearchPage(filters: filters);
+         },
+       ),
+       GoRoute(
+         path: RouteNames.purchaseHistory,
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'purchase_history',
+         builder: (context, state) => const PurchaseHistoryPage(),
        ),
     ],
     errorBuilder: (context, state) => Scaffold(

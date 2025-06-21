@@ -117,7 +117,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
     return BlocConsumer<OnboardingBloc, OnboardingState>(
       listener: (context, state) {
         if (state is OnboardingCompleted) {
-          context.go(RouteNames.home);
+          // Navigate to login screen instead of home
+          context.go(RouteNames.login);
         }
       },
       builder: (context, state) {

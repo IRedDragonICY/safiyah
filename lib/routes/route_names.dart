@@ -11,14 +11,19 @@ class RouteNames {
   static const String subscription = '/subscription';
 
   static const String prayer = '/prayer';
+  static const String prayerTimes = '/prayer/times';
   static const String qibla = '/prayer/qibla';
 
   static const String places = '/places';
+  static const String placesMap = '/places/map';
+  static const String placeDetail = '/places/detail';
 
   static const String itinerary = '/itinerary';
   static const String createItinerary = '/itinerary/create';
+  static const String itineraryDetail = '/itinerary/detail';
 
   static const String voucher = '/voucher';
+  static const String voucherHistory = '/voucher/history';
 
   static const String chatbot = '/chatbot';
   static const String chatHistory = '/chatbot/history';
@@ -30,8 +35,10 @@ class RouteNames {
   static const String guideTourDetail = '/guide-tour/detail';
 
   static const String weather = '/weather';
+  static const String weatherDetail = '/weather/detail';
 
   static const String events = '/events';
+  static const String eventDetail = '/events/detail';
 
   static const String notifications = '/notifications';
 
@@ -40,10 +47,20 @@ class RouteNames {
 
   static const String boycott = '/boycott';
 
+  // Hotel routes
+  static const String hotelSearch = '/hotel/search';
+  static const String hotelDetail = '/hotel/detail';
+  static const String hotelBooking = '/hotel/booking';
+
+  // Purchase History
+  static const String purchaseHistory = '/purchase/history';
+  static const String purchaseDetail = '/purchase/detail';
+
   // Insurance routes
   static const String insurance = '/insurance';
   static const String insuranceDetail = '/insurance/detail';
   static const String insuranceClaim = '/insurance/claim';
+  static const String insuranceComparison = '/insurance/comparison';
 
   // Holiday Package routes
   static const String holidayPackage = '/holiday-package';
@@ -54,7 +71,11 @@ class RouteNames {
   static const String hajjUmroh = '/hajj-umroh';
   static const String hajjUmrohDetail = '/hajj-umroh/detail';
   static const String hajjUmrohGuide = '/hajj-umroh/guide';
+  static const String hajjUmrohGuideDetail = '/hajj-umroh/guide-detail';
   static const String hajjUmrohCalculator = '/hajj-umroh/calculator';
   static const String hajjUmrohBooking = '/hajj-umroh/booking';
   static const String hajjUmrohBookingDetail = '/hajj-umroh/booking-detail';
+
+  // Accessibility Onboarding
+  static const String accessibilityOnboarding = '/onboarding/accessibility';
 }
