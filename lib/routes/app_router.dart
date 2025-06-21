@@ -11,6 +11,10 @@ import 'package:safiyah/presentation/pages/weather/weather_detail_page.dart';
 import 'package:safiyah/presentation/pages/insurance/insurance_page.dart';
 import 'package:safiyah/presentation/pages/holiday_package/holiday_package_page.dart';
 import 'package:safiyah/presentation/pages/hajj_umroh/hajj_umroh_page.dart';
+import 'package:safiyah/presentation/pages/hajj_umroh/hajj_umroh_detail_page.dart';
+import 'package:safiyah/presentation/pages/hajj_umroh/hajj_umroh_booking_page.dart';
+import 'package:safiyah/presentation/pages/hajj_umroh/hajj_umroh_booking_detail_page.dart';
+import 'package:safiyah/presentation/pages/hajj_umroh/hajj_umroh_guide_detail_page.dart';
 import 'package:safiyah/presentation/pages/insurance/insurance_detail_page.dart';
 import 'package:safiyah/presentation/pages/holiday_package/holiday_package_detail_page.dart';
 import 'package:safiyah/presentation/pages/insurance/insurance_comparison_page.dart';
@@ -276,6 +280,42 @@ class AppRouter {
          parentNavigatorKey: _rootNavigatorKey,
          name: 'hajj_umroh',
          builder: (context, state) => const HajjUmrohPage(),
+       ),
+       GoRoute(
+         path: '/hajj-umroh/detail/:id',
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'hajj_umroh_detail',
+         builder: (context, state) {
+           final id = state.pathParameters['id']!;
+           return HajjUmrohDetailPage(packageId: id);
+         },
+       ),
+       GoRoute(
+         path: '/hajj-umroh/booking/:id',
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'hajj_umroh_booking',
+         builder: (context, state) {
+           final id = state.pathParameters['id']!;
+           return HajjUmrohBookingPage(packageId: id);
+         },
+       ),
+       GoRoute(
+         path: '/hajj-umroh/booking-detail/:id',
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'hajj_umroh_booking_detail',
+         builder: (context, state) {
+           final id = state.pathParameters['id']!;
+           return HajjUmrohBookingDetailPage(bookingId: id);
+         },
+       ),
+       GoRoute(
+         path: '/hajj-umroh/guide/:type',
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'hajj_umroh_guide',
+         builder: (context, state) {
+           final type = state.pathParameters['type']!;
+           return HajjUmrohGuideDetailPage(guideType: type);
+         },
        ),
        GoRoute(
          path: '/insurance/detail/:id',

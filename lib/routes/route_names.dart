@@ -53,4 +53,6 @@ class RouteNames {
   static const String hajjUmrohDetail = '/hajj-umroh/detail';
   static const String hajjUmrohGuide = '/hajj-umroh/guide';
   static const String hajjUmrohCalculator = '/hajj-umroh/calculator';
+  static const String hajjUmrohBooking = '/hajj-umroh/booking';
+  static const String hajjUmrohBookingDetail = '/hajj-umroh/booking-detail';
 }
