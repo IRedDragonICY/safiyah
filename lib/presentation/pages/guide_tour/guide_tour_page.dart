@@ -26,7 +26,13 @@ class _GuideTourPageState extends State<GuideTourPage> {
       'difficultyColor': AppColors.success,
       'popularCities': ['Tokyo', 'Osaka', 'Kyoto', 'Hiroshima'],
       'image': 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?ixlib=rb-4.0.3',
-      'description': 'A fascinating blend of ancient traditions and modern technology, perfect for Muslim travelers.'
+      'description': 'A fascinating blend of ancient traditions and modern technology, perfect for Muslim travelers.',
+      'transportation': {
+        'bestOption': 'JR Pass',
+        'halalFriendly': true,
+        'nfcPayment': true,
+        'tips': 'Get a JR Pass for unlimited travel on most trains. IC cards like Suica work everywhere.'
+      }
     },
     {
       'name': 'Indonesia',
@@ -39,7 +45,13 @@ class _GuideTourPageState extends State<GuideTourPage> {
       'difficultyColor': AppColors.success,
       'popularCities': ['Jakarta', 'Bali', 'Yogyakarta', 'Surabaya'],
       'image': 'https://images.unsplash.com/photo-1555212697-194d092e3b8f?ixlib=rb-4.0.3',
-      'description': 'The largest Muslim country in the world with incredible diversity and halal-friendly atmosphere.'
+      'description': 'The largest Muslim country in the world with incredible diversity and halal-friendly atmosphere.',
+      'transportation': {
+        'bestOption': 'Grab/Gojek',
+        'halalFriendly': true,
+        'nfcPayment': false,
+        'tips': 'Use Grab or Gojek for convenient travel. TransJakarta buses are efficient in Jakarta.'
+      }
     },
     {
       'name': 'Malaysia',
@@ -52,7 +64,13 @@ class _GuideTourPageState extends State<GuideTourPage> {
       'difficultyColor': AppColors.success,
       'popularCities': ['Kuala Lumpur', 'Penang', 'Johor Bahru', 'Malacca'],
       'image': 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?ixlib=rb-4.0.3',
-      'description': 'Modern Muslim-majority country with excellent halal infrastructure and diverse culture.'
+      'description': 'Modern Muslim-majority country with excellent halal infrastructure and diverse culture.',
+      'transportation': {
+        'bestOption': 'Touch \'n Go',
+        'halalFriendly': true,
+        'nfcPayment': true,
+        'tips': 'Touch \'n Go cards work on all public transport. Grab is widely available.'
+      }
     },
     {
       'name': 'Turkey',
@@ -486,6 +504,63 @@ class _GuideTourPageState extends State<GuideTourPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
+                    
+                    // Transportation Info
+                    if (country['transportation'] != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.directions_transit,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Transportation: ${country['transportation']['bestOption']}',
+                                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    country['transportation']['tips'],
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (country['transportation']['nfcPayment'] == true)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.info,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Text(
+                                  'NFC',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
                     
                     // Stats
                     Row(

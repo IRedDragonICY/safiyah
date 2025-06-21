@@ -76,6 +76,15 @@ class RouteNames {
   static const String hajjUmrohBooking = '/hajj-umroh/booking';
   static const String hajjUmrohBookingDetail = '/hajj-umroh/booking-detail';
 
+  // Transportation routes
+  static const String transportation = '/transportation';
+  static const String transportationGuide = '/transportation/guide';
+  static const String flightDetail = '/transportation/flight';
+  static const String trainDetail = '/transportation/train';
+  static const String busDetail = '/transportation/bus';
+  static const String rideDetail = '/transportation/ride';
+  static const String rentalDetail = '/transportation/rental';
+
   // Accessibility Onboarding
   static const String accessibilityOnboarding = '/onboarding/accessibility';
 }

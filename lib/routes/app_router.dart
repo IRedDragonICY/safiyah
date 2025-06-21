@@ -20,6 +20,11 @@ import 'package:safiyah/presentation/pages/holiday_package/holiday_package_detai
 import 'package:safiyah/presentation/pages/insurance/insurance_comparison_page.dart';
 import 'package:safiyah/presentation/pages/hotel/hotel_search_page.dart';
 import 'package:safiyah/presentation/pages/purchase/purchase_history_page.dart';
+import 'package:safiyah/presentation/pages/transportation/transportation_page.dart';
+import 'package:safiyah/presentation/pages/transportation/transportation_guide_page.dart';
+import 'package:safiyah/presentation/pages/transportation/flight_detail_page.dart';
+import 'package:safiyah/presentation/pages/transportation/train_detail_page.dart';
+import 'package:safiyah/presentation/pages/transportation/bus_detail_page.dart';
 
 import '../presentation/pages/home/home_page.dart';
 import '../presentation/pages/settings/settings_page.dart';
@@ -371,6 +376,66 @@ class AppRouter {
          parentNavigatorKey: _rootNavigatorKey,
          name: 'purchase_history',
          builder: (context, state) => const PurchaseHistoryPage(),
+       ),
+       // Transportation routes
+       GoRoute(
+         path: '/transportation',
+         name: RouteNames.transportation,
+         builder: (context, state) {
+           final tabIndex = state.uri.queryParameters['tab'];
+           return TransportationPage(
+             initialTabIndex: tabIndex != null ? int.tryParse(tabIndex) : null,
+           );
+         },
+       ),
+       GoRoute(
+         path: RouteNames.transportationGuide,
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'transportation_guide',
+         builder: (context, state) => const TransportationGuidePage(),
+       ),
+       
+       // Transportation Detail routes
+       GoRoute(
+         path: '/transportation/flight/:flightId',
+         name: 'flight-detail',
+         builder: (context, state) => FlightDetailPage(
+           flightId: state.pathParameters['flightId']!,
+         ),
+       ),
+       GoRoute(
+         path: '/transportation/train/:trainId',
+         name: 'train-detail',
+         builder: (context, state) => TrainDetailPage(
+           trainId: state.pathParameters['trainId']!,
+         ),
+       ),
+       GoRoute(
+         path: '/transportation/bus/:busId',
+         name: 'bus-detail',
+         builder: (context, state) => BusDetailPage(
+           busId: state.pathParameters['busId']!,
+         ),
+       ),
+       GoRoute(
+         path: '/transportation/ride/:rideId',
+         name: 'ride-detail',
+         builder: (context, state) => Scaffold(
+           appBar: AppBar(title: const Text('Ride Details')),
+           body: Center(
+             child: Text('Ride service details for ID: ${state.pathParameters['rideId']}'),
+           ),
+         ),
+       ),
+       GoRoute(
+         path: '/transportation/rental/:rentalId',
+         name: 'rental-detail',
+         builder: (context, state) => Scaffold(
+           appBar: AppBar(title: const Text('Rental Details')),
+           body: Center(
+             child: Text('Rental details for ID: ${state.pathParameters['rentalId']}'),
+           ),
+         ),
        ),
     ],
     errorBuilder: (context, state) => Scaffold(

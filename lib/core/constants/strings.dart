@@ -112,6 +112,37 @@ class AppStrings {
       'Safiyah needs notification access to remind you of prayer times.';
   static const String openSettings = 'Open Settings';
   
+  // Transportation
+  static const String transportation = 'Transportation';
+  static const String flights = 'Flights';
+  static const String trains = 'Trains';
+  static const String buses = 'Buses';
+  static const String rideHailing = 'Ride-hailing';
+  static const String rentals = 'Rentals';
+  static const String nfcPayment = 'NFC Payment';
+  static const String halalCertified = 'Halal Certified';
+  static const String departure = 'Departure';
+  static const String arrival = 'Arrival';
+  static const String duration = 'Duration';
+  static const String from = 'From';
+  static const String to = 'To';
+  static const String selectDate = 'Select Date';
+  static const String searchTransport = 'Search Transportation';
+  static const String halalMeals = 'Halal Meals';
+  static const String noPetPolicy = 'No Pet Policy';
+  static const String prayerNotifications = 'Prayer Notifications';
+  static const String alcoholFree = 'Alcohol-free Service';
+  static const String wifiAvailable = 'WiFi Available';
+  static const String wheelchairAccess = 'Wheelchair Access';
+  static const String transportGuide = 'Transport Guide';
+  static const String book = 'Book';
+  static const String viewDetails = 'View Details';
+  static const String paymentMethods = 'Payment Methods';
+  static const String icCard = 'IC Card';
+  static const String creditCard = 'Credit Card';
+  static const String cash = 'Cash';
+  static const String qrCode = 'QR Code';
+  
   // Errors
   static const String genericError = 'Something went wrong. Please try again.';
   static const String networkError = 'Network error. Please check your connection.';

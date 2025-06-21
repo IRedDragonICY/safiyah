@@ -18,6 +18,7 @@ import '../../widgets/notifications/notification_badge.dart';
 import '../../widgets/insurance/insurance_card.dart';
 import '../../widgets/holiday_package/holiday_package_card.dart';
 import '../../widgets/hajj_umroh/hajj_umroh_card.dart';
+import '../../widgets/home/transportation_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -126,6 +127,8 @@ class _HomePageState extends State<HomePage> {
                             const CurrencyWidget(),
                             const SizedBox(height: 16),
                             const QuickActionsWidget(),
+                            const SizedBox(height: 24),
+                            const TransportationWidget(),
                             const SizedBox(height: 24),
                             _buildNewServices(context),
                             const SizedBox(height: 24),
