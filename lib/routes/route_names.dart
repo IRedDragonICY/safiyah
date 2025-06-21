@@ -6,6 +6,8 @@ class RouteNames {
 
   static const String home = '/';
   static const String settings = '/settings';
+  static const String currencySelection = '/settings/currency';
+  static const String about = '/settings/about';
   static const String subscription = '/subscription';
 
   static const String prayer = '/prayer';

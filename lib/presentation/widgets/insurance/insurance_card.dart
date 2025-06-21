@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/services/currency_service.dart';
+
 class InsuranceCard extends StatelessWidget {
   const InsuranceCard({super.key});
 
@@ -80,33 +82,30 @@ class InsuranceCard extends StatelessWidget {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  _buildStatItem('3', 'Active Policies', colorScheme),
-                  const SizedBox(width: 16),
-                  _buildStatItem('5', 'Claims', colorScheme),
+                  Expanded(
+                    child: _buildStatCard('Active Policies', '12', Icons.policy, colorScheme),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildStatCard('Claims This Year', '3', Icons.assignment, colorScheme),
+                  ),
                 ],
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Text(
-                    'Starting from',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
+                  Expanded(
+                    child: ListenableBuilder(
+                      listenable: CurrencyService(),
+                      builder: (context, child) {
+                        final currencyService = CurrencyService();
+                        return _buildStatCard('Starting From', currencyService.formatAmount(100), Icons.attach_money, colorScheme); // ~$100 USD base
+                      },
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '¥15,000',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onPrimaryContainer,
-                    ),
-                  ),
-                  const Spacer(),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    size: 16,
-                    color: colorScheme.onPrimaryContainer,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildStatCard('Providers', '15+', Icons.business, colorScheme),
                   ),
                 ],
               ),
@@ -117,26 +116,42 @@ class InsuranceCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(String value, String label, ColorScheme colorScheme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: colorScheme.onPrimaryContainer,
-          ),
+  Widget _buildStatCard(String title, String value, IconData icon, ColorScheme colorScheme) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.2),
         ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            icon,
+            color: colorScheme.onSecondaryContainer.withValues(alpha: 0.7),
+            size: 20,
           ),
-        ),
-      ],
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              color: colorScheme.onSecondaryContainer,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            title,
+            style: TextStyle(
+              color: colorScheme.onSecondaryContainer.withValues(alpha: 0.7),
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
     );
   }
 } 

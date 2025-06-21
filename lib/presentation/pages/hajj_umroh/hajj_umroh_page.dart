@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/services/currency_service.dart';
+
 class HajjUmrohPage extends StatefulWidget {
   const HajjUmrohPage({super.key});
 
@@ -14,11 +16,11 @@ class _HajjUmrohPageState extends State<HajjUmrohPage> with TickerProviderStateM
   // Calculator state
   String? _selectedPackage;
   int _pilgrimCount = 1;
-  Map<String, int> _packagePrices = {
-    'Regular Hajj': 6500000,
-    'Hajj Plus': 8500000,
-    '9-Day Umroh': 2200000,
-    '12-Day Umroh': 2800000,
+  Map<String, double> _packagePrices = {
+    'Regular Hajj': 43333, // ~$43,333 USD base
+    'Hajj Plus': 56667, // ~$56,667 USD base
+    '9-Day Umroh': 14667, // ~$14,667 USD base
+    '12-Day Umroh': 18667, // ~$18,667 USD base
   };
   
   // Filter state
@@ -85,14 +87,40 @@ class _HajjUmrohPageState extends State<HajjUmrohPage> with TickerProviderStateM
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildQuickActions(),
+                Row(
+                  children: [
+                    Text(
+                      'Available Packages',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.verified, size: 16, color: Theme.of(context).colorScheme.primary),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Certified',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 16),
                 _buildPackageFilter(),
-                const SizedBox(height: 16),
-                Text(
-                  'Trusted Packages',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
+                const SizedBox(height: 8),
               ],
             ),
           ),
@@ -115,27 +143,52 @@ class _HajjUmrohPageState extends State<HajjUmrohPage> with TickerProviderStateM
   }
 
   Widget _buildGuideTab() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        _buildGuideSection('Preparation', Icons.checklist, [
-          'Required Documents',
-          'Health Conditions',
-          'Mental & Spiritual Preparation',
-          'Hajj/Umroh Equipment',
-        ]),
-        _buildGuideSection('Pillars & Sunnah', Icons.book, [
-          'Pillars of Hajj',
-          'Pillars of Umroh',
-          'Sunnah of Hajj',
-          'Prohibitions in Ihram',
-        ]),
-        _buildGuideSection('Prayers & Dhikr', Icons.menu_book, [
-          'Ihram Prayers',
-          'Tawaf Prayers',
-          'Sa\'i Prayers',
-          'Wuquf Prayers',
-        ]),
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Complete Guide',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Everything you need to know for a successful pilgrimage',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ),
+        SliverList(
+          delegate: SliverChildListDelegate([
+            _buildGuideSection('Pre-Journey Preparation', Icons.checklist_rtl, [
+              'Required Documents',
+              'Health Conditions',
+              'Mental & Spiritual Preparation',
+              'Hajj/Umroh Equipment',
+            ], Colors.blue),
+            _buildGuideSection('Religious Guidance', Icons.menu_book_outlined, [
+              'Pillars of Hajj',
+              'Pillars of Umroh',
+              'Sunnah of Hajj',
+              'Prohibitions in Ihram',
+            ], Colors.green),
+            _buildGuideSection('Prayers & Supplications', Icons.auto_stories_outlined, [
+              'Ihram Prayers',
+              'Tawaf Prayers',
+              'Sa\'i Prayers',
+              'Wuquf Prayers',
+            ], Colors.purple),
+          ]),
+        ),
       ],
     );
   }
@@ -143,128 +196,260 @@ class _HajjUmrohPageState extends State<HajjUmrohPage> with TickerProviderStateM
   Widget _buildCalculatorTab() {
     final calculatedTotal = _calculateTotal();
     
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Hajj/Umroh Cost Calculator',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    value: _selectedPackage,
-                    decoration: const InputDecoration(labelText: 'Select Package'),
-                    items: ['Regular Hajj', 'Hajj Plus', '9-Day Umroh', '12-Day Umroh']
-                        .map((item) => DropdownMenuItem(value: item, child: Text(item)))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedPackage = value;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text('Number of Pilgrims: $_pilgrimCount'),
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Theme.of(context).colorScheme.outline),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              onPressed: _pilgrimCount > 1 ? () {
-                                setState(() {
-                                  _pilgrimCount--;
-                                });
-                              } : null,
-                              icon: const Icon(Icons.remove),
-                            ),
-                            Text('$_pilgrimCount', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  _pilgrimCount++;
-                                });
-                              },
-                              icon: const Icon(Icons.add),
-                            ),
-                          ],
-                        ),
+                      child: Icon(
+                        Icons.calculate,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 24,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: _selectedPackage != null ? () {
-                        setState(() {
-                          // Trigger recalculation
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Cost calculated successfully!')),
-                        );
-                      } : null,
-                      child: const Text('Calculate Cost'),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Cost Estimation',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-                  if (_selectedPackage != null) ...[
-                    _buildCostItem('Package Cost ($_selectedPackage)', '¥${(_packagePrices[_selectedPackage!]! * _pilgrimCount).toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}'),
-                    _buildCostItem('Visa & Documents', '¥${(250000 * _pilgrimCount).toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}'),
-                    _buildCostItem('Insurance', '¥${(50000 * _pilgrimCount).toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}'),
-                    const Divider(),
-                    _buildCostItem('Total', '¥${calculatedTotal.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}', isTotal: true),
-                  ] else ...[
-                    const Center(
-                      child: Text(
-                        'Select a package to calculate costs',
-                        style: TextStyle(fontStyle: FontStyle.italic),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Cost Calculator',
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            'Calculate your pilgrimage costs',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 24),
+                Card(
+                  elevation: 0,
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Package Selection',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 16),
+                        DropdownButtonFormField<String>(
+                          value: _selectedPackage,
+                          decoration: InputDecoration(
+                            labelText: 'Choose your package',
+                            prefixIcon: Icon(
+                              _selectedPackage?.contains('Hajj') == true ? Icons.mosque : Icons.location_city,
+                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          items: ['Regular Hajj', 'Hajj Plus', '9-Day Umroh', '12-Day Umroh']
+                              .map((item) => DropdownMenuItem(
+                                    value: item,
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          item.contains('Hajj') ? Icons.mosque : Icons.location_city,
+                                          size: 20,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(item),
+                                      ],
+                                    ),
+                                  ))
+                              .toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedPackage = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          'Number of Pilgrims',
+                          style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.people, color: Theme.of(context).colorScheme.primary),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '$_pilgrimCount ${_pilgrimCount == 1 ? 'Pilgrim' : 'Pilgrims'}',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context).colorScheme.primary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Theme.of(context).colorScheme.outline),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    onPressed: _pilgrimCount > 1 ? () {
+                                      setState(() {
+                                        _pilgrimCount--;
+                                      });
+                                    } : null,
+                                    icon: const Icon(Icons.remove),
+                                  ),
+                                  Container(
+                                    constraints: const BoxConstraints(minWidth: 40),
+                                    child: Text(
+                                      '$_pilgrimCount',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _pilgrimCount++;
+                                      });
+                                    },
+                                    icon: const Icon(Icons.add),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                if (_selectedPackage != null) ...[
+                  Card(
+                    elevation: 0,
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.receipt_long,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Cost Breakdown',
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          ListenableBuilder(
+                            listenable: CurrencyService(),
+                            builder: (context, child) {
+                              final currencyService = CurrencyService();
+                              final packageCost = _packagePrices[_selectedPackage!]! * _pilgrimCount;
+                              final visaCost = 1667.0 * _pilgrimCount; // ~$1,667 USD base
+                              final insuranceCost = 333.0 * _pilgrimCount; // ~$333 USD base
+                              final total = packageCost + visaCost + insuranceCost;
+
+                              return Column(
+                                children: [
+                                  _buildCostItem('Package Cost ($_selectedPackage)', currencyService.formatAmount(packageCost)),
+                                  _buildCostItem('Visa & Documents', currencyService.formatAmount(visaCost)),
+                                  _buildCostItem('Insurance', currencyService.formatAmount(insuranceCost)),
+                                  const Divider(height: 24),
+                                  _buildCostItem('Total Estimated Cost', currencyService.formatAmount(total), isTotal: true),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ] else ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(32),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                        style: BorderStyle.solid,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.calculate_outlined,
+                          size: 48,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Select a package to see cost breakdown',
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
-              ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  int _calculateTotal() {
+  double _calculateTotal() {
     if (_selectedPackage == null) return 0;
     final packageCost = _packagePrices[_selectedPackage!]! * _pilgrimCount;
-    final visaCost = 250000 * _pilgrimCount;
-    final insuranceCost = 50000 * _pilgrimCount;
+    final visaCost = 1667.0 * _pilgrimCount; // ~$1,667 USD base
+    final insuranceCost = 333.0 * _pilgrimCount; // ~$333 USD base
     return packageCost + visaCost + insuranceCost;
   }
 
@@ -275,94 +460,66 @@ class _HajjUmrohPageState extends State<HajjUmrohPage> with TickerProviderStateM
     );
   }
 
-  Widget _buildQuickActions() {
-    final actions = [
-      {'title': 'Hajj', 'icon': Icons.mosque, 'color': Theme.of(context).colorScheme.primary, 'action': () {
-        setState(() {
-          _selectedFilter = 'Hajj';
-        });
-      }},
-      {'title': 'Umroh', 'icon': Icons.location_city, 'color': Theme.of(context).colorScheme.secondary, 'action': () {
-        setState(() {
-          _selectedFilter = 'Umroh';
-        });
-      }},
-      {'title': 'Guide', 'icon': Icons.book, 'color': Theme.of(context).colorScheme.tertiary, 'action': () {
-        _tabController.animateTo(1);
-      }},
-      {'title': 'Calculator', 'icon': Icons.calculate, 'color': Theme.of(context).colorScheme.primary, 'action': () {
-        _tabController.animateTo(2);
-      }},
-    ];
 
-    return Row(
-      children: actions.map((action) => Expanded(
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          child: Card(
-            child: InkWell(
-              onTap: action['action'] as VoidCallback,
-              borderRadius: BorderRadius.circular(12),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Icon(action['icon'] as IconData, color: action['color'] as Color, size: 28),
-                    const SizedBox(height: 8),
-                    Text(
-                      action['title'] as String,
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      )).toList(),
-    );
-  }
 
   Widget _buildPackageFilter() {
-    return Row(
-      children: [
-        Expanded(
-          child: FilterChip(
-            label: const Text('All'),
-            selected: _selectedFilter == 'All',
-            onSelected: (value) {
-              setState(() {
-                _selectedFilter = 'All';
-              });
-            },
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: FilterChip(
-            label: const Text('Hajj'),
-            selected: _selectedFilter == 'Hajj',
-            onSelected: (value) {
-              setState(() {
-                _selectedFilter = 'Hajj';
-              });
-            },
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: FilterChip(
-            label: const Text('Umroh'),
-            selected: _selectedFilter == 'Umroh',
-            onSelected: (value) {
-              setState(() {
-                _selectedFilter = 'Umroh';
-              });
-            },
-          ),
-        ),
-      ],
+    final filters = ['All', 'Hajj', 'Umroh'];
+    final filterCounts = {
+      'All': _getAllPackages().length,
+      'Hajj': _getAllPackages().where((p) => p['type'] == 'Hajj').length,
+      'Umroh': _getAllPackages().where((p) => p['type'] == 'Umroh').length,
+    };
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: filters.map((filter) {
+          final isSelected = _selectedFilter == filter;
+          return Container(
+            margin: const EdgeInsets.only(right: 12),
+            child: FilterChip(
+              label: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    filter,
+                    style: TextStyle(
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: isSelected 
+                          ? Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.9)
+                          : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '${filterCounts[filter]}',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: isSelected 
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              selected: isSelected,
+              onSelected: (value) {
+                setState(() {
+                  _selectedFilter = filter;
+                });
+              },
+              showCheckmark: false,
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 
@@ -372,7 +529,7 @@ class _HajjUmrohPageState extends State<HajjUmrohPage> with TickerProviderStateM
         'id': 0,
         'title': 'Regular Hajj Package 2025',
         'type': 'Hajj',
-        'price': '¥6,500,000',
+        'usdPrice': 43333.0, // ~$43,333 USD base
         'duration': '40 Days',
         'departure': 'June 15, 2025',
         'hotel': '4-Star Hotel',
@@ -385,7 +542,7 @@ class _HajjUmrohPageState extends State<HajjUmrohPage> with TickerProviderStateM
         'id': 1,
         'title': 'Premium Umroh Package',
         'type': 'Umroh',
-        'price': '¥2,500,000',
+        'usdPrice': 16667.0, // ~$16,667 USD base
         'duration': '12 Days',
         'departure': 'December 20, 2024',
         'hotel': '5-Star Hotel',
@@ -398,7 +555,7 @@ class _HajjUmrohPageState extends State<HajjUmrohPage> with TickerProviderStateM
         'id': 2,
         'title': 'Hajj Plus Package 2025',
         'type': 'Hajj',
-        'price': '¥8,500,000',
+        'usdPrice': 56667.0, // ~$56,667 USD base
         'duration': '45 Days',
         'departure': 'May 20, 2025',
         'hotel': '5-Star Hotel',
@@ -411,7 +568,7 @@ class _HajjUmrohPageState extends State<HajjUmrohPage> with TickerProviderStateM
         'id': 3,
         'title': '9-Day Umroh Package',
         'type': 'Umroh',
-        'price': '¥2,200,000',
+        'usdPrice': 14667.0, // ~$14,667 USD base
         'duration': '9 Days',
         'departure': 'January 10, 2025',
         'hotel': '4-Star Hotel',
@@ -521,12 +678,18 @@ class _HajjUmrohPageState extends State<HajjUmrohPage> with TickerProviderStateM
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        package['price'] as String,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.primary,
-                        ),
+                      ListenableBuilder(
+                        listenable: CurrencyService(),
+                        builder: (context, child) {
+                          final currencyService = CurrencyService();
+                          return Text(
+                            currencyService.formatAmount(package['usdPrice'] as double),
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.primary,
+                            ),
+                          );
+                        },
                       ),
                       Row(
                         children: [
@@ -560,32 +723,75 @@ class _HajjUmrohPageState extends State<HajjUmrohPage> with TickerProviderStateM
     );
   }
 
-  Widget _buildGuideSection(String title, IconData icon, List<String> items) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+  Widget _buildGuideSection(String title, IconData icon, List<String> items, Color accentColor) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+      child: Card(
+        elevation: 2,
+        child: ExpansionTile(
+          tilePadding: EdgeInsets.zero,
+          childrenPadding: const EdgeInsets.only(bottom: 8),
+          title: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  accentColor.withValues(alpha: 0.1),
+                  accentColor.withValues(alpha: 0.05),
+                ],
+              ),
+            ),
+            child: Row(
               children: [
-                Icon(icon, color: Theme.of(context).colorScheme.primary),
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: accentColor.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: accentColor, size: 24),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: accentColor,
+                        ),
+                      ),
+                      Text(
+                        '${items.length} topics',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            ...items.map((item) => ListTile(
-              dense: true,
-              leading: const Icon(Icons.arrow_forward_ios, size: 12),
-              title: Text(item),
-              onTap: () => context.push('/hajj-umroh/guide/$item'),
-            )),
-          ],
+          ),
+          children: items.map((item) => ListTile(
+            dense: true,
+            leading: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: accentColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Icon(Icons.menu_book, size: 16, color: accentColor),
+            ),
+            title: Text(
+              item,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+            trailing: Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.onSurfaceVariant),
+            onTap: () => context.push('/hajj-umroh/guide/$item'),
+          )).toList(),
         ),
       ),
     );
@@ -625,7 +831,7 @@ class _HajjUmrohPageState extends State<HajjUmrohPage> with TickerProviderStateM
         'date': 'December 20, 2024',
         'status': 'Confirmed',
         'participants': 2,
-        'amount': '¥5,000,000',
+        'usdAmount': 33333.0, // ~$33,333 USD base
       },
       {
         'title': 'Regular Hajj Package 2025',
@@ -633,7 +839,7 @@ class _HajjUmrohPageState extends State<HajjUmrohPage> with TickerProviderStateM
         'date': 'June 15, 2025',
         'status': 'Pending',
         'participants': 1,
-        'amount': '¥6,500,000',
+        'usdAmount': 43333.0, // ~$43,333 USD base
       },
     ];
 
@@ -675,13 +881,19 @@ class _HajjUmrohPageState extends State<HajjUmrohPage> with TickerProviderStateM
             const SizedBox(height: 12),
             Row(
               children: [
-                Text(
-                  booking['amount'] as String,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                ListenableBuilder(
+                  listenable: CurrencyService(),
+                  builder: (context, child) {
+                    final currencyService = CurrencyService();
+                    return Text(
+                      currencyService.formatAmount(booking['usdAmount'] as double),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    );
+                  },
                 ),
                 const Spacer(),
                 TextButton(

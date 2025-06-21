@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/services/currency_service.dart';
+
 class HolidayPackageCard extends StatelessWidget {
   const HolidayPackageCard({super.key});
 
@@ -8,135 +10,206 @@ class HolidayPackageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
-    return Card(
-      elevation: 2,
-      child: InkWell(
-        onTap: () => context.push('/holiday-package'),
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                colorScheme.secondaryContainer,
-                colorScheme.secondaryContainer.withValues(alpha: 0.7),
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            colorScheme.primaryContainer,
+            colorScheme.primaryContainer.withValues(alpha: 0.8),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.15),
+            offset: const Offset(0, 8),
+            blurRadius: 20,
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.flight_takeoff,
+                    color: colorScheme.primary,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Holiday Packages',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+                      ),
+                      Text(
+                        'Discover amazing destinations',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.flight_takeoff,
-                      color: colorScheme.onSecondaryContainer,
-                      size: 24,
-                    ),
-                  ),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.orange,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Text(
-                      '30% OFF',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Holiday Packages',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSecondaryContainer,
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildDestinationCard('🇯🇵 Japan', 'Tokyo, Kyoto, Osaka', colorScheme),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Halal-certified packages with complete itineraries',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSecondaryContainer.withValues(alpha: 0.8),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildDestinationCard('🇲🇾 Malaysia', 'Kuala Lumpur, Penang', colorScheme),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  _buildHighlight('Tokyo Explorer', '5D4N', colorScheme),
-                  const SizedBox(width: 16),
-                  _buildHighlight('Kyoto Heritage', '4D3N', colorScheme),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Text(
-                    'Starting from',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSecondaryContainer.withValues(alpha: 0.7),
-                    ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: ListenableBuilder(
+                    listenable: CurrencyService(),
+                    builder: (context, child) {
+                      final currencyService = CurrencyService();
+                      return _buildPriceCard('Starting From', currencyService.formatAmount(1200), colorScheme); // ~$1,200 USD base
+                    },
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '¥180,000',
-                    style: theme.textTheme.titleMedium?.copyWith(
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildPriceCard('Destinations', '50+', colorScheme),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Text(
+                    'HALAL CERTIFIED',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      color: colorScheme.onSecondaryContainer,
                     ),
                   ),
-                  const Spacer(),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    size: 16,
-                    color: colorScheme.onSecondaryContainer,
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(6),
                   ),
-                ],
-              ),
-            ],
-          ),
+                  child: const Text(
+                    'PRAYER FACILITIES',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildHighlight(String title, String duration, ColorScheme colorScheme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onSecondaryContainer,
-          ),
+  Widget _buildDestinationCard(String destination, String cities, ColorScheme colorScheme) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.2),
         ),
-        Text(
-          duration,
-          style: TextStyle(
-            fontSize: 12,
-            color: colorScheme.onSecondaryContainer.withValues(alpha: 0.7),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            destination,
+            style: TextStyle(
+              color: colorScheme.onPrimaryContainer,
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
           ),
+          const SizedBox(height: 4),
+          Text(
+            cities,
+            style: TextStyle(
+              color: colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPriceCard(String title, String value, ColorScheme colorScheme) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.2),
         ),
-      ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              color: colorScheme.onPrimaryContainer,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
     );
   }
 } 

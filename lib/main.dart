@@ -11,6 +11,7 @@ import 'package:safiyah/presentation/bloc/onboarding/onboarding_event.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import 'app.dart';
+import 'core/services/currency_service.dart';
 import 'core/services/location_service.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/storage_service.dart';
@@ -48,6 +49,7 @@ void main() async {
 
 Future<void> _initializeServices() async {
   await StorageService.initialize();
+  await CurrencyService().initialize();
   if (!kIsWeb) {
     await NotificationService.initialize();
     await LocationService.initialize();

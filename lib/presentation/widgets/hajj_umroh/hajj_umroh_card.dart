@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/services/currency_service.dart';
+
 class HajjUmrohCard extends StatelessWidget {
   const HajjUmrohCard({super.key});
 
@@ -80,9 +82,25 @@ class HajjUmrohCard extends StatelessWidget {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  _buildPackageInfo('Umroh', '¥2,500,000', colorScheme),
+                  Expanded(
+                    child: ListenableBuilder(
+                      listenable: CurrencyService(),
+                      builder: (context, child) {
+                        final currencyService = CurrencyService();
+                        return _buildPackageInfo('Umroh', currencyService.formatAmount(16667), colorScheme); // ~$16,667 USD base
+                      },
+                    ),
+                  ),
                   const SizedBox(width: 16),
-                  _buildPackageInfo('Hajj', '¥6,500,000', colorScheme),
+                  Expanded(
+                    child: ListenableBuilder(
+                      listenable: CurrencyService(),
+                      builder: (context, child) {
+                        final currencyService = CurrencyService();
+                        return _buildPackageInfo('Hajj', currencyService.formatAmount(43333), colorScheme); // ~$43,333 USD base
+                      },
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 12),
@@ -130,25 +148,37 @@ class HajjUmrohCard extends StatelessWidget {
   }
 
   Widget _buildPackageInfo(String type, String price, ColorScheme colorScheme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          type,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onTertiaryContainer,
-          ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.2),
         ),
-        Text(
-          price,
-          style: TextStyle(
-            fontSize: 12,
-            color: colorScheme.onTertiaryContainer.withValues(alpha: 0.7),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            type,
+            style: TextStyle(
+              color: colorScheme.onTertiaryContainer,
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
           ),
-        ),
-      ],
+          const SizedBox(height: 4),
+          Text(
+            price,
+            style: TextStyle(
+              color: colorScheme.onTertiaryContainer,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
     );
   }
 } 

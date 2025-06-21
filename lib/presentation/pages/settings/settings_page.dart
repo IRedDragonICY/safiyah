@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:safiyah/data/models/user_model.dart';
 
 import '../../../core/constants/colors.dart';
+import '../../../core/services/currency_service.dart';
 import '../../../routes/route_names.dart';
 import '../../bloc/auth/auth_bloc.dart';
 import '../../bloc/auth/auth_event.dart';
@@ -34,6 +35,8 @@ class SettingsPage extends StatelessWidget {
               _buildAccessibilitySection(context, state.preferences),
               const SizedBox(height: 16),
               _buildAppearanceSection(context, state.preferences, state.paletteName),
+              const SizedBox(height: 16),
+              _buildCurrencySection(context),
               const SizedBox(height: 16),
               _buildPrayerSection(context, state.preferences),
               const SizedBox(height: 16),
@@ -568,6 +571,80 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
+  Widget _buildCurrencySection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle(context, 'Currency & Region'),
+        Card(
+          elevation: 3,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Column(
+            children: [
+              ListenableBuilder(
+                listenable: CurrencyService(),
+                builder: (context, child) {
+                  final currencyService = CurrencyService();
+                  final currency = currencyService.selectedCurrency;
+                  
+                  return ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.attach_money,
+                        color: Colors.green,
+                      ),
+                    ),
+                    title: const Text('Currency'),
+                    subtitle: Text('${currency.name} (${currency.code})'),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                currency.flag,
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                currency.symbol,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.arrow_forward_ios, size: 16),
+                      ],
+                    ),
+                    onTap: () {
+                      context.push(RouteNames.currencySelection);
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildPrayerSection(BuildContext context, UserPreferences prefs) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -716,7 +793,7 @@ class SettingsPage extends StatelessWidget {
                 subtitle: const Text('Upgrade to Pro for premium features'),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 onTap: () {
-                  context.go(RouteNames.subscription);
+                  context.push(RouteNames.subscription);
                 },
               ),
               const Divider(height: 1),
@@ -818,9 +895,12 @@ class SettingsPage extends StatelessWidget {
                     color: Colors.blue,
                   ),
                 ),
-                title: const Text('App Version'),
-                subtitle: const Text('1.0.0'),
-                onTap: () {},
+                title: const Text('About App'),
+                subtitle: const Text('App version, developer info & more'),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                onTap: () {
+                  context.push(RouteNames.about);
+                },
               ),
               const Divider(height: 1),
               ListTile(

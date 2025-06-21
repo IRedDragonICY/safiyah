@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/services/currency_service.dart';
+
 class HolidayPackageDetailPage extends StatefulWidget {
   final String packageId;
   
@@ -122,25 +124,31 @@ class _HolidayPackageDetailPageState extends State<HolidayPackageDetailPage> wit
           children: [
             Row(
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '¥320,000',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        decoration: TextDecoration.lineThrough,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    Text(
-                      '¥250,000',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.primary,
-                      ),
-                    ),
-                    const Text('per person'),
-                  ],
+                ListenableBuilder(
+                  listenable: CurrencyService(),
+                  builder: (context, child) {
+                    final currencyService = CurrencyService();
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          currencyService.formatAmount(2133), // ~$2,133 USD base (original ¥320,000)
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            decoration: TextDecoration.lineThrough,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        Text(
+                          currencyService.formatAmount(1667), // ~$1,667 USD base (¥250,000)
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                        const Text('per person'),
+                      ],
+                    );
+                  },
                 ),
                 const Spacer(),
                 FilledButton(

@@ -21,6 +21,8 @@ import 'package:safiyah/presentation/pages/insurance/insurance_comparison_page.d
 
 import '../presentation/pages/home/home_page.dart';
 import '../presentation/pages/settings/settings_page.dart';
+import '../presentation/pages/settings/currency_selection_page.dart';
+import '../presentation/pages/settings/about_page.dart';
 import '../presentation/pages/subscription/subscription_page.dart';
 import '../presentation/pages/splash/splash_page.dart';
 import '../presentation/pages/auth/login_page.dart';
@@ -137,6 +139,18 @@ class AppRouter {
         path: RouteNames.settings,
         name: 'settings',
         builder: (context, state) => const SettingsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.currencySelection,
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'currency_selection',
+        builder: (context, state) => const CurrencySelectionPage(),
+      ),
+      GoRoute(
+        path: RouteNames.about,
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'about',
+        builder: (context, state) => const AboutPage(),
       ),
       GoRoute(
         path: RouteNames.subscription,
