@@ -196,7 +196,7 @@ class _BusDetailPageState extends State<BusDetailPage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          DateFormat('HH:mm').format(_bus!.departureTime),
+                          DateFormat('HH:mm').format(_bus!.departureTime!),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 28,
@@ -228,7 +228,7 @@ class _BusDetailPageState extends State<BusDetailPage>
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          DateFormat('HH:mm').format(_bus!.arrivalTime),
+                          DateFormat('HH:mm').format(_bus!.arrivalTime!),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 28,
