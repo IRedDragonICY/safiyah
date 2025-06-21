@@ -37,4 +37,20 @@ class RouteNames {
   static const String termsOfService = '/terms-of-service';
 
   static const String boycott = '/boycott';
+
+  // Insurance routes
+  static const String insurance = '/insurance';
+  static const String insuranceDetail = '/insurance/detail';
+  static const String insuranceClaim = '/insurance/claim';
+
+  // Holiday Package routes
+  static const String holidayPackage = '/holiday-package';
+  static const String holidayPackageDetail = '/holiday-package/detail';
+  static const String holidayPackageBooking = '/holiday-package/booking';
+
+  // Hajj & Umroh routes
+  static const String hajjUmroh = '/hajj-umroh';
+  static const String hajjUmrohDetail = '/hajj-umroh/detail';
+  static const String hajjUmrohGuide = '/hajj-umroh/guide';
+  static const String hajjUmrohCalculator = '/hajj-umroh/calculator';
 }

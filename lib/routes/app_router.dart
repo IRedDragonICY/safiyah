@@ -8,6 +8,12 @@ import 'package:safiyah/presentation/pages/onboarding/onboarding_page.dart';
 import 'package:safiyah/presentation/pages/guide_tour/guide_tour_page.dart';
 import 'package:safiyah/presentation/pages/guide_tour/guide_tour_detail_page.dart';
 import 'package:safiyah/presentation/pages/weather/weather_detail_page.dart';
+import 'package:safiyah/presentation/pages/insurance/insurance_page.dart';
+import 'package:safiyah/presentation/pages/holiday_package/holiday_package_page.dart';
+import 'package:safiyah/presentation/pages/hajj_umroh/hajj_umroh_page.dart';
+import 'package:safiyah/presentation/pages/insurance/insurance_detail_page.dart';
+import 'package:safiyah/presentation/pages/holiday_package/holiday_package_detail_page.dart';
+import 'package:safiyah/presentation/pages/insurance/insurance_comparison_page.dart';
 
 import '../presentation/pages/home/home_page.dart';
 import '../presentation/pages/settings/settings_page.dart';
@@ -253,6 +259,48 @@ class AppRouter {
         name: 'weather',
         builder: (context, state) => const WeatherDetailPage(),
       ),
+      GoRoute(
+        path: RouteNames.insurance,
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'insurance',
+        builder: (context, state) => const InsurancePage(),
+      ),
+      GoRoute(
+        path: RouteNames.holidayPackage,
+        parentNavigatorKey: _rootNavigatorKey,
+        name: 'holiday_package',
+        builder: (context, state) => const HolidayPackagePage(),
+      ),
+             GoRoute(
+         path: RouteNames.hajjUmroh,
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'hajj_umroh',
+         builder: (context, state) => const HajjUmrohPage(),
+       ),
+       GoRoute(
+         path: '/insurance/detail/:id',
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'insurance_detail',
+         builder: (context, state) {
+           final id = state.pathParameters['id']!;
+           return InsuranceDetailPage(insuranceId: id);
+         },
+       ),
+       GoRoute(
+         path: '/holiday-package/detail/:id',
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'holiday_package_detail',
+         builder: (context, state) {
+           final id = state.pathParameters['id']!;
+           return HolidayPackageDetailPage(packageId: id);
+         },
+       ),
+       GoRoute(
+         path: '/insurance/comparison',
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'insurance_comparison',
+         builder: (context, state) => const InsuranceComparisonPage(),
+       ),
     ],
     errorBuilder: (context, state) => Scaffold(
       body: Center(
