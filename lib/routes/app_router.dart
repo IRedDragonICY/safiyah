@@ -55,6 +55,23 @@ import '../presentation/bloc/notifications/notifications_bloc.dart';
 
 import 'route_names.dart';
 
+// Transaction imports
+import '../presentation/pages/transaction/transaction_history_page.dart';
+import '../presentation/pages/transaction/transaction_detail_page.dart';
+import '../presentation/pages/transaction/refund_detail_page.dart';
+import '../presentation/pages/transaction/transaction_statistics_page.dart';
+
+// Help Center imports
+import '../presentation/pages/help/help_center_page.dart';
+import '../presentation/pages/help/help_category_page.dart';
+import '../presentation/pages/help/help_article_page.dart';
+import '../presentation/pages/help/report_issue_page.dart';
+
+// Payment imports
+import '../presentation/pages/payment/payment_page.dart';
+import '../presentation/pages/payment/payment_success_page.dart';
+import '../data/models/transaction_model.dart';
+
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -436,6 +453,100 @@ class AppRouter {
              child: Text('Rental details for ID: ${state.pathParameters['rentalId']}'),
            ),
          ),
+       ),
+       
+       // Transaction routes
+       GoRoute(
+         path: RouteNames.transactionHistory,
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'transaction_history',
+         builder: (context, state) => const TransactionHistoryPage(),
+       ),
+       GoRoute(
+         path: '/transaction/detail/:id',
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'transaction_detail',
+         builder: (context, state) {
+           final id = state.pathParameters['id']!;
+           return TransactionDetailPage(transactionId: id);
+         },
+       ),
+       GoRoute(
+         path: '/transaction/refund/:id',
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'transaction_refund',
+         builder: (context, state) {
+           final id = state.pathParameters['id']!;
+           return RefundDetailPage(transactionId: id);
+         },
+       ),
+       GoRoute(
+         path: RouteNames.transactionStatistics,
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'transaction_statistics',
+         builder: (context, state) => const TransactionStatisticsPage(),
+       ),
+       
+       // Help Center routes
+       GoRoute(
+         path: RouteNames.helpCenter,
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'help_center',
+         builder: (context, state) => const HelpCenterPage(),
+       ),
+       GoRoute(
+         path: '/help/category/:id',
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'help_category',
+         builder: (context, state) {
+           final id = state.pathParameters['id']!;
+           return HelpCategoryPage(categoryId: id);
+         },
+       ),
+       GoRoute(
+         path: '/help/article/:id',
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'help_article',
+         builder: (context, state) {
+           final id = state.pathParameters['id']!;
+           return HelpArticlePage(articleId: id);
+         },
+       ),
+       GoRoute(
+         path: RouteNames.helpReportIssue,
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'help_report_issue',
+         builder: (context, state) => const ReportIssuePage(),
+       ),
+       
+       // Payment routes
+       GoRoute(
+         path: RouteNames.payment,
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'payment',
+         builder: (context, state) {
+           final extra = state.extra as Map<String, dynamic>;
+           return PaymentPage(
+             orderDetails: extra['orderDetails'] as Map<String, dynamic>,
+             amount: extra['amount'] as double,
+             currency: extra['currency'] as String,
+             transactionType: extra['transactionType'] as TransactionType,
+           );
+         },
+       ),
+       GoRoute(
+         path: RouteNames.paymentSuccess,
+         parentNavigatorKey: _rootNavigatorKey,
+         name: 'payment_success',
+         builder: (context, state) {
+           final extra = state.extra as Map<String, dynamic>?;
+           return PaymentSuccessPage(
+             transactionId: extra?['transactionId'] as String?,
+             amount: extra?['amount'] as double?,
+             paymentMethod: extra?['paymentMethod'] as PaymentMethod?,
+             orderDetails: extra?['orderDetails'] as Map<String, dynamic>?,
+           );
+         },
        ),
     ],
     errorBuilder: (context, state) => Scaffold(

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../routes/route_names.dart';
+import '../../../data/models/transaction_model.dart';
 
 class SubscriptionPage extends StatefulWidget {
   const SubscriptionPage({super.key});
@@ -9,6 +12,30 @@ class SubscriptionPage extends StatefulWidget {
 
 class _SubscriptionPageState extends State<SubscriptionPage> {
   int selectedPlan = 0; // 0 = Pro, 1 = Student
+
+  // Plan details
+  final List<Map<String, dynamic>> subscriptionPlans = [
+    {
+      'id': 'safiyah_pro',
+      'name': 'Safiyah Pro',
+      'price': 29000,
+      'originalPrice': 35000,
+      'currency': 'IDR',
+      'period': 'monthly',
+      'description': 'Full premium experience with all features',
+      'discount': 17, // percentage
+    },
+    {
+      'id': 'student_plan',
+      'name': 'Student Plan', 
+      'price': 15000,
+      'originalPrice': 29000,
+      'currency': 'IDR',
+      'period': 'monthly',
+      'description': 'Special discount for students with verification',
+      'discount': 48, // percentage
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -372,8 +399,9 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
   }
 
   Widget _buildSubscribeButton(BuildContext context) {
-    final selectedPlanName = selectedPlan == 0 ? 'Safiyah Pro' : 'Student Plan';
-    final selectedPrice = selectedPlan == 0 ? 'Rp 29.000' : 'Rp 15.000';
+    final selectedPlanData = subscriptionPlans[selectedPlan];
+    final selectedPlanName = selectedPlanData['name'] as String;
+    final selectedPrice = 'Rp ${(selectedPlanData['price'] as int).toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => '.')}';
     
     return Column(
       children: [
@@ -381,7 +409,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              _showPaymentDialog(context, selectedPlanName, selectedPrice);
+              _navigateToPayment(context, selectedPlanData);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
@@ -392,7 +420,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
               ),
             ),
             child: Text(
-              'Subscribe to $selectedPlanName',
+              'Start 7-Day Free Trial',
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -400,9 +428,18 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
             ),
           ),
         ),
+        const SizedBox(height: 8),
+        Text(
+          'Then $selectedPrice/month • Cancel anytime',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.primary,
+            fontWeight: FontWeight.w600,
+          ),
+          textAlign: TextAlign.center,
+        ),
         const SizedBox(height: 12),
         Text(
-          'Cancel anytime • Secure payment • 7-day free trial',
+          'Secure payment • No commitment • Premium features included',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: Colors.grey[600],
           ),
@@ -412,59 +449,41 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     );
   }
 
-  void _showPaymentDialog(BuildContext context, String planName, String price) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text('Subscribe to $planName'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Plan: $planName'),
-              Text('Price: $price/month'),
-              const SizedBox(height: 16),
-              const Text('Payment methods:'),
-              const SizedBox(height: 8),
-              _buildPaymentMethod('PayPal', Icons.account_balance_wallet),
-              _buildPaymentMethod('Google Pay', Icons.account_balance_wallet),
-              _buildPaymentMethod('Apple Pay', Icons.account_balance_wallet),
-              _buildPaymentMethod('Bank Transfer', Icons.account_balance),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Payment feature will be available soon!'),
-                  ),
-                );
-              },
-              child: const Text('Continue'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  void _navigateToPayment(BuildContext context, Map<String, dynamic> planData) {
+    // Create order details for payment page
+    final orderDetails = {
+      'type': 'subscription',
+      'serviceType': 'subscription',
+      'planId': planData['id'],
+      'planName': planData['name'],
+      'originalAmount': planData['originalPrice'],
+      'period': planData['period'],
+      'description': planData['description'],
+      'discount': planData['discount'],
+      'trialDays': 7,
+      'isTrialEligible': true,
+      'title': 'Subscribe to ${planData['name']}',
+      'subtitle': 'Get premium features and support charity',
+      'details': {
+        'Service': 'Safiyah Premium Subscription',
+        'Plan': planData['name'],
+        'Billing': 'Monthly subscription',
+        'Trial': '7 days free, then IDR ${planData['price']}/month',
+        'Features': selectedPlan == 0 ? 
+          'All premium features, 12-hour AI, AR navigation, No ads' :
+          'All premium features, 6-hour AI, AR navigation, No ads',
+      }
+    };
 
-  Widget _buildPaymentMethod(String name, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          Icon(icon, size: 16),
-          const SizedBox(width: 8),
-          Text(name),
-        ],
-      ),
+    // Navigate using GoRouter with correct parameters
+    context.go(
+      RouteNames.payment,
+      extra: {
+        'orderDetails': orderDetails,
+        'amount': (planData['price'] as int).toDouble(),
+        'currency': planData['currency'] as String,
+        'transactionType': TransactionType.other,
+      },
     );
   }
 } 

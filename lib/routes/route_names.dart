@@ -87,4 +87,25 @@ class RouteNames {
 
   // Accessibility Onboarding
   static const String accessibilityOnboarding = '/onboarding/accessibility';
+
+  // Transaction routes
+  static const String transactionHistory = '/transaction/history';
+  static const String transactionDetail = '/transaction/detail';
+  static const String transactionRefund = '/transaction/refund';
+  static const String transactionStatistics = '/transaction/statistics';
+
+  // Help Center routes
+  static const String helpCenter = '/help';
+  static const String helpCategory = '/help/category';
+  static const String helpArticle = '/help/article';
+  static const String helpSearch = '/help/search';
+  static const String helpContact = '/help/contact';
+  static const String helpReportIssue = '/help/report-issue';
+
+  // Payment routes
+  static const String payment = '/payment';
+  static const String paymentMethod = '/payment/method';
+  static const String paymentSuccess = '/payment/success';
+  static const String paymentFailed = '/payment/failed';
+  static const String paymentPending = '/payment/pending';
 }

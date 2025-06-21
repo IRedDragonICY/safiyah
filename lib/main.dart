@@ -20,6 +20,8 @@ import 'data/repositories/events_repository.dart';
 import 'data/repositories/itinerary_repository.dart';
 import 'data/repositories/place_repository.dart';
 import 'data/repositories/prayer_repository.dart';
+import 'data/repositories/transaction_repository.dart';
+import 'data/repositories/help_center_repository.dart';
 import 'presentation/bloc/auth/auth_bloc.dart';
 import 'presentation/bloc/events/events_bloc.dart';
 import 'presentation/bloc/home/home_bloc.dart';
@@ -54,6 +56,10 @@ Future<void> _initializeServices() async {
     await NotificationService.initialize();
     await LocationService.initialize();
   }
+  
+  // Initialize repositories
+  TransactionRepository().init();
+  HelpCenterRepository().init();
 }
 
 class SafiyahApp extends StatelessWidget {
